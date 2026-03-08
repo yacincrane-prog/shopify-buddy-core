@@ -165,6 +165,7 @@ export type Database = {
       }
       exit_intent_popups: {
         Row: {
+          config: Json
           created_at: string
           cta_text: string
           discount_code: string | null
@@ -176,6 +177,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          config?: Json
           created_at?: string
           cta_text?: string
           discount_code?: string | null
@@ -187,6 +189,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          config?: Json
           created_at?: string
           cta_text?: string
           discount_code?: string | null

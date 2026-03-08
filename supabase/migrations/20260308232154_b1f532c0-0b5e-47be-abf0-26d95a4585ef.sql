@@ -1,0 +1,1 @@
+ALTER TABLE public.exit_intent_popups ADD COLUMN IF NOT EXISTS config jsonb NOT NULL DEFAULT '{}'::jsonb;
