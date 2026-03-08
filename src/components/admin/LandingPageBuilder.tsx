@@ -647,7 +647,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
             </ScrollArea>
           </div>
         ) : (
-          <div className="w-80 shrink-0 border-l border-border bg-card flex flex-col items-center justify-center text-center p-6">
+          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-border bg-card flex flex-col items-center justify-center text-center p-6 min-h-[200px] lg:min-h-0">
             <PanelRightOpen className="w-8 h-8 text-muted-foreground/40 mb-3" />
             <p className="text-sm font-medium text-muted-foreground">No section selected</p>
             <p className="text-xs text-muted-foreground/70 mt-1">Click a section in the left panel to edit its content</p>

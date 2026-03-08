@@ -409,7 +409,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
         return (
           <div className="space-y-2">
             <Label className="text-sm">{field.label}</Label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setDeliveryType("home")}
