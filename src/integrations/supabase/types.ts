@@ -113,6 +113,54 @@ export type Database = {
         }
         Relationships: []
       }
+      order_upsell_tracking: {
+        Row: {
+          accepted: boolean
+          created_at: string
+          discount_percent: number
+          id: string
+          order_id: string
+          upsell_price: number
+          upsell_product_id: string
+          upsell_product_title: string
+        }
+        Insert: {
+          accepted: boolean
+          created_at?: string
+          discount_percent: number
+          id?: string
+          order_id: string
+          upsell_price: number
+          upsell_product_id: string
+          upsell_product_title: string
+        }
+        Update: {
+          accepted?: boolean
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          order_id?: string
+          upsell_price?: number
+          upsell_product_id?: string
+          upsell_product_title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_upsell_tracking_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_upsell_tracking_upsell_product_id_fkey"
+            columns: ["upsell_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           commune: string
@@ -169,6 +217,57 @@ export type Database = {
           {
             foreignKeyName: "orders_product_id_fkey"
             columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_order_upsells: {
+        Row: {
+          accept_text: string
+          created_at: string
+          decline_text: string
+          discount_percent: number
+          headline: string
+          id: string
+          is_active: boolean
+          source_product_id: string
+          upsell_product_id: string
+        }
+        Insert: {
+          accept_text?: string
+          created_at?: string
+          decline_text?: string
+          discount_percent?: number
+          headline?: string
+          id?: string
+          is_active?: boolean
+          source_product_id: string
+          upsell_product_id: string
+        }
+        Update: {
+          accept_text?: string
+          created_at?: string
+          decline_text?: string
+          discount_percent?: number
+          headline?: string
+          id?: string
+          is_active?: boolean
+          source_product_id?: string
+          upsell_product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_order_upsells_source_product_id_fkey"
+            columns: ["source_product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_order_upsells_upsell_product_id_fkey"
+            columns: ["upsell_product_id"]
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
