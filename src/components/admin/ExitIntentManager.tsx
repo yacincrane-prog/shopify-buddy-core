@@ -121,6 +121,13 @@ export function ExitIntentManager() {
                   </div>
                 </div>
                 <div className="flex gap-1">
+                  <ExitIntentPreviewButton
+                    title={p.title}
+                    subtitle={p.subtitle}
+                    discountPercent={p.discount_percent}
+                    discountCode={p.discount_code}
+                    ctaText={p.cta_text}
+                  />
                   <Button size="sm" variant="outline" onClick={() => startEdit(p)}>Edit</Button>
                   <Button size="sm" variant="outline" onClick={() => deleteMutation.mutate(p.id)}>
                     <Trash2 className="w-3 h-3" />
