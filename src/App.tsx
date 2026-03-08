@@ -72,6 +72,7 @@ function AppInner() {
             <Route path="tracking-pixels" element={<Suspense fallback={<AdminFallback />}><AdminTrackingPixels /></Suspense>} />
             <Route path="discount-codes" element={<Suspense fallback={<AdminFallback />}><AdminDiscountCodes /></Suspense>} />
             <Route path="shipping" element={<Suspense fallback={<AdminFallback />}><AdminShipping /></Suspense>} />
+            <Route path="google-sheets" element={<Suspense fallback={<AdminFallback />}><AdminGoogleSheets /></Suspense>} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

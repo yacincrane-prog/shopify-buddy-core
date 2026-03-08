@@ -13,7 +13,14 @@ export function useOrders() {
 export function useCreateOrder() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: OrderData) => createOrder(data),
+    mutationFn: async (data: OrderData) => {
+      const order = await createOrder(data);
+      // Auto-export to Google Sheets (fire-and-forget)
+      supabase.functions
+        .invoke("export-to-sheets", { body: { orderIds: [order.id] } })
+        .catch((err) => console.error("Auto-export failed:", err));
+      return order;
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["orders"] }),
   });
 }
