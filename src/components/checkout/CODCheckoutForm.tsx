@@ -43,6 +43,8 @@ type CheckoutPhase = "form" | "post-upsell" | "confirmed";
 
 export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, freeDelivery = false }: CODCheckoutFormProps) {
   const { data: shippingRates } = useActiveShippingRates();
+  const { data: checkoutConfig } = useCheckoutConfig();
+  const config = checkoutConfig ?? DEFAULT_CONFIG;
   const { trackEvent } = useTrackingPixels();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -51,11 +53,16 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [deliveryType, setDeliveryType] = useState<"home" | "stop_desk">("home");
   const [submitting, setSubmitting] = useState(false);
   const [phase, setPhase] = useState<CheckoutPhase>("form");
+  const [customFields, setCustomFields] = useState<Record<string, string>>({});
 
   const [discountInput, setDiscountInput] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
   const [discountError, setDiscountError] = useState("");
   const [validatingCode, setValidatingCode] = useState(false);
+
+  const visibleFields = config.fields.filter((f) => f.visible).sort((a, b) => a.position - b.position);
+  const getField = (id: string) => config.fields.find((f) => f.id === id);
+  const isFieldVisible = (id: string) => getField(id)?.visible !== false;
 
   const getWilayaByCode = (code: string) => WILAYAS.find((w) => w.code === code);
   const getShippingRate = (code: string): ShippingRate | undefined =>
