@@ -118,6 +118,7 @@ export function LandingPageBuilder() {
       setEditingPage(page as LandingPage);
       setView("edit");
       setNewTitle("");
+      setNewSlug("");
       setNewProductId("");
     },
     onError: (e: any) => toast.error(e.message || "Failed to create"),
