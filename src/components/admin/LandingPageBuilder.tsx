@@ -85,6 +85,7 @@ export function LandingPageBuilder() {
 
   // Create form state
   const [newTitle, setNewTitle] = useState("");
+  const [newSlug, setNewSlug] = useState("");
   const [newProductId, setNewProductId] = useState("");
   const [newTemplate, setNewTemplate] = useState("classic");
 
