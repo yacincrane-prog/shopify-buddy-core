@@ -361,6 +361,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
   const [addMode, setAddMode] = useState<"type" | "preset">("type");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [previewKey, setPreviewKey] = useState(0);
+  const [fullPreview, setFullPreview] = useState(false);
 
   const { data: sections, isLoading } = useQuery({
     queryKey: ["lp-sections-admin", page.id],
