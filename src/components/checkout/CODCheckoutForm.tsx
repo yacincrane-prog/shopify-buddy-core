@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { PostOrderUpsellPage } from "@/components/checkout/PostOrderUpsellPage";
 import type { Product } from "@/types/product";
 import { useAbandonedLeadCapture } from "@/hooks/useAbandonedLeadCapture";
+import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 
 interface UpsellItem {
   title: string;
