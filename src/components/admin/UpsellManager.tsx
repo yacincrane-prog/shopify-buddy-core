@@ -127,21 +127,33 @@ export function UpsellManager() {
         <p className="text-muted-foreground text-sm py-8 text-center">No upsells configured yet</p>
       ) : (
         <div className="space-y-2">
-          {upsells.map((u) => (
-            <Card key={u.id as string}>
-              <CardContent className="py-3 flex items-center justify-between">
-                <p className="text-sm">
-                  <span className="font-medium">{(u.source as { title: string }).title}</span>
-                  <span className="text-muted-foreground mx-2">→</span>
-                  <span className="font-medium">{(u.target as { title: string }).title}</span>
-                  <span className="text-accent ml-2">-{Number(u.discount_percent)}%</span>
-                </p>
-                <Button variant="ghost" size="icon" onClick={() => deleteMut.mutate(u.id as string)}>
-                  <Trash2 className="w-4 h-4 text-destructive" />
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+          {upsells.map((u) => {
+            const targetProduct = products?.find((p) => p.id === (u.upsell_product_id as string));
+            return (
+              <Card key={u.id as string}>
+                <CardContent className="py-3 flex items-center justify-between">
+                  <p className="text-sm">
+                    <span className="font-medium">{(u.source as { title: string }).title}</span>
+                    <span className="text-muted-foreground mx-2">→</span>
+                    <span className="font-medium">{(u.target as { title: string }).title}</span>
+                    <span className="text-accent ml-2">-{Number(u.discount_percent)}%</span>
+                  </p>
+                  <div className="flex items-center gap-0.5">
+                    <UpsellPreviewButton
+                      sourceName={(u.source as { title: string }).title}
+                      targetName={(u.target as { title: string }).title}
+                      targetPrice={Number(targetProduct?.price ?? 0)}
+                      discountPercent={Number(u.discount_percent)}
+                      targetImage={targetProduct?.images?.[0]}
+                    />
+                    <Button variant="ghost" size="icon" onClick={() => deleteMut.mutate(u.id as string)}>
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>
