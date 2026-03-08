@@ -129,6 +129,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="qty-offers">Qty Offers</TabsTrigger>
               <TabsTrigger value="post-upsell">Post-Order</TabsTrigger>
               <TabsTrigger value="abandoned">Abandoned</TabsTrigger>
+              <TabsTrigger value="landing-pages">Landing Pages</TabsTrigger>
             </TabsList>
 
             <TabsContent value="products">
