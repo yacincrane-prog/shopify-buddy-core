@@ -9,6 +9,7 @@ interface ProductTableProps {
   onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
   onView?: (product: Product) => void;
+  isLoading?: boolean;
 }
 
 export function ProductTable({ products, onEdit, onDelete, onView }: ProductTableProps) {
