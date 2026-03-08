@@ -207,6 +207,9 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading }: ProductF
           {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
           {product ? "Update product" : "Create product"}
         </Button>
+        {product?.slug && (
+          <PreviewProductButton slug={product.slug} />
+        )}
         <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
       </div>
     </form>
