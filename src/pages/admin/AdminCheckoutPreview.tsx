@@ -133,8 +133,8 @@ export default function AdminCheckoutPreview() {
         description="تعديل تصميم نموذج الشراء وإضافة أو حذف الحقول"
       />
 
-      <div className="flex flex-col xl:flex-row gap-6">
-        {/* Left: Editor */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left: Editor - full width on mobile, 60% on desktop */}
         <div className="flex-1 space-y-4">
           {/* Tabs */}
           <div className="flex items-center gap-2 border-b border-border pb-2">
