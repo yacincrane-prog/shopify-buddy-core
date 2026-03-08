@@ -68,6 +68,8 @@ import {
   X,
   Monitor,
   Smartphone,
+  Copy,
+  LayoutTemplate,
 } from "lucide-react";
 import { toast } from "sonner";
 
