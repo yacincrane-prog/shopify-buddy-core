@@ -2,22 +2,35 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProductBySlug } from "@/lib/products";
+import { fetchDiscountsForProduct, getDiscountedPrice } from "@/lib/quantity-discounts";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { QuantitySelector } from "@/components/product/QuantitySelector";
+import { QuantityPricing } from "@/components/product/QuantityPricing";
+import { BundleOffers } from "@/components/product/BundleOffers";
+import { UpsellModal } from "@/components/product/UpsellModal";
 import { CODCheckoutForm } from "@/components/checkout/CODCheckoutForm";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
+import type { UpsellWithProduct } from "@/lib/upsells";
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const [quantity, setQuantity] = useState(1);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showUpsell, setShowUpsell] = useState(false);
+  const [upsellItem, setUpsellItem] = useState<{ title: string; price: number; discountedPrice: number; quantity: number } | null>(null);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => fetchProductBySlug(slug!),
     enabled: !!slug,
+  });
+
+  const { data: discountTiers } = useQuery({
+    queryKey: ["quantity-discounts", product?.id],
+    queryFn: () => fetchDiscountsForProduct(product!.id),
+    enabled: !!product?.id,
   });
 
   if (isLoading) {
@@ -42,8 +55,32 @@ export default function ProductPage() {
     );
   }
 
+  const basePrice = Number(product.price);
+  const unitPrice = discountTiers?.length ? getDiscountedPrice(basePrice, quantity, discountTiers) : basePrice;
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
   const inStock = product.inventory_quantity > 0;
+
+  const handleOrderClick = () => {
+    // Show upsell modal first, then checkout
+    setShowUpsell(true);
+  };
+
+  const handleAddUpsell = (upsell: UpsellWithProduct) => {
+    const discountedPrice = Math.round(upsell.product_price * (1 - upsell.discount_percent / 100));
+    setUpsellItem({
+      title: upsell.product_title,
+      price: upsell.product_price,
+      discountedPrice,
+      quantity: 1,
+    });
+    setShowUpsell(false);
+    setShowCheckout(true);
+  };
+
+  const handleSkipUpsell = () => {
+    setShowUpsell(false);
+    setShowCheckout(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,10 +101,10 @@ export default function ProductPage() {
             <div>
               <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
               <div className="flex items-baseline gap-3 mt-3">
-                <span className="text-2xl font-bold">{Number(product.price).toLocaleString()} DA</span>
-                {hasDiscount && (
+                <span className="text-2xl font-bold">{Math.round(unitPrice).toLocaleString()} DA</span>
+                {(hasDiscount || unitPrice < basePrice) && (
                   <span className="text-lg text-muted-foreground line-through">
-                    {Number(product.compare_at_price).toLocaleString()} DA
+                    {(hasDiscount ? Number(product.compare_at_price) : basePrice).toLocaleString()} DA
                   </span>
                 )}
                 {hasDiscount && (
@@ -91,14 +128,23 @@ export default function ProductPage() {
                     <p className="text-xs text-muted-foreground">{product.inventory_quantity} in stock</p>
                   </div>
 
+                  <QuantityPricing productId={product.id} basePrice={basePrice} quantity={quantity} />
+
                   {!showCheckout ? (
-                    <Button size="lg" className="w-full" onClick={() => setShowCheckout(true)}>
+                    <Button size="lg" className="w-full" onClick={handleOrderClick}>
                       <ShoppingBag className="w-4 h-4 mr-2" />
-                      Order now — {(Number(product.price) * quantity).toLocaleString()} DA
+                      Order now — {(Math.round(unitPrice) * quantity).toLocaleString()} DA
                     </Button>
                   ) : (
-                    <CODCheckoutForm product={product} quantity={quantity} />
+                    <CODCheckoutForm
+                      product={product}
+                      quantity={quantity}
+                      unitPrice={Math.round(unitPrice)}
+                      upsellItem={upsellItem}
+                    />
                   )}
+
+                  <BundleOffers productId={product.id} />
                 </>
               ) : (
                 <Button size="lg" className="w-full" disabled>
@@ -109,6 +155,14 @@ export default function ProductPage() {
           </div>
         </div>
       </main>
+
+      <UpsellModal
+        productId={product.id}
+        open={showUpsell}
+        onClose={() => setShowUpsell(false)}
+        onAddUpsell={handleAddUpsell}
+        onSkip={handleSkipUpsell}
+      />
     </div>
   );
 }
