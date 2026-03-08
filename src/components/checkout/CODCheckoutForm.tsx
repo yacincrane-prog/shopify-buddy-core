@@ -258,7 +258,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
               <Select value={wilayaCode} onValueChange={handleWilayaChange}>
                 <SelectTrigger><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
                 <SelectContent className="max-h-60">
-                  {WILAYAS.map((w) => (
+                  {activeWilayas.map((w) => (
                     <SelectItem key={w.code} value={w.code}>{w.code} - {w.name}</SelectItem>
                   ))}
                 </SelectContent>
