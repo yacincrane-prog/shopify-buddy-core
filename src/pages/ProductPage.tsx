@@ -45,10 +45,6 @@ export default function ProductPage() {
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
   const inStock = product.inventory_quantity > 0;
 
-  const handleOrder = () => {
-    toast.success(`Added ${quantity}x ${product.title} to order`);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
@@ -68,10 +64,10 @@ export default function ProductPage() {
             <div>
               <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
               <div className="flex items-baseline gap-3 mt-3">
-                <span className="text-2xl font-bold">${Number(product.price).toFixed(2)}</span>
+                <span className="text-2xl font-bold">{Number(product.price).toLocaleString()} DA</span>
                 {hasDiscount && (
                   <span className="text-lg text-muted-foreground line-through">
-                    ${Number(product.compare_at_price).toFixed(2)}
+                    {Number(product.compare_at_price).toLocaleString()} DA
                   </span>
                 )}
                 {hasDiscount && (
@@ -94,10 +90,15 @@ export default function ProductPage() {
                     <QuantitySelector value={quantity} onChange={setQuantity} max={product.inventory_quantity} />
                     <p className="text-xs text-muted-foreground">{product.inventory_quantity} in stock</p>
                   </div>
-                  <Button size="lg" className="w-full" onClick={handleOrder}>
-                    <ShoppingBag className="w-4 h-4 mr-2" />
-                    Add to order — ${(Number(product.price) * quantity).toFixed(2)}
-                  </Button>
+
+                  {!showCheckout ? (
+                    <Button size="lg" className="w-full" onClick={() => setShowCheckout(true)}>
+                      <ShoppingBag className="w-4 h-4 mr-2" />
+                      Order now — {(Number(product.price) * quantity).toLocaleString()} DA
+                    </Button>
+                  ) : (
+                    <CODCheckoutForm product={product} quantity={quantity} />
+                  )}
                 </>
               ) : (
                 <Button size="lg" className="w-full" disabled>
