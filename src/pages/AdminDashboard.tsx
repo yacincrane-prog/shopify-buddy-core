@@ -3,10 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { ProductTable } from "@/components/admin/ProductTable";
+import { BundleManager } from "@/components/admin/BundleManager";
+import { QuantityDiscountManager } from "@/components/admin/QuantityDiscountManager";
+import { UpsellManager } from "@/components/admin/UpsellManager";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { Plus, Package, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Product, ProductFormData } from "@/types/product";
 import {
   AlertDialog,
@@ -81,7 +85,7 @@ export default function AdminDashboard() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <Package className="w-5 h-5 text-accent" />
-            <h1 className="text-lg font-semibold">Products</h1>
+            <h1 className="text-lg font-semibold">Admin</h1>
           </div>
           {view === "list" && (
             <Button onClick={() => setView("create")} size="sm">
@@ -93,43 +97,53 @@ export default function AdminDashboard() {
       </header>
 
       <main className="container py-8 max-w-4xl">
-        {view === "list" && (
-          <Card>
-            <CardContent className="p-0">
-              {isLoading ? (
-                <div className="text-center py-16 text-muted-foreground">Loading…</div>
-              ) : (
-                <ProductTable products={products ?? []} onEdit={startEdit} onDelete={setDeleteId} />
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {view === "create" && (
+        {(view === "create" || view === "edit") ? (
           <Card>
             <CardHeader>
-              <CardTitle>New product</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ProductForm onSubmit={handleCreate} onCancel={() => setView("list")} isLoading={createMutation.isPending} />
-            </CardContent>
-          </Card>
-        )}
-
-        {view === "edit" && editingProduct && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Edit product</CardTitle>
+              <CardTitle>{view === "create" ? "New product" : "Edit product"}</CardTitle>
             </CardHeader>
             <CardContent>
               <ProductForm
-                product={editingProduct}
-                onSubmit={handleUpdate}
+                product={view === "edit" ? editingProduct! : undefined}
+                onSubmit={view === "create" ? handleCreate : handleUpdate}
                 onCancel={() => { setView("list"); setEditingProduct(null); }}
-                isLoading={updateMutation.isPending}
+                isLoading={view === "create" ? createMutation.isPending : updateMutation.isPending}
               />
             </CardContent>
           </Card>
+        ) : (
+          <Tabs defaultValue="products">
+            <TabsList className="mb-6">
+              <TabsTrigger value="products">Products</TabsTrigger>
+              <TabsTrigger value="bundles">Bundles</TabsTrigger>
+              <TabsTrigger value="discounts">Qty Discounts</TabsTrigger>
+              <TabsTrigger value="upsells">Upsells</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="products">
+              <Card>
+                <CardContent className="p-0">
+                  {isLoading ? (
+                    <div className="text-center py-16 text-muted-foreground">Loading…</div>
+                  ) : (
+                    <ProductTable products={products ?? []} onEdit={startEdit} onDelete={setDeleteId} />
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="bundles">
+              <BundleManager />
+            </TabsContent>
+
+            <TabsContent value="discounts">
+              <QuantityDiscountManager />
+            </TabsContent>
+
+            <TabsContent value="upsells">
+              <UpsellManager />
+            </TabsContent>
+          </Tabs>
         )}
       </main>
 

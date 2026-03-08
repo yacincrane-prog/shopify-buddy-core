@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      bundle_items: {
+        Row: {
+          bundle_id: string
+          id: string
+          product_id: string
+        }
+        Insert: {
+          bundle_id: string
+          id?: string
+          product_id: string
+        }
+        Update: {
+          bundle_id?: string
+          id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bundle_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bundle_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bundles: {
+        Row: {
+          bundle_price: number
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bundle_price: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bundle_price?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           commune: string
@@ -117,6 +180,74 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      quantity_discounts: {
+        Row: {
+          discount_percent: number
+          id: string
+          min_quantity: number
+          product_id: string
+        }
+        Insert: {
+          discount_percent: number
+          id?: string
+          min_quantity: number
+          product_id: string
+        }
+        Update: {
+          discount_percent?: number
+          id?: string
+          min_quantity?: number
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quantity_discounts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      upsells: {
+        Row: {
+          discount_percent: number
+          id: string
+          is_active: boolean
+          source_product_id: string
+          upsell_product_id: string
+        }
+        Insert: {
+          discount_percent?: number
+          id?: string
+          is_active?: boolean
+          source_product_id: string
+          upsell_product_id: string
+        }
+        Update: {
+          discount_percent?: number
+          id?: string
+          is_active?: boolean
+          source_product_id?: string
+          upsell_product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "upsells_source_product_id_fkey"
+            columns: ["source_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "upsells_upsell_product_id_fkey"
+            columns: ["upsell_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
