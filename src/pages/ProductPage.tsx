@@ -27,6 +27,20 @@ export default function ProductPage() {
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellItem, setUpsellItem] = useState<{ title: string; price: number; discountedPrice: number; quantity: number } | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<QuantityOffer | null>(null);
+  const { trackEvent } = useTrackingPixels();
+
+  // Track PageView + ViewContent
+  useEffect(() => {
+    if (!product) return;
+    trackEvent("PageView");
+    trackEvent("ViewContent", {
+      content_name: product.title,
+      content_ids: [product.id],
+      content_type: "product",
+      value: Number(product.price),
+      currency: "DZD",
+    });
+  }, [product?.id]);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
