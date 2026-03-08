@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { WILAYAS } from "@/data/algeria";
 import { useActiveShippingRates, type ShippingRate } from "@/hooks/useShippingRates";
+import { useCheckoutConfig, DEFAULT_CONFIG, type CheckoutField } from "@/hooks/useCheckoutConfig";
 import { createOrder } from "@/lib/orders";
 import { Loader2, Truck, Building2, CheckCircle2, Ticket, X } from "lucide-react";
 import { toast } from "sonner";
