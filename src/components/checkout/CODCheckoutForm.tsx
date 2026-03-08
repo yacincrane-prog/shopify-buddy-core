@@ -113,6 +113,11 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const handleWilayaChange = (code: string) => {
     setWilayaCode(code);
     setCommune("");
+    // Auto-switch to home if stop desk not available
+    const rate = shippingRates?.find((r) => r.wilaya_code === code);
+    if (rate && !rate.stop_desk_enabled && deliveryType === "stop_desk") {
+      setDeliveryType("home");
+    }
   };
 
   const isValid = name.trim().length >= 3 && phone.trim().length >= 9 && wilayaCode && commune;
