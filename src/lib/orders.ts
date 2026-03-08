@@ -12,6 +12,8 @@ export interface OrderData {
   delivery_type: "home" | "stop_desk";
   shipping_price: number;
   total_price: number;
+  discount_code?: string;
+  discount_amount?: number;
 }
 
 export async function createOrder(data: OrderData) {
