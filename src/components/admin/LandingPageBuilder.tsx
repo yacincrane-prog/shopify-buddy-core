@@ -378,6 +378,28 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
     onSuccess: () => { invalidate(); toast.success("Removed"); setSelectedId(null); },
   });
 
+  const duplicateMutation = useMutation({
+    mutationFn: (section: LPSection) => duplicateLPSection(section, sections?.length ?? 0),
+    onSuccess: () => { invalidate(); toast.success("Section duplicated"); },
+  });
+
+  const addPresetMutation = useMutation({
+    mutationFn: async (preset: typeof SECTION_PRESETS[number]) => {
+      const { data } = await (await import("@/integrations/supabase/client")).supabase
+        .from("landing_page_sections")
+        .insert({
+          landing_page_id: page.id,
+          section_type: preset.type,
+          position: sections?.length ?? 0,
+          content: preset.content,
+        })
+        .select()
+        .single();
+      return data;
+    },
+    onSuccess: () => { invalidate(); toast.success("Template section added"); },
+  });
+
   const moveMutation = useMutation({
     mutationFn: reorderLPSections,
     onSuccess: invalidate,
