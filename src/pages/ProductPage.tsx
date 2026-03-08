@@ -12,6 +12,7 @@ import { ArrowLeft, ShoppingBag } from "lucide-react";
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const [quantity, setQuantity] = useState(1);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
