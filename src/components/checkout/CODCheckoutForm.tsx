@@ -261,7 +261,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
 
             return (
               <div key={field.id}>
-                {showSeparator && <Separator className="mb-5" />}
+                {showSeparator && <Separator className="mb-4 sm:mb-5" />}
                 {renderFormField(field)}
               </div>
             );
