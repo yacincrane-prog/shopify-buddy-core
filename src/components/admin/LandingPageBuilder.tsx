@@ -475,9 +475,12 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
               <Smartphone className="w-3.5 h-3.5" />
             </Button>
           </div>
+          <Button size="sm" variant="outline" onClick={() => setFullPreview(true)}>
+            <Maximize2 className="w-3.5 h-3.5 mr-1" /> Full Preview
+          </Button>
           <Button size="sm" variant="outline" asChild>
             <a href={`/offer/${page.slug}`} target="_blank" rel="noopener">
-              <ExternalLink className="w-3.5 h-3.5 mr-1" /> Preview
+              <ExternalLink className="w-3.5 h-3.5 mr-1" /> Open
             </a>
           </Button>
         </div>
