@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowLeft, ShoppingBag, Star, HelpCircle, Play, Shield, Clock } from "lucide-react";
 import type { Product } from "@/types/product";
+import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 
 export default function LandingPageView() {
   const { slug } = useParams<{ slug: string }>();
