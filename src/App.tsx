@@ -34,7 +34,9 @@ function AdminFallback() {
   return <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">Loading…</div>;
 }
 
-const App = () => (
+const App = () => {
+  useApplyTheme();
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
