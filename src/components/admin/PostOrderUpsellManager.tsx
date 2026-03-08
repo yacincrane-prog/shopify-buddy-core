@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Trash2, Save, Gift } from "lucide-react";
+import { PostOrderUpsellPreviewButton } from "@/components/admin/PostOrderUpsellPreview";
 import { toast } from "sonner";
 
 export function PostOrderUpsellManager() {
@@ -163,6 +164,20 @@ export function PostOrderUpsellManager() {
                   </div>
                 </div>
                 <div className="flex gap-1">
+                  {(() => {
+                    const upsellProduct = products?.find((p) => p.id === c.upsell_product_id);
+                    return (
+                      <PostOrderUpsellPreviewButton
+                        headline={c.headline}
+                        productTitle={upsellProduct?.title ?? "Product"}
+                        productPrice={Number(upsellProduct?.price ?? 0)}
+                        discountPercent={c.discount_percent}
+                        acceptText={c.accept_text}
+                        declineText={c.decline_text}
+                        productImage={upsellProduct?.images?.[0]}
+                      />
+                    );
+                  })()}
                   <Button size="sm" variant="outline" onClick={() => setEditing(c)}>Edit</Button>
                   <Button size="sm" variant="outline" onClick={() => deleteMutation.mutate(c.id)}>
                     <Trash2 className="w-3 h-3" />

@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { DataTable, type DataTableColumn } from "@/components/admin/DataTable";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import type { Product } from "@/types/product";
 
 interface ProductTableProps {
@@ -13,6 +15,8 @@ interface ProductTableProps {
 }
 
 export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: ProductTableProps) {
+  const [previewSlug, setPreviewSlug] = useState<string | null>(null);
+
   const columns: DataTableColumn<Product>[] = [
     {
       key: "image",
@@ -74,6 +78,9 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
       className: "text-right",
       render: (p) => (
         <div className="flex justify-end gap-0.5">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setPreviewSlug(p.slug)} title="Preview">
+            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+          </Button>
           {onView && (
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onView(p)}>
               <Eye className="w-3.5 h-3.5 text-muted-foreground" />
@@ -91,13 +98,21 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
   ];
 
   return (
-    <DataTable
-      data={products}
-      columns={columns}
-      keyExtractor={(p) => p.id}
-      emptyMessage="No products yet. Create your first product to get started."
-      pageSize={10}
-      isLoading={isLoading}
-    />
+    <>
+      <DataTable
+        data={products}
+        columns={columns}
+        keyExtractor={(p) => p.id}
+        emptyMessage="No products yet. Create your first product to get started."
+        pageSize={10}
+        isLoading={isLoading}
+      />
+      <PreviewFrame
+        url={previewSlug ? `/product/${previewSlug}` : "/"}
+        open={!!previewSlug}
+        onOpenChange={(open) => !open && setPreviewSlug(null)}
+        title="Product Page Preview"
+      />
+    </>
   );
 }

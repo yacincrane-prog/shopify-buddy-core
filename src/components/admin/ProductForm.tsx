@@ -5,9 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, X, Loader2, FileText, DollarSign, Image, Settings } from "lucide-react";
+import { Upload, X, Loader2, FileText, DollarSign, Image, Settings, Eye } from "lucide-react";
 import { uploadProductImage } from "@/lib/products";
 import type { Product, ProductFormData } from "@/types/product";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { toast } from "sonner";
 
 interface ProductFormProps {
@@ -206,8 +207,28 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading }: ProductF
           {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
           {product ? "Update product" : "Create product"}
         </Button>
+        {product?.slug && (
+          <PreviewProductButton slug={product.slug} />
+        )}
         <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
       </div>
     </form>
+  );
+}
+
+function PreviewProductButton({ slug }: { slug: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+        <Eye className="w-4 h-4 mr-1" /> Preview
+      </Button>
+      <PreviewFrame
+        url={`/product/${slug}`}
+        open={open}
+        onOpenChange={setOpen}
+        title="Product Page Preview"
+      />
+    </>
   );
 }

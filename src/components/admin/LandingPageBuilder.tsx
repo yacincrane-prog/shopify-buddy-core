@@ -70,7 +70,9 @@ import {
   Smartphone,
   Copy,
   LayoutTemplate,
+  Maximize2,
 } from "lucide-react";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { toast } from "sonner";
 
 type View = "list" | "create" | "edit";
@@ -359,6 +361,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
   const [addMode, setAddMode] = useState<"type" | "preset">("type");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [previewKey, setPreviewKey] = useState(0);
+  const [fullPreview, setFullPreview] = useState(false);
 
   const { data: sections, isLoading } = useQuery({
     queryKey: ["lp-sections-admin", page.id],
@@ -472,9 +475,12 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
               <Smartphone className="w-3.5 h-3.5" />
             </Button>
           </div>
+          <Button size="sm" variant="outline" onClick={() => setFullPreview(true)}>
+            <Maximize2 className="w-3.5 h-3.5 mr-1" /> Full Preview
+          </Button>
           <Button size="sm" variant="outline" asChild>
             <a href={`/offer/${page.slug}`} target="_blank" rel="noopener">
-              <ExternalLink className="w-3.5 h-3.5 mr-1" /> Preview
+              <ExternalLink className="w-3.5 h-3.5 mr-1" /> Open
             </a>
           </Button>
         </div>
@@ -639,6 +645,13 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
           </div>
         )}
       </div>
+      <PreviewFrame
+        url={`/offer/${page.slug}`}
+        open={fullPreview}
+        onOpenChange={setFullPreview}
+        title={`${page.title} — Full Preview`}
+        refreshKey={previewKey}
+      />
     </div>
   );
 }
