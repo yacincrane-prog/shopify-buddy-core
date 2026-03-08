@@ -121,6 +121,14 @@ export default function LandingPageView() {
           />
         ))}
       </div>
+      <StickyOrderBar
+        totalPrice={activeTotalPrice}
+        quantity={activeQuantity}
+        onOrderClick={() => {
+          setShowCheckout(true);
+          scrollToOrder();
+        }}
+      />
       <ExitIntentPopup />
     </div>
   );
