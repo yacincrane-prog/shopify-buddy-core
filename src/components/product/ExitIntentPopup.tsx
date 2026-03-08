@@ -42,7 +42,7 @@ export function ExitIntentPopup() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-md text-center">
+      <DialogContent className="sm:max-w-md text-center" dir="rtl">
         <DialogHeader className="items-center">
           <div className="w-14 h-14 rounded-full bg-accent/15 flex items-center justify-center mb-2 mx-auto">
             <Gift className="w-7 h-7 text-accent" />
@@ -55,15 +55,15 @@ export function ExitIntentPopup() {
           {popup.discount_percent ? (
             <div className="flex justify-center">
               <Badge className="bg-accent text-accent-foreground text-lg px-4 py-2">
-                {popup.discount_percent}% OFF
+                خصم {popup.discount_percent}%
               </Badge>
             </div>
           ) : null}
 
           {popup.discount_code ? (
             <div className="bg-muted rounded-lg p-3">
-              <p className="text-xs text-muted-foreground mb-1">Use code:</p>
-              <p className="font-mono font-bold text-lg tracking-wider">{popup.discount_code}</p>
+              <p className="text-xs text-muted-foreground mb-1">استخدم الكود:</p>
+              <p className="font-mono font-bold text-lg tracking-wider" dir="ltr">{popup.discount_code}</p>
             </div>
           ) : null}
 
@@ -74,7 +74,7 @@ export function ExitIntentPopup() {
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setOpen(false)}
           >
-            No thanks, I'll pass
+            لا شكراً
           </button>
         </div>
       </DialogContent>

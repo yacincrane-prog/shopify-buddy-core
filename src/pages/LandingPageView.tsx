@@ -23,7 +23,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowLeft, ShoppingBag, Star, HelpCircle, Play, Shield, Clock } from "lucide-react";
+import { ArrowRight, ShoppingBag, Star, HelpCircle, Play, Shield, Clock } from "lucide-react";
 import type { Product } from "@/types/product";
 import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 
@@ -69,7 +69,6 @@ export default function LandingPageView() {
   const { trackEvent } = useTrackingPixels();
   const trackedRef = useRef(false);
 
-  // Track PageView + ViewContent for landing page
   useEffect(() => {
     if (!product || trackedRef.current) return;
     trackedRef.current = true;
@@ -84,14 +83,14 @@ export default function LandingPageView() {
   }, [product?.id]);
 
   if (pageLoading) {
-    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;
+    return <div className="min-h-screen flex items-center justify-center text-muted-foreground">جاري التحميل…</div>;
   }
 
   if (!page || !product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-lg text-muted-foreground">Page not found</p>
-        <Link to="/"><Button variant="outline"><ArrowLeft className="w-4 h-4 mr-2" /> Back to store</Button></Link>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" dir="rtl">
+        <p className="text-lg text-muted-foreground">الصفحة غير موجودة</p>
+        <Link to="/"><Button variant="outline"><ArrowRight className="w-4 h-4 ml-2" /> العودة للمتجر</Button></Link>
       </div>
     );
   }
@@ -113,7 +112,7 @@ export default function LandingPageView() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir="rtl">
       <div className="max-w-3xl mx-auto">
         {sections?.map((section) => (
           <LPSectionBlock
@@ -210,7 +209,7 @@ function LPSectionBlock({
               <p className="text-lg md:text-xl text-muted-foreground">{content.subtitle}</p>
             )}
             <Button size="lg" className="text-base px-8" onClick={scrollToOrder}>
-              {content.cta_text || "Order Now"}
+              {content.cta_text || "اطلب الآن"}
             </Button>
           </div>
         </section>
@@ -239,7 +238,7 @@ function LPSectionBlock({
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               loading="lazy"
-              title={content.title ?? "Video"}
+              title={content.title ?? "فيديو"}
             />
           </div>
         </section>
@@ -248,7 +247,7 @@ function LPSectionBlock({
     case "benefits":
       return (
         <section className="py-10 px-4">
-          <h2 className="text-2xl font-bold text-center mb-8">{content.heading || "Why Choose Us"}</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">{content.heading || "لماذا تختارنا"}</h2>
           <div className="grid md:grid-cols-2 gap-4">
             {(content.items ?? []).map((item: any, i: number) => (
               <div key={i} className="flex gap-3 p-4 rounded-xl bg-card border border-border">
@@ -267,7 +266,7 @@ function LPSectionBlock({
       return (
         <section className="py-10 px-4">
           <h2 className="text-2xl font-bold text-center mb-8 flex items-center justify-center gap-2">
-            <Star className="w-6 h-6 text-accent" /> {content.heading || "What Our Customers Say"}
+            <Star className="w-6 h-6 text-accent" /> {content.heading || "آراء عملائنا"}
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
             {(content.items ?? []).map((review: any, i: number) => (
@@ -300,19 +299,19 @@ function LPSectionBlock({
       if (!content.before_image && !content.after_image) return null;
       return (
         <section className="py-10 px-4 space-y-4">
-          <h2 className="text-2xl font-bold text-center">{content.heading || "See the Difference"}</h2>
+          <h2 className="text-2xl font-bold text-center">{content.heading || "شاهد الفرق"}</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               {content.before_image && (
-                <img src={content.before_image} alt="Before" className="w-full rounded-xl border border-border" loading="lazy" />
+                <img src={content.before_image} alt="قبل" className="w-full rounded-xl border border-border" loading="lazy" />
               )}
-              <p className="text-center text-sm font-medium text-muted-foreground">{content.before_label || "Before"}</p>
+              <p className="text-center text-sm font-medium text-muted-foreground">{content.before_label || "قبل"}</p>
             </div>
             <div className="space-y-2">
               {content.after_image && (
-                <img src={content.after_image} alt="After" className="w-full rounded-xl border border-border" loading="lazy" />
+                <img src={content.after_image} alt="بعد" className="w-full rounded-xl border border-border" loading="lazy" />
               )}
-              <p className="text-center text-sm font-medium text-accent">{content.after_label || "After"}</p>
+              <p className="text-center text-sm font-medium text-accent">{content.after_label || "بعد"}</p>
             </div>
           </div>
         </section>
@@ -322,13 +321,13 @@ function LPSectionBlock({
       return (
         <section className="py-10 px-4">
           <h2 className="text-2xl font-bold text-center mb-6 flex items-center justify-center gap-2">
-            <HelpCircle className="w-6 h-6 text-accent" /> {content.heading || "FAQ"}
+            <HelpCircle className="w-6 h-6 text-accent" /> {content.heading || "الأسئلة الشائعة"}
           </h2>
           <Accordion type="single" collapsible className="max-w-xl mx-auto">
             {(content.items ?? []).map((faq: any, i: number) =>
               faq.question ? (
                 <AccordionItem key={i} value={`faq-${i}`}>
-                  <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
+                  <AccordionTrigger className="text-right">{faq.question}</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">{faq.answer}</AccordionContent>
                 </AccordionItem>
               ) : null
@@ -344,11 +343,10 @@ function LPSectionBlock({
       return (
         <section id="lp-order-section" className="py-10 px-4">
           <div className="max-w-lg mx-auto space-y-4">
-            {/* Price */}
             <div className="text-center">
-              <p className="text-3xl font-bold">{activeTotalPrice.toLocaleString()} DA</p>
+              <p className="text-3xl font-bold">{activeTotalPrice.toLocaleString()} د.ج</p>
               {selectedOffer && basePrice * selectedOffer.quantity > activeTotalPrice && (
-                <p className="text-muted-foreground line-through">{(basePrice * selectedOffer.quantity).toLocaleString()} DA</p>
+                <p className="text-muted-foreground line-through">{(basePrice * selectedOffer.quantity).toLocaleString()} د.ج</p>
               )}
             </div>
 
@@ -363,15 +361,15 @@ function LPSectionBlock({
                   />
                 ) : (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Quantity</label>
+                    <label className="text-sm font-medium">الكمية</label>
                     <QuantitySelector value={quantity} onChange={onQuantityChange} max={product.inventory_quantity} />
                   </div>
                 )}
 
                 {!showCheckout ? (
                   <Button size="lg" className="w-full text-base" onClick={onOrderClick}>
-                    <ShoppingBag className="w-5 h-5 mr-2" />
-                    Order Now — {activeTotalPrice.toLocaleString()} DA
+                    <ShoppingBag className="w-5 h-5 ml-2" />
+                    اطلب الآن — {activeTotalPrice.toLocaleString()} د.ج
                   </Button>
                 ) : (
                   <CODCheckoutForm
@@ -383,7 +381,7 @@ function LPSectionBlock({
                 )}
               </>
             ) : (
-              <Button size="lg" className="w-full" disabled>Out of stock</Button>
+              <Button size="lg" className="w-full" disabled>نفذ المخزون</Button>
             )}
           </div>
         </section>
@@ -395,7 +393,7 @@ function LPSectionBlock({
           <div className="max-w-lg mx-auto text-center bg-card border border-border rounded-2xl p-8 space-y-3">
             <div className="text-4xl">{content.icon || "🛡️"}</div>
             <h2 className="text-xl font-bold flex items-center justify-center gap-2">
-              <Shield className="w-5 h-5 text-accent" /> {content.heading || "Our Guarantee"}
+              <Shield className="w-5 h-5 text-accent" /> {content.heading || "ضماننا"}
             </h2>
             {content.text && <p className="text-muted-foreground">{content.text}</p>}
           </div>
@@ -408,6 +406,13 @@ function LPSectionBlock({
 }
 
 // ── Countdown component ──
+
+const timeUnitLabels: Record<string, string> = {
+  days: "يوم",
+  hours: "ساعة",
+  minutes: "دقيقة",
+  seconds: "ثانية",
+};
 
 function CountdownSection({ content }: { content: Record<string, any> }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -435,14 +440,14 @@ function CountdownSection({ content }: { content: Record<string, any> }) {
     <section className="py-10 px-4 bg-accent/5">
       <div className="text-center space-y-4">
         <h2 className="text-2xl font-bold flex items-center justify-center gap-2">
-          <Clock className="w-6 h-6 text-accent" /> {content.heading || "Limited Time Offer"}
+          <Clock className="w-6 h-6 text-accent" /> {content.heading || "عرض لفترة محدودة"}
         </h2>
         {content.subtitle && <p className="text-muted-foreground">{content.subtitle}</p>}
-        <div className="flex justify-center gap-3">
+        <div className="flex justify-center gap-3" dir="ltr">
           {(["days", "hours", "minutes", "seconds"] as const).map((unit) => (
             <div key={unit} className="bg-card border border-border rounded-xl px-4 py-3 min-w-[64px]">
               <p className="text-2xl md:text-3xl font-bold font-mono">{String(timeLeft[unit]).padStart(2, "0")}</p>
-              <p className="text-xs text-muted-foreground capitalize">{unit}</p>
+              <p className="text-xs text-muted-foreground">{timeUnitLabels[unit]}</p>
             </div>
           ))}
         </div>

@@ -33,14 +33,14 @@ export function UpsellModal({ productId, open, onClose, onAddUpsell, onSkip }: U
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" dir="rtl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-accent" />
-            Special Offer!
+            عرض خاص!
           </DialogTitle>
           <DialogDescription>
-            Add this to your order with an exclusive discount
+            أضف هذا المنتج لطلبك بخصم حصري
           </DialogDescription>
         </DialogHeader>
 
@@ -56,23 +56,23 @@ export function UpsellModal({ productId, open, onClose, onAddUpsell, onSkip }: U
             <div className="flex-1 min-w-0">
               <p className="font-semibold">{upsell.product_title}</p>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-lg font-bold text-accent">{discountedPrice.toLocaleString()} DA</span>
+                <span className="text-lg font-bold text-accent">{discountedPrice.toLocaleString()} د.ج</span>
                 <span className="text-sm text-muted-foreground line-through">
-                  {upsell.product_price.toLocaleString()} DA
+                  {upsell.product_price.toLocaleString()} د.ج
                 </span>
               </div>
               <Badge className="bg-accent text-accent-foreground mt-1">
-                {upsell.discount_percent}% OFF
+                خصم {upsell.discount_percent}%
               </Badge>
             </div>
           </div>
 
           <div className="flex gap-2">
             <Button className="flex-1" onClick={() => onAddUpsell(upsell)}>
-              Add to Order
+              أضف للطلب
             </Button>
             <Button variant="outline" className="flex-1" onClick={onSkip}>
-              No Thanks
+              لا شكراً
             </Button>
           </div>
         </div>
