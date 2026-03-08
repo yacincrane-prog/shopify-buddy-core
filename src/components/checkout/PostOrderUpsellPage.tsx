@@ -26,17 +26,15 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
     enabled: !!sourceProductId,
   });
 
-  // If no upsell configured or still loading, skip immediately
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12 text-muted-foreground">
-        Loading…
+        جاري التحميل…
       </div>
     );
   }
 
   if (!upsell) {
-    // No upsell available, complete immediately
     onComplete(null);
     return null;
   }
@@ -47,7 +45,6 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
   const handleAccept = async () => {
     setProcessing(true);
     try {
-      // Track acceptance
       await trackUpsellResponse({
         order_id: orderId,
         upsell_product_id: upsell.upsell_product_id,
@@ -57,13 +54,12 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
         accepted: true,
       });
 
-      // Update order with upsell
       await updateOrderWithUpsell(orderId, upsell.product_title, discountedPrice);
 
-      toast.success("Added to your order!");
+      toast.success("تمت الإضافة لطلبك!");
       onComplete(discountedPrice);
     } catch {
-      toast.error("Something went wrong");
+      toast.error("حدث خطأ ما");
       onComplete(null);
     } finally {
       setProcessing(false);
@@ -82,18 +78,16 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
         accepted: false,
       });
     } catch {
-      // Non-critical, proceed anyway
+      // Non-critical
     }
     onComplete(null);
   };
 
   return (
-    <Card className="border-accent/30 overflow-hidden">
-      {/* Accent bar */}
+    <Card className="border-accent/30 overflow-hidden" dir="rtl">
       <div className="h-1 bg-accent w-full" />
 
       <CardContent className="py-8 px-6 space-y-6">
-        {/* Headline */}
         <div className="text-center space-y-2">
           <div className="w-14 h-14 rounded-full bg-accent/15 flex items-center justify-center mx-auto">
             <Gift className="w-7 h-7 text-accent" />
@@ -103,7 +97,6 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
           </h2>
         </div>
 
-        {/* Product card */}
         <div className="flex gap-4 items-center bg-secondary/50 rounded-xl p-4">
           {upsell.product_image && (
             <img
@@ -116,24 +109,23 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
             <p className="font-semibold text-lg">{upsell.product_title}</p>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-2xl font-bold text-accent">
-                {discountedPrice.toLocaleString()} DA
+                {discountedPrice.toLocaleString()} د.ج
               </span>
               <span className="text-base text-muted-foreground line-through">
-                {upsell.product_price.toLocaleString()} DA
+                {upsell.product_price.toLocaleString()} د.ج
               </span>
             </div>
             <div className="flex gap-2 flex-wrap">
               <Badge className="bg-accent text-accent-foreground text-xs">
-                {upsell.discount_percent}% OFF
+                خصم {upsell.discount_percent}%
               </Badge>
               <Badge variant="secondary" className="text-xs">
-                Save {savings.toLocaleString()} DA
+                وفّر {savings.toLocaleString()} د.ج
               </Badge>
             </div>
           </div>
         </div>
 
-        {/* Action buttons */}
         <div className="space-y-3">
           <Button
             size="lg"
@@ -141,8 +133,8 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
             onClick={handleAccept}
             disabled={processing}
           >
-            <ShoppingBag className="w-5 h-5 mr-2" />
-            {upsell.accept_text} — {discountedPrice.toLocaleString()} DA
+            <ShoppingBag className="w-5 h-5 ml-2" />
+            {upsell.accept_text} — {discountedPrice.toLocaleString()} د.ج
           </Button>
           <button
             className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-2 flex items-center justify-center gap-1.5"

@@ -20,7 +20,7 @@ export function BundleOffers({ productId }: BundleOffersProps) {
     <div className="space-y-3">
       <h3 className="text-sm font-semibold flex items-center gap-2">
         <PackageOpen className="w-4 h-4 text-accent" />
-        Bundle Deals
+        عروض الحزم
       </h3>
       {bundles.map((b) => {
         const originalTotal = b.items.reduce((s, i) => s + i.product_price, 0);
@@ -30,7 +30,7 @@ export function BundleOffers({ productId }: BundleOffersProps) {
             <CardContent className="py-3 px-4">
               <div className="flex items-center justify-between mb-2">
                 <p className="font-medium text-sm">{b.title}</p>
-                <Badge className="bg-accent text-accent-foreground text-xs">Save {savings}%</Badge>
+                <Badge className="bg-accent text-accent-foreground text-xs">وفّر {savings}%</Badge>
               </div>
               <div className="flex flex-wrap gap-1 mb-2">
                 {b.items.map((item) => (
@@ -40,8 +40,8 @@ export function BundleOffers({ productId }: BundleOffersProps) {
                 ))}
               </div>
               <div className="flex items-baseline gap-2 text-sm">
-                <span className="font-bold text-accent">{Number(b.bundle_price).toLocaleString()} DA</span>
-                <span className="text-muted-foreground line-through text-xs">{originalTotal.toLocaleString()} DA</span>
+                <span className="font-bold text-accent">{Number(b.bundle_price).toLocaleString()} د.ج</span>
+                <span className="text-muted-foreground line-through text-xs">{originalTotal.toLocaleString()} د.ج</span>
               </div>
             </CardContent>
           </Card>

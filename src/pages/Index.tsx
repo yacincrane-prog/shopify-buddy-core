@@ -4,28 +4,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-
 export default function Index() {
   const { data: products, isLoading } = useProducts();
   const activeProducts = products?.filter((p) => p.is_active) ?? [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir="rtl">
       <header className="border-b border-border bg-card">
         <div className="container flex items-center justify-between h-14">
-          <h1 className="text-lg font-semibold tracking-tight">Store</h1>
+          <h1 className="text-lg font-semibold tracking-tight">المتجر</h1>
           <span className="text-sm text-muted-foreground">🇩🇿</span>
         </div>
       </header>
 
       <main className="container py-8 md:py-12">
         {isLoading ? (
-          <div className="text-center py-16 text-muted-foreground">Loading…</div>
+          <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
         ) : !activeProducts.length ? (
           <div className="text-center py-16">
-            <p className="text-lg text-muted-foreground">No products available</p>
+            <p className="text-lg text-muted-foreground">لا توجد منتجات متاحة</p>
             <Link to="/admin" className="mt-4 inline-block">
-              <Button variant="outline">Add your first product</Button>
+              <Button variant="outline">أضف أول منتج</Button>
             </Link>
           </div>
         ) : (
@@ -45,22 +44,22 @@ export default function Index() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
-                          No image
+                          لا توجد صورة
                         </div>
                       )}
                     </div>
                     <CardContent className="p-3">
                       <p className="font-medium text-sm truncate">{product.title}</p>
                       <div className="flex items-baseline gap-2 mt-1">
-                        <span className="font-semibold text-sm">{Number(product.price).toLocaleString()} DA</span>
+                        <span className="font-semibold text-sm">{Number(product.price).toLocaleString()} د.ج</span>
                         {hasDiscount && (
                           <span className="text-xs text-muted-foreground line-through">
-                            {Number(product.compare_at_price).toLocaleString()} DA
+                            {Number(product.compare_at_price).toLocaleString()} د.ج
                           </span>
                         )}
                       </div>
                       {product.inventory_quantity <= 0 && (
-                        <Badge variant="secondary" className="mt-2 text-xs">Sold out</Badge>
+                        <Badge variant="secondary" className="mt-2 text-xs">نفذ المخزون</Badge>
                       )}
                     </CardContent>
                   </Card>

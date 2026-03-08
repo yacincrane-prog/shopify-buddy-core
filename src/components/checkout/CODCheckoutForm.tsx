@@ -48,13 +48,11 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [submitting, setSubmitting] = useState(false);
   const [phase, setPhase] = useState<CheckoutPhase>("form");
 
-  // Discount code state
   const [discountInput, setDiscountInput] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
   const [discountError, setDiscountError] = useState("");
   const [validatingCode, setValidatingCode] = useState(false);
 
-  // Silent abandoned lead capture
   const getLeadData = useCallback(() => ({
     product_id: product.id,
     product_title: product.title,
@@ -70,7 +68,6 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const productTotal = effectiveUnitPrice * quantity;
   const upsellTotal = upsellItem ? upsellItem.discountedPrice * upsellItem.quantity : 0;
 
-  // Track InitiateCheckout once this form mounts
   useEffect(() => {
     trackEvent("InitiateCheckout", {
       content_name: product.title,
@@ -98,11 +95,10 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
 
   const isValid = name.trim().length >= 3 && phone.trim().length >= 9 && wilayaCode && commune;
 
-  // Discount code handlers
   const handleApplyDiscount = async () => {
     const trimmed = discountInput.trim();
-    if (!trimmed) { setDiscountError("Enter a discount code"); return; }
-    if (trimmed.length > 30) { setDiscountError("Invalid code"); return; }
+    if (!trimmed) { setDiscountError("أدخل كود الخصم"); return; }
+    if (trimmed.length > 30) { setDiscountError("كود غير صالح"); return; }
 
     setValidatingCode(true);
     setDiscountError("");
@@ -111,12 +107,12 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
       if (result.valid && result.discount) {
         setAppliedDiscount(result.discount);
         setDiscountError("");
-        toast.success("Discount applied!");
+        toast.success("تم تطبيق الخصم!");
       } else {
-        setDiscountError(result.error || "Invalid code");
+        setDiscountError(result.error || "كود غير صالح");
       }
     } catch {
-      setDiscountError("Error validating code");
+      setDiscountError("خطأ في التحقق من الكود");
     } finally {
       setValidatingCode(false);
     }
@@ -131,7 +127,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) {
-      toast.error("Please fill all fields correctly");
+      toast.error("يرجى ملء جميع الحقول بشكل صحيح");
       return;
     }
 
@@ -156,12 +152,10 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
       });
       setOrderId(order.id);
 
-      // Increment discount usage
       if (appliedDiscount) {
         incrementDiscountUsage(appliedDiscount.id).catch(() => {});
       }
 
-      // Fire Purchase event for all active pixels
       trackEvent("Purchase", {
         content_name: product.title,
         content_ids: [product.id],
@@ -170,10 +164,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
         num_items: quantity,
       });
 
-      // Show post-order upsell instead of confirming immediately
       setPhase("post-upsell");
     } catch {
-      toast.error("Failed to place order. Please try again.");
+      toast.error("فشل في إرسال الطلب. يرجى المحاولة مرة أخرى.");
     } finally {
       setSubmitting(false);
     }
@@ -184,10 +177,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
       setPostUpsellExtra(addedPrice);
     }
     setPhase("confirmed");
-    toast.success("Order placed successfully!");
+    toast.success("تم تأكيد طلبك بنجاح!");
   };
 
-  // Post-order upsell phase
   if (phase === "post-upsell" && orderId) {
     return (
       <PostOrderUpsellPage
@@ -198,19 +190,18 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
     );
   }
 
-  // Confirmed phase
   if (phase === "confirmed") {
     const finalTotal = totalPrice + postUpsellExtra;
     return (
-      <Card className="border-border">
+      <Card className="border-border" dir="rtl">
         <CardContent className="py-10 text-center space-y-4">
           <CheckCircle2 className="w-12 h-12 text-accent mx-auto" />
-          <h3 className="text-xl font-semibold">Order confirmed!</h3>
+          <h3 className="text-xl font-semibold">تم تأكيد الطلب!</h3>
           <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-            Your order has been placed. We'll contact you at {phone} to confirm delivery.
+            تم تسجيل طلبك بنجاح. سنتواصل معك على الرقم {phone} لتأكيد التوصيل.
           </p>
           <div className="bg-secondary rounded-lg p-3 text-sm inline-block">
-            Total: <span className="font-bold">{finalTotal.toLocaleString()} DA</span>
+            المجموع: <span className="font-bold">{finalTotal.toLocaleString()} د.ج</span>
           </div>
         </CardContent>
       </Card>
@@ -218,21 +209,21 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   }
 
   return (
-    <Card className="border-border">
+    <Card className="border-border" dir="rtl">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg">Cash on Delivery</CardTitle>
+        <CardTitle className="text-lg">الدفع عند الاستلام</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Customer info */}
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="cod-name" className="text-sm">Full Name</Label>
-              <Input id="cod-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" autoComplete="name" />
+              <Label htmlFor="cod-name" className="text-sm">الاسم الكامل</Label>
+              <Input id="cod-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="أدخل اسمك الكامل" autoComplete="name" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="cod-phone" className="text-sm">Phone Number</Label>
-              <Input id="cod-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0555 123 456" type="tel" autoComplete="tel" />
+              <Label htmlFor="cod-phone" className="text-sm">رقم الهاتف</Label>
+              <Input id="cod-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0555 123 456" type="tel" autoComplete="tel" dir="ltr" />
             </div>
           </div>
 
@@ -241,9 +232,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
           {/* Location */}
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-sm">Wilaya</Label>
+              <Label className="text-sm">الولاية</Label>
               <Select value={wilayaCode} onValueChange={handleWilayaChange}>
-                <SelectTrigger><SelectValue placeholder="Select wilaya" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
                 <SelectContent className="max-h-60">
                   {WILAYAS.map((w) => (
                     <SelectItem key={w.code} value={w.code}>{w.code} - {w.name}</SelectItem>
@@ -252,9 +243,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm">Commune</Label>
+              <Label className="text-sm">البلدية</Label>
               <Select value={commune} onValueChange={setCommune} disabled={!communes.length}>
-                <SelectTrigger><SelectValue placeholder={communes.length ? "Select commune" : "Select wilaya first"} /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={communes.length ? "اختر البلدية" : "اختر الولاية أولاً"} /></SelectTrigger>
                 <SelectContent className="max-h-60">
                   {communes.map((c) => (
                     <SelectItem key={c} value={c}>{c}</SelectItem>
@@ -268,21 +259,21 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
 
           {/* Delivery type */}
           <div className="space-y-2">
-            <Label className="text-sm">Delivery Type</Label>
+            <Label className="text-sm">نوع التوصيل</Label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setDeliveryType("home")}
-                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left text-sm ${
+                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
                   deliveryType === "home" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
                 }`}
               >
                 <Truck className="w-4 h-4 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Home</p>
+                  <p className="font-medium">المنزل</p>
                   {selectedWilaya && (
                     <p className="text-xs text-muted-foreground">
-                      {freeDelivery ? "Free" : `${selectedWilaya.homeDelivery} DA`}
+                      {freeDelivery ? "مجاني" : `${selectedWilaya.homeDelivery} د.ج`}
                     </p>
                   )}
                 </div>
@@ -290,16 +281,16 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
               <button
                 type="button"
                 onClick={() => setDeliveryType("stop_desk")}
-                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left text-sm ${
+                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
                   deliveryType === "stop_desk" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
                 }`}
               >
                 <Building2 className="w-4 h-4 flex-shrink-0" />
                 <div>
-                  <p className="font-medium">Stop Desk</p>
+                  <p className="font-medium">المكتب</p>
                   {selectedWilaya && (
                     <p className="text-xs text-muted-foreground">
-                      {freeDelivery ? "Free" : `${selectedWilaya.stopDesk} DA`}
+                      {freeDelivery ? "مجاني" : `${selectedWilaya.stopDesk} د.ج`}
                     </p>
                   )}
                 </div>
@@ -312,7 +303,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
           {/* Discount Code */}
           <div className="space-y-2">
             <Label className="text-sm flex items-center gap-1.5">
-              <Ticket className="w-3.5 h-3.5" /> Discount Code
+              <Ticket className="w-3.5 h-3.5" /> كود الخصم
             </Label>
             {appliedDiscount ? (
               <div className="flex items-center justify-between bg-accent/10 border border-accent/30 rounded-lg px-3 py-2">
@@ -323,7 +314,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                   <span className="text-sm text-accent font-medium">
                     -{appliedDiscount.discount_type === "percentage"
                       ? `${appliedDiscount.discount_value}%`
-                      : `${appliedDiscount.discount_value.toLocaleString()} DA`}
+                      : `${appliedDiscount.discount_value.toLocaleString()} د.ج`}
                   </span>
                 </div>
                 <button
@@ -339,9 +330,10 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                 <Input
                   value={discountInput}
                   onChange={(e) => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); }}
-                  placeholder="Enter code"
+                  placeholder="أدخل الكود"
                   className="font-mono uppercase flex-1"
                   maxLength={30}
+                  dir="ltr"
                 />
                 <Button
                   type="button"
@@ -351,7 +343,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                   disabled={validatingCode || !discountInput.trim()}
                   className="shrink-0"
                 >
-                  {validatingCode ? <Loader2 className="w-3 h-3 animate-spin" /> : "Apply"}
+                  {validatingCode ? <Loader2 className="w-3 h-3 animate-spin" /> : "تطبيق"}
                 </Button>
               </div>
             )}
@@ -366,42 +358,42 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">{product.title} × {quantity}</span>
-              <span>{productTotal.toLocaleString()} DA</span>
+              <span>{productTotal.toLocaleString()} د.ج</span>
             </div>
             {upsellItem && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground flex items-center gap-1">
                   {upsellItem.title}
-                  <Badge variant="secondary" className="text-xs ml-1">Upsell</Badge>
+                  <Badge variant="secondary" className="text-xs mr-1">عرض إضافي</Badge>
                 </span>
-                <span>{upsellTotal.toLocaleString()} DA</span>
+                <span>{upsellTotal.toLocaleString()} د.ج</span>
               </div>
             )}
             {discountAmount > 0 && (
               <div className="flex justify-between text-accent">
                 <span className="flex items-center gap-1">
-                  Discount
+                  خصم
                   <Badge variant="outline" className="text-xs font-mono border-accent/30 text-accent">
                     {appliedDiscount?.code}
                   </Badge>
                 </span>
-                <span>-{discountAmount.toLocaleString()} DA</span>
+                <span>-{discountAmount.toLocaleString()} د.ج</span>
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping</span>
-              <span>{freeDelivery ? "Free" : (shippingPrice ? `${shippingPrice.toLocaleString()} DA` : "—")}</span>
+              <span className="text-muted-foreground">التوصيل</span>
+              <span>{freeDelivery ? "مجاني" : (shippingPrice ? `${shippingPrice.toLocaleString()} د.ج` : "—")}</span>
             </div>
             <Separator />
             <div className="flex justify-between font-bold text-base">
-              <span>Total</span>
-              <span>{totalPrice.toLocaleString()} DA</span>
+              <span>المجموع</span>
+              <span>{totalPrice.toLocaleString()} د.ج</span>
             </div>
           </div>
 
           <Button type="submit" size="lg" className="w-full" disabled={!isValid || submitting}>
-            {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-            Confirm Order — {totalPrice.toLocaleString()} DA
+            {submitting ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
+            تأكيد الطلب — {totalPrice.toLocaleString()} د.ج
           </Button>
         </form>
       </CardContent>

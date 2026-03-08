@@ -16,7 +16,7 @@ import { ExitIntentPopup } from "@/components/product/ExitIntentPopup";
 import { SectionRenderer } from "@/components/product/SectionRenderer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ShoppingBag } from "lucide-react";
+import { ArrowRight, ShoppingBag } from "lucide-react";
 import type { UpsellWithProduct } from "@/lib/upsells";
 import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 
@@ -35,7 +35,6 @@ export default function ProductPage() {
     enabled: !!slug,
   });
 
-  // Track PageView + ViewContent
   useEffect(() => {
     if (!product) return;
     trackEvent("PageView");
@@ -69,19 +68,19 @@ export default function ProductPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        Loading…
+        جاري التحميل…
       </div>
     );
   }
 
   if (error || !product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-lg text-muted-foreground">Product not found</p>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" dir="rtl">
+        <p className="text-lg text-muted-foreground">المنتج غير موجود</p>
         <Link to="/">
           <Button variant="outline">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to store
+            <ArrowRight className="w-4 h-4 ml-2" />
+            العودة للمتجر
           </Button>
         </Link>
       </div>
@@ -91,7 +90,6 @@ export default function ProductPage() {
   const basePrice = Number(product.price);
   const hasOffers = (quantityOffers?.length ?? 0) > 0;
 
-  // When a smart offer is selected, use its price; otherwise use discount tiers / base
   const activeQuantity = selectedOffer ? selectedOffer.quantity : quantity;
   const activeUnitPrice = selectedOffer
     ? Number(selectedOffer.price) / selectedOffer.quantity
@@ -139,12 +137,10 @@ export default function ProductPage() {
     setQuantity(offer.quantity);
   };
 
-  /** The quantity/order block used in both default and custom layouts */
   const renderOrderBlock = () => (
     <div className="space-y-4">
       {inStock ? (
         <>
-          {/* Smart Quantity Offers replace the standard selector when available */}
           {hasOffers ? (
             <SmartQuantityOffers
               productId={product.id}
@@ -154,16 +150,16 @@ export default function ProductPage() {
             />
           ) : (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Quantity</label>
+              <label className="text-sm font-medium">الكمية</label>
               <QuantitySelector value={quantity} onChange={setQuantity} max={product.inventory_quantity} />
-              <p className="text-xs text-muted-foreground">{product.inventory_quantity} in stock</p>
+              <p className="text-xs text-muted-foreground">{product.inventory_quantity} متوفر في المخزون</p>
             </div>
           )}
 
           {!showCheckout ? (
             <Button size="lg" className="w-full" onClick={handleOrderClick}>
-              <ShoppingBag className="w-4 h-4 mr-2" />
-              Order now — {activeTotalProductPrice.toLocaleString()} DA
+              <ShoppingBag className="w-4 h-4 ml-2" />
+              اطلب الآن — {activeTotalProductPrice.toLocaleString()} د.ج
             </Button>
           ) : (
             <CODCheckoutForm
@@ -177,13 +173,12 @@ export default function ProductPage() {
         </>
       ) : (
         <Button size="lg" className="w-full" disabled>
-          Out of stock
+          نفذ المخزون
         </Button>
       )}
     </div>
   );
 
-  // Display price — use offer price when selected
   const displayPrice = selectedOffer ? Number(selectedOffer.price) : Math.round(activeUnitPrice);
   const displayComparePrice = selectedOffer
     ? basePrice * selectedOffer.quantity
@@ -194,12 +189,12 @@ export default function ProductPage() {
         : null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" dir="rtl">
       <header className="border-b border-border bg-card">
         <div className="container flex items-center h-14">
           <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Store</span>
+            <ArrowRight className="w-4 h-4" />
+            <span className="text-sm">المتجر</span>
           </Link>
         </div>
       </header>
@@ -210,15 +205,15 @@ export default function ProductPage() {
             <div className="md:col-span-2">
               <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
               <div className="flex items-baseline gap-3 mt-3">
-                <span className="text-2xl font-bold">{displayPrice.toLocaleString()} DA</span>
+                <span className="text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
                 {displayComparePrice && displayComparePrice > displayPrice && (
                   <span className="text-lg text-muted-foreground line-through">
-                    {displayComparePrice.toLocaleString()} DA
+                    {displayComparePrice.toLocaleString()} د.ج
                   </span>
                 )}
                 {hasDiscount && !selectedOffer && (
                   <Badge variant="secondary" className="text-xs">
-                    {Math.round((1 - product.price / product.compare_at_price!) * 100)}% off
+                    خصم {Math.round((1 - product.price / product.compare_at_price!) * 100)}%
                   </Badge>
                 )}
               </div>
@@ -240,15 +235,15 @@ export default function ProductPage() {
               <div>
                 <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
                 <div className="flex items-baseline gap-3 mt-3">
-                  <span className="text-2xl font-bold">{displayPrice.toLocaleString()} DA</span>
+                  <span className="text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
                   {displayComparePrice && displayComparePrice > displayPrice && (
                     <span className="text-lg text-muted-foreground line-through">
-                      {displayComparePrice.toLocaleString()} DA
+                      {displayComparePrice.toLocaleString()} د.ج
                     </span>
                   )}
                   {hasDiscount && !selectedOffer && (
                     <Badge variant="secondary" className="text-xs">
-                      {Math.round((1 - product.price / product.compare_at_price!) * 100)}% off
+                      خصم {Math.round((1 - product.price / product.compare_at_price!) * 100)}%
                     </Badge>
                   )}
                 </div>
