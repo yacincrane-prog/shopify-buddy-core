@@ -151,6 +151,10 @@ export default function AdminDashboard() {
             <TabsContent value="exit-intent">
               <ExitIntentManager />
             </TabsContent>
+
+            <TabsContent value="page-builder">
+              <SectionBuilder />
+            </TabsContent>
           </Tabs>
         )}
       </main>
