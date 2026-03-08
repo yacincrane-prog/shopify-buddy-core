@@ -119,6 +119,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="bundles">Bundles</TabsTrigger>
               <TabsTrigger value="discounts">Qty Discounts</TabsTrigger>
               <TabsTrigger value="upsells">Upsells</TabsTrigger>
+              <TabsTrigger value="exit-intent">Exit Intent</TabsTrigger>
             </TabsList>
 
             <TabsContent value="products">
