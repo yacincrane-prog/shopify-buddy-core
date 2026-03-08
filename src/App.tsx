@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import LandingPageView from "./pages/LandingPageView";
 
 const queryClient = new QueryClient();
 
