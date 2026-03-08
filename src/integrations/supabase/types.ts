@@ -202,6 +202,45 @@ export type Database = {
         }
         Relationships: []
       }
+      google_sheets_config: {
+        Row: {
+          column_mapping: Json | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_export_at: string | null
+          sheet_name: string | null
+          sheet_url: string | null
+          total_exported: number | null
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          column_mapping?: Json | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_export_at?: string | null
+          sheet_name?: string | null
+          sheet_url?: string | null
+          total_exported?: number | null
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          column_mapping?: Json | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_export_at?: string | null
+          sheet_name?: string | null
+          sheet_url?: string | null
+          total_exported?: number | null
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       landing_page_sections: {
         Row: {
           content: Json
@@ -338,6 +377,7 @@ export type Database = {
           delivery_type: string
           discount_amount: number
           discount_code: string | null
+          exported_to_sheets: boolean | null
           id: string
           product_id: string | null
           product_price: number
@@ -357,6 +397,7 @@ export type Database = {
           delivery_type: string
           discount_amount?: number
           discount_code?: string | null
+          exported_to_sheets?: boolean | null
           id?: string
           product_id?: string | null
           product_price: number
@@ -376,6 +417,7 @@ export type Database = {
           delivery_type?: string
           discount_amount?: number
           discount_code?: string | null
+          exported_to_sheets?: boolean | null
           id?: string
           product_id?: string | null
           product_price?: number
