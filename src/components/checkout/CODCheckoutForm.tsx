@@ -57,6 +57,10 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [discountError, setDiscountError] = useState("");
   const [validatingCode, setValidatingCode] = useState(false);
 
+  const getWilayaByCode = (code: string) => WILAYAS.find((w) => w.code === code);
+  const getShippingRate = (code: string): ShippingRate | undefined =>
+    shippingRates?.find((r) => r.wilaya_code === code);
+
   const getLeadData = useCallback(() => ({
     product_id: product.id,
     product_title: product.title,
