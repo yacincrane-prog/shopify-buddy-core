@@ -75,7 +75,7 @@ export default function ProductPage() {
 
   if (error || !product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4" dir="rtl">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4" dir="rtl">
         <p className="text-lg text-muted-foreground">المنتج غير موجود</p>
         <Link to="/">
           <Button variant="outline">
@@ -157,7 +157,7 @@ export default function ProductPage() {
           )}
 
           {!showCheckout ? (
-            <Button size="lg" className="w-full" onClick={handleOrderClick}>
+            <Button size="lg" className="w-full text-sm sm:text-base" onClick={handleOrderClick}>
               <ShoppingBag className="w-4 h-4 ml-2" />
               اطلب الآن — {activeTotalProductPrice.toLocaleString()} د.ج
             </Button>
@@ -191,7 +191,7 @@ export default function ProductPage() {
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <header className="border-b border-border bg-card">
-        <div className="container flex items-center h-14">
+        <div className="container px-4 flex items-center h-12 sm:h-14">
           <Link to="/" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
             <ArrowRight className="w-4 h-4" />
             <span className="text-sm">المتجر</span>
@@ -199,15 +199,15 @@ export default function ProductPage() {
         </div>
       </header>
 
-      <main className="container py-8 md:py-12 max-w-5xl">
+      <main className="container px-4 py-6 sm:py-8 md:py-12 max-w-5xl">
         {hasCustomSections ? (
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-            <div className="md:col-span-2">
-              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
-              <div className="flex items-baseline gap-3 mt-3">
-                <span className="text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
+              <div className="flex items-baseline gap-2 sm:gap-3 mt-2 sm:mt-3 flex-wrap">
+                <span className="text-xl sm:text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
                 {displayComparePrice && displayComparePrice > displayPrice && (
-                  <span className="text-lg text-muted-foreground line-through">
+                  <span className="text-base sm:text-lg text-muted-foreground line-through">
                     {displayComparePrice.toLocaleString()} د.ج
                   </span>
                 )}
@@ -218,26 +218,24 @@ export default function ProductPage() {
                 )}
               </div>
             </div>
-            <div className="md:col-span-2">
-              <SectionRenderer
-                product={product}
-                basePrice={basePrice}
-                quantity={activeQuantity}
-                renderOrderBlock={renderOrderBlock}
-              />
-            </div>
+            <SectionRenderer
+              product={product}
+              basePrice={basePrice}
+              quantity={activeQuantity}
+              renderOrderBlock={renderOrderBlock}
+            />
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
             <ProductGallery images={product.images ?? []} title={product.title} />
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
-                <div className="flex items-baseline gap-3 mt-3">
-                  <span className="text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
+                <div className="flex items-baseline gap-2 sm:gap-3 mt-2 sm:mt-3 flex-wrap">
+                  <span className="text-xl sm:text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
                   {displayComparePrice && displayComparePrice > displayPrice && (
-                    <span className="text-lg text-muted-foreground line-through">
+                    <span className="text-base sm:text-lg text-muted-foreground line-through">
                       {displayComparePrice.toLocaleString()} د.ج
                     </span>
                   )}
@@ -250,7 +248,7 @@ export default function ProductPage() {
               </div>
 
               {product.description && (
-                <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{product.description}</p>
               )}
 
               <div className="space-y-4 pt-2">

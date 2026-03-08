@@ -42,8 +42,10 @@ import {
   Paintbrush,
   Check,
   Loader2,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const VIEWPORTS = [
   { id: "desktop" as const, icon: Monitor, width: "100%", label: "Desktop" },
@@ -51,7 +53,6 @@ const VIEWPORTS = [
   { id: "mobile" as const, icon: Smartphone, width: "375px", label: "Mobile" },
 ];
 
-// HSL string to hex for color picker
 function hslStringToHex(hsl: string): string {
   const parts = hsl.trim().split(/\s+/);
   if (parts.length < 3) return "#000000";
@@ -67,7 +68,6 @@ function hslStringToHex(hsl: string): string {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
-// Hex to HSL string
 function hexToHslString(hex: string): string {
   const r = parseInt(hex.slice(1, 3), 16) / 255;
   const g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -107,7 +107,9 @@ export default function AdminThemeEditor() {
   const queryClient = useQueryClient();
   const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [theme, setTheme] = useState<ThemeConfig>(DEFAULT_THEME);
+  const [showPreview, setShowPreview] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const isMobile = useIsMobile();
 
   const { data: savedTheme, isLoading } = useQuery({
     queryKey: ["theme-settings"],
@@ -118,7 +120,6 @@ export default function AdminThemeEditor() {
     if (savedTheme) setTheme(savedTheme);
   }, [savedTheme]);
 
-  // Apply theme to iframe in real-time
   const applyToIframe = useCallback((t: ThemeConfig) => {
     const iframe = iframeRef.current;
     if (!iframe?.contentDocument) return;
@@ -176,8 +177,188 @@ export default function AdminThemeEditor() {
     );
   }
 
+  const controlsPanel = (
+    <ScrollArea className="flex-1">
+      <div className="p-4">
+        <Tabs defaultValue="colors" className="w-full">
+          <TabsList className="w-full grid grid-cols-3 mb-4">
+            <TabsTrigger value="colors" className="text-xs gap-1">
+              <Palette className="w-3.5 h-3.5" /> Colors
+            </TabsTrigger>
+            <TabsTrigger value="fonts" className="text-xs gap-1">
+              <Type className="w-3.5 h-3.5" /> Fonts
+            </TabsTrigger>
+            <TabsTrigger value="style" className="text-xs gap-1">
+              <Paintbrush className="w-3.5 h-3.5" /> Style
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="colors" className="mt-0 space-y-5">
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Quick Presets</Label>
+              <div className="grid grid-cols-3 gap-1.5">
+                {COLOR_PRESETS.map((preset) => (
+                  <button
+                    key={preset.name}
+                    onClick={() => applyPreset(preset)}
+                    className="text-left p-2 rounded-lg border border-border hover:border-accent/50 transition-colors group"
+                  >
+                    <div className="flex gap-1 mb-1.5">
+                      {Object.values(preset.colors).slice(0, 3).map((c, i) => (
+                        <div
+                          key={i}
+                          className="w-4 h-4 rounded-full border border-border"
+                          style={{ backgroundColor: `hsl(${c})` }}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground truncate">{preset.name}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Customize Colors</Label>
+              <div className="space-y-2">
+                {(Object.keys(COLOR_LABELS) as (keyof ThemeColors)[]).map((key) => (
+                  <div key={key} className="flex items-center gap-2">
+                    <div className="relative">
+                      <input
+                        type="color"
+                        value={hslStringToHex(theme.colors[key])}
+                        onChange={(e) => updateColor(key, e.target.value)}
+                        className="w-8 h-8 rounded-md border border-border cursor-pointer appearance-none bg-transparent [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-webkit-color-swatch]:rounded-sm [&::-webkit-color-swatch]:border-0"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium">{COLOR_LABELS[key]}</p>
+                      <p className="text-[10px] text-muted-foreground font-mono truncate">{theme.colors[key]}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="fonts" className="mt-0 space-y-5">
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label className="text-xs">Heading Font</Label>
+                <Select value={theme.fonts.heading} onValueChange={(v) => updateFont("heading", v)}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {FONT_OPTIONS.map((f) => (
+                      <SelectItem key={f} value={f}>{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                  <p className="text-lg font-bold" style={{ fontFamily: theme.fonts.heading }}>The quick brown fox</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">Body Font</Label>
+                <Select value={theme.fonts.body} onValueChange={(v) => updateFont("body", v)}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {FONT_OPTIONS.map((f) => (
+                      <SelectItem key={f} value={f}>{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                  <p className="text-sm" style={{ fontFamily: theme.fonts.body }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="style" className="mt-0 space-y-5">
+            <div className="space-y-3">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Border Radius</Label>
+              <div className="grid grid-cols-3 gap-1.5">
+                {RADIUS_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setTheme((prev) => ({ ...prev, borderRadius: opt.value }))}
+                    className={`flex flex-col items-center gap-1.5 p-2.5 rounded-lg border-2 transition-all ${
+                      theme.borderRadius === opt.value ? "border-accent bg-accent/5" : "border-border hover:border-muted-foreground/30"
+                    }`}
+                  >
+                    <div className="w-10 h-7 bg-accent/20 border-2 border-accent/50" style={{ borderRadius: opt.value }} />
+                    <span className="text-[10px] font-medium">{opt.label}</span>
+                    {theme.borderRadius === opt.value && <Check className="w-3 h-3 text-accent" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Preview Elements</Label>
+              <div className="space-y-2 p-3 rounded-lg bg-muted/30 border border-border">
+                <Button size="sm" className="w-full" style={{ borderRadius: theme.borderRadius }}>Primary Button</Button>
+                <Button size="sm" variant="outline" className="w-full" style={{ borderRadius: theme.borderRadius }}>Outline Button</Button>
+                <Input placeholder="Input field" style={{ borderRadius: theme.borderRadius }} className="h-9" />
+                <Card style={{ borderRadius: theme.borderRadius }}>
+                  <CardContent className="p-3"><p className="text-xs text-muted-foreground">Card element preview</p></CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </ScrollArea>
+  );
+
+  // Mobile layout: stacked vertically
+  if (isMobile) {
+    return (
+      <div className="space-y-4 -mx-3 sm:-mx-4 md:-mx-6 lg:-mx-8">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-card">
+          <div className="flex items-center gap-2">
+            <Palette className="w-4 h-4 text-accent" />
+            <h2 className="text-sm font-semibold">Theme</h2>
+            {hasChanges && <Badge variant="secondary" className="text-[10px]">●</Badge>}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button size="sm" variant="outline" className="h-8 px-2" onClick={() => setShowPreview(!showPreview)}>
+              <Eye className="w-3.5 h-3.5" />
+            </Button>
+            <Button size="sm" variant="outline" className="h-8 px-2" onClick={resetTheme}>
+              <RotateCcw className="w-3.5 h-3.5" />
+            </Button>
+            <Button size="sm" className="h-8" onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending}>
+              {saveMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            </Button>
+          </div>
+        </div>
+
+        {showPreview && (
+          <div className="px-3">
+            <div className="bg-background border border-border rounded-lg shadow-lg overflow-hidden h-[300px]">
+              <iframe
+                ref={iframeRef}
+                src="/"
+                className="w-full h-full border-0"
+                title="Theme preview"
+                onLoad={() => applyToIframe(theme)}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="px-3">
+          {controlsPanel}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop layout: side-by-side
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)] -m-6">
+    <div className="flex flex-col h-[calc(100vh-120px)] -m-4 md:-m-6 lg:-m-8">
       {/* Top toolbar */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-3">
@@ -214,160 +395,7 @@ export default function AdminThemeEditor() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left: Controls */}
         <div className="w-80 shrink-0 border-r border-border bg-card flex flex-col">
-          <ScrollArea className="flex-1">
-            <div className="p-4">
-              <Tabs defaultValue="colors" className="w-full">
-                <TabsList className="w-full grid grid-cols-3 mb-4">
-                  <TabsTrigger value="colors" className="text-xs gap-1">
-                    <Palette className="w-3.5 h-3.5" /> Colors
-                  </TabsTrigger>
-                  <TabsTrigger value="fonts" className="text-xs gap-1">
-                    <Type className="w-3.5 h-3.5" /> Fonts
-                  </TabsTrigger>
-                  <TabsTrigger value="style" className="text-xs gap-1">
-                    <Paintbrush className="w-3.5 h-3.5" /> Style
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="colors" className="mt-0 space-y-5">
-                  {/* Presets */}
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Quick Presets</Label>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {COLOR_PRESETS.map((preset) => (
-                        <button
-                          key={preset.name}
-                          onClick={() => applyPreset(preset)}
-                          className="text-left p-2 rounded-lg border border-border hover:border-accent/50 transition-colors group"
-                        >
-                          <div className="flex gap-1 mb-1.5">
-                            {Object.values(preset.colors).slice(0, 3).map((c, i) => (
-                              <div
-                                key={i}
-                                className="w-4 h-4 rounded-full border border-border"
-                                style={{ backgroundColor: `hsl(${c})` }}
-                              />
-                            ))}
-                          </div>
-                          <p className="text-[10px] font-medium text-muted-foreground group-hover:text-foreground truncate">{preset.name}</p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Individual colors */}
-                  <div className="space-y-2">
-                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Customize Colors</Label>
-                    <div className="space-y-2">
-                      {(Object.keys(COLOR_LABELS) as (keyof ThemeColors)[]).map((key) => (
-                        <div key={key} className="flex items-center gap-2">
-                          <div className="relative">
-                            <input
-                              type="color"
-                              value={hslStringToHex(theme.colors[key])}
-                              onChange={(e) => updateColor(key, e.target.value)}
-                              className="w-8 h-8 rounded-md border border-border cursor-pointer appearance-none bg-transparent [&::-webkit-color-swatch-wrapper]:p-0.5 [&::-webkit-color-swatch]:rounded-sm [&::-webkit-color-swatch]:border-0"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium">{COLOR_LABELS[key]}</p>
-                            <p className="text-[10px] text-muted-foreground font-mono">{theme.colors[key]}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="fonts" className="mt-0 space-y-5">
-                  <div className="space-y-3">
-                    <div className="space-y-2">
-                      <Label className="text-xs">Heading Font</Label>
-                      <Select value={theme.fonts.heading} onValueChange={(v) => updateFont("heading", v)}>
-                        <SelectTrigger className="h-9">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {FONT_OPTIONS.map((f) => (
-                            <SelectItem key={f} value={f}>{f}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
-                        <p className="text-lg font-bold" style={{ fontFamily: theme.fonts.heading }}>
-                          The quick brown fox
-                        </p>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs">Body Font</Label>
-                      <Select value={theme.fonts.body} onValueChange={(v) => updateFont("body", v)}>
-                        <SelectTrigger className="h-9">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {FONT_OPTIONS.map((f) => (
-                            <SelectItem key={f} value={f}>{f}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <div className="p-3 rounded-lg bg-muted/30 border border-border">
-                        <p className="text-sm" style={{ fontFamily: theme.fonts.body }}>
-                          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="style" className="mt-0 space-y-5">
-                  <div className="space-y-3">
-                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Border Radius</Label>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {RADIUS_OPTIONS.map((opt) => (
-                        <button
-                          key={opt.value}
-                          onClick={() => setTheme((prev) => ({ ...prev, borderRadius: opt.value }))}
-                          className={`flex flex-col items-center gap-1.5 p-2.5 rounded-lg border-2 transition-all ${
-                            theme.borderRadius === opt.value
-                              ? "border-accent bg-accent/5"
-                              : "border-border hover:border-muted-foreground/30"
-                          }`}
-                        >
-                          <div
-                            className="w-10 h-7 bg-accent/20 border-2 border-accent/50"
-                            style={{ borderRadius: opt.value }}
-                          />
-                          <span className="text-[10px] font-medium">{opt.label}</span>
-                          {theme.borderRadius === opt.value && (
-                            <Check className="w-3 h-3 text-accent" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Preview Elements</Label>
-                    <div className="space-y-2 p-3 rounded-lg bg-muted/30 border border-border">
-                      <Button size="sm" className="w-full" style={{ borderRadius: theme.borderRadius }}>
-                        Primary Button
-                      </Button>
-                      <Button size="sm" variant="outline" className="w-full" style={{ borderRadius: theme.borderRadius }}>
-                        Outline Button
-                      </Button>
-                      <Input placeholder="Input field" style={{ borderRadius: theme.borderRadius }} className="h-9" />
-                      <Card style={{ borderRadius: theme.borderRadius }}>
-                        <CardContent className="p-3">
-                          <p className="text-xs text-muted-foreground">Card element preview</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </ScrollArea>
+          {controlsPanel}
         </div>
 
         {/* Right: Live Preview */}
