@@ -77,6 +77,42 @@ export type Database = {
         }
         Relationships: []
       }
+      exit_intent_popups: {
+        Row: {
+          created_at: string
+          cta_text: string
+          discount_code: string | null
+          discount_percent: number | null
+          id: string
+          is_active: boolean
+          subtitle: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cta_text?: string
+          discount_code?: string | null
+          discount_percent?: number | null
+          id?: string
+          is_active?: boolean
+          subtitle?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cta_text?: string
+          discount_code?: string | null
+          discount_percent?: number | null
+          id?: string
+          is_active?: boolean
+          subtitle?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           commune: string

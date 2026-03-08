@@ -9,6 +9,7 @@ import { QuantityPricing } from "@/components/product/QuantityPricing";
 import { BundleOffers } from "@/components/product/BundleOffers";
 import { UpsellModal } from "@/components/product/UpsellModal";
 import { CODCheckoutForm } from "@/components/checkout/CODCheckoutForm";
+import { ExitIntentPopup } from "@/components/product/ExitIntentPopup";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
@@ -163,6 +164,8 @@ export default function ProductPage() {
         onAddUpsell={handleAddUpsell}
         onSkip={handleSkipUpsell}
       />
+
+      <ExitIntentPopup />
     </div>
   );
 }
