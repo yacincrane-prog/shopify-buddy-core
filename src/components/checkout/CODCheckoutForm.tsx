@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,7 @@ import { Loader2, Truck, Building2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { PostOrderUpsellPage } from "@/components/checkout/PostOrderUpsellPage";
 import type { Product } from "@/types/product";
+import { useAbandonedLeadCapture } from "@/hooks/useAbandonedLeadCapture";
 
 interface UpsellItem {
   title: string;
@@ -38,6 +39,18 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [deliveryType, setDeliveryType] = useState<"home" | "stop_desk">("home");
   const [submitting, setSubmitting] = useState(false);
   const [phase, setPhase] = useState<CheckoutPhase>("form");
+
+  // Silent abandoned lead capture
+  const getLeadData = useCallback(() => ({
+    product_id: product.id,
+    product_title: product.title,
+    customer_name: name,
+    customer_phone: phone,
+    wilaya: wilayaCode ? (getWilayaByCode(wilayaCode)?.name ?? "") : "",
+    commune,
+  }), [product.id, product.title, name, phone, wilayaCode, commune]);
+
+  useAbandonedLeadCapture(getLeadData, phone.trim().length >= 5, phase !== "form");
   const [orderId, setOrderId] = useState<string | null>(null);
   const [postUpsellExtra, setPostUpsellExtra] = useState(0);
 

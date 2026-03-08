@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_leads: {
+        Row: {
+          commune: string
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          id: string
+          product_id: string | null
+          product_title: string
+          status: string
+          wilaya: string
+        }
+        Insert: {
+          commune?: string
+          created_at?: string
+          customer_name?: string
+          customer_phone: string
+          id?: string
+          product_id?: string | null
+          product_title: string
+          status?: string
+          wilaya?: string
+        }
+        Update: {
+          commune?: string
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          product_id?: string | null
+          product_title?: string
+          status?: string
+          wilaya?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abandoned_leads_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bundle_items: {
         Row: {
           bundle_id: string
@@ -474,7 +518,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      capture_abandoned_lead: {
+        Args: {
+          p_commune: string
+          p_customer_name: string
+          p_customer_phone: string
+          p_product_id: string
+          p_product_title: string
+          p_wilaya: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
