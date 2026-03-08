@@ -347,6 +347,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addingType, setAddingType] = useState<LPSectionType | "">("");
+  const [addMode, setAddMode] = useState<"type" | "preset">("type");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [previewKey, setPreviewKey] = useState(0);
 
