@@ -8,12 +8,18 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { WILAYAS, getWilayaByCode, getShippingPrice } from "@/data/algeria";
 import { createOrder } from "@/lib/orders";
-import { Loader2, Truck, Building2, CheckCircle2 } from "lucide-react";
+import { Loader2, Truck, Building2, CheckCircle2, Ticket, X } from "lucide-react";
 import { toast } from "sonner";
 import { PostOrderUpsellPage } from "@/components/checkout/PostOrderUpsellPage";
 import type { Product } from "@/types/product";
 import { useAbandonedLeadCapture } from "@/hooks/useAbandonedLeadCapture";
 import { useTrackingPixels } from "@/hooks/useTrackingPixels";
+import {
+  validateDiscountCode,
+  calculateDiscount,
+  incrementDiscountUsage,
+  type DiscountCode,
+} from "@/lib/discount-codes";
 
 interface UpsellItem {
   title: string;
@@ -42,6 +48,12 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [submitting, setSubmitting] = useState(false);
   const [phase, setPhase] = useState<CheckoutPhase>("form");
 
+  // Discount code state
+  const [discountInput, setDiscountInput] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
+  const [discountError, setDiscountError] = useState("");
+  const [validatingCode, setValidatingCode] = useState(false);
+
   // Silent abandoned lead capture
   const getLeadData = useCallback(() => ({
     product_id: product.id,
@@ -53,6 +65,10 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   }), [product.id, product.title, name, phone, wilayaCode, commune]);
 
   useAbandonedLeadCapture(getLeadData, phone.trim().length >= 5, phase !== "form");
+
+  const effectiveUnitPrice = unitPrice ?? Number(product.price);
+  const productTotal = effectiveUnitPrice * quantity;
+  const upsellTotal = upsellItem ? upsellItem.discountedPrice * upsellItem.quantity : 0;
 
   // Track InitiateCheckout once this form mounts
   useEffect(() => {
@@ -71,10 +87,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const communes = selectedWilaya?.communes ?? [];
   const shippingPrice = freeDelivery ? 0 : (wilayaCode ? getShippingPrice(wilayaCode, deliveryType) : 0);
 
-  const effectiveUnitPrice = unitPrice ?? Number(product.price);
-  const productTotal = effectiveUnitPrice * quantity;
-  const upsellTotal = upsellItem ? upsellItem.discountedPrice * upsellItem.quantity : 0;
-  const totalPrice = productTotal + upsellTotal + shippingPrice;
+  const subtotalBeforeDiscount = productTotal + upsellTotal;
+  const discountAmount = appliedDiscount ? calculateDiscount(appliedDiscount, subtotalBeforeDiscount) : 0;
+  const totalPrice = subtotalBeforeDiscount - discountAmount + shippingPrice;
 
   const handleWilayaChange = (code: string) => {
     setWilayaCode(code);
@@ -82,6 +97,36 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   };
 
   const isValid = name.trim().length >= 3 && phone.trim().length >= 9 && wilayaCode && commune;
+
+  // Discount code handlers
+  const handleApplyDiscount = async () => {
+    const trimmed = discountInput.trim();
+    if (!trimmed) { setDiscountError("Enter a discount code"); return; }
+    if (trimmed.length > 30) { setDiscountError("Invalid code"); return; }
+
+    setValidatingCode(true);
+    setDiscountError("");
+    try {
+      const result = await validateDiscountCode(trimmed, subtotalBeforeDiscount);
+      if (result.valid && result.discount) {
+        setAppliedDiscount(result.discount);
+        setDiscountError("");
+        toast.success("Discount applied!");
+      } else {
+        setDiscountError(result.error || "Invalid code");
+      }
+    } catch {
+      setDiscountError("Error validating code");
+    } finally {
+      setValidatingCode(false);
+    }
+  };
+
+  const handleRemoveDiscount = () => {
+    setAppliedDiscount(null);
+    setDiscountInput("");
+    setDiscountError("");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,8 +149,17 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
         delivery_type: deliveryType,
         shipping_price: shippingPrice,
         total_price: totalPrice,
+        ...(appliedDiscount ? {
+          discount_code: appliedDiscount.code,
+          discount_amount: discountAmount,
+        } : {}),
       });
       setOrderId(order.id);
+
+      // Increment discount usage
+      if (appliedDiscount) {
+        incrementDiscountUsage(appliedDiscount.id).catch(() => {});
+      }
 
       // Fire Purchase event for all active pixels
       trackEvent("Purchase", {
@@ -255,6 +309,59 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
 
           <Separator />
 
+          {/* Discount Code */}
+          <div className="space-y-2">
+            <Label className="text-sm flex items-center gap-1.5">
+              <Ticket className="w-3.5 h-3.5" /> Discount Code
+            </Label>
+            {appliedDiscount ? (
+              <div className="flex items-center justify-between bg-accent/10 border border-accent/30 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-accent text-accent-foreground font-mono text-xs">
+                    {appliedDiscount.code}
+                  </Badge>
+                  <span className="text-sm text-accent font-medium">
+                    -{appliedDiscount.discount_type === "percentage"
+                      ? `${appliedDiscount.discount_value}%`
+                      : `${appliedDiscount.discount_value.toLocaleString()} DA`}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveDiscount}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  value={discountInput}
+                  onChange={(e) => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); }}
+                  placeholder="Enter code"
+                  className="font-mono uppercase flex-1"
+                  maxLength={30}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleApplyDiscount}
+                  disabled={validatingCode || !discountInput.trim()}
+                  className="shrink-0"
+                >
+                  {validatingCode ? <Loader2 className="w-3 h-3 animate-spin" /> : "Apply"}
+                </Button>
+              </div>
+            )}
+            {discountError && (
+              <p className="text-xs text-destructive">{discountError}</p>
+            )}
+          </div>
+
+          <Separator />
+
           {/* Price breakdown */}
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
@@ -268,6 +375,17 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                   <Badge variant="secondary" className="text-xs ml-1">Upsell</Badge>
                 </span>
                 <span>{upsellTotal.toLocaleString()} DA</span>
+              </div>
+            )}
+            {discountAmount > 0 && (
+              <div className="flex justify-between text-accent">
+                <span className="flex items-center gap-1">
+                  Discount
+                  <Badge variant="outline" className="text-xs font-mono border-accent/30 text-accent">
+                    {appliedDiscount?.code}
+                  </Badge>
+                </span>
+                <span>-{discountAmount.toLocaleString()} DA</span>
               </div>
             )}
             <div className="flex justify-between">

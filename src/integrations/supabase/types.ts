@@ -121,6 +121,48 @@ export type Database = {
         }
         Relationships: []
       }
+      discount_codes: {
+        Row: {
+          code: string
+          created_at: string
+          current_uses: number
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          min_order_amount: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          current_uses?: number
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          current_uses?: number
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          min_order_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exit_intent_popups: {
         Row: {
           created_at: string
@@ -291,6 +333,8 @@ export type Database = {
           customer_name: string
           customer_phone: string
           delivery_type: string
+          discount_amount: number
+          discount_code: string | null
           id: string
           product_id: string | null
           product_price: number
@@ -308,6 +352,8 @@ export type Database = {
           customer_name: string
           customer_phone: string
           delivery_type: string
+          discount_amount?: number
+          discount_code?: string | null
           id?: string
           product_id?: string | null
           product_price: number
@@ -325,6 +371,8 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           delivery_type?: string
+          discount_amount?: number
+          discount_code?: string | null
           id?: string
           product_id?: string | null
           product_price?: number

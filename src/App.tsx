@@ -29,6 +29,7 @@ const AdminPageBuilder = lazy(() => import("./pages/admin/AdminPageBuilder"));
 const AdminThemeEditor = lazy(() => import("./pages/admin/AdminThemeEditor"));
 const AdminCheckoutPreview = lazy(() => import("./pages/admin/AdminCheckoutPreview"));
 const AdminTrackingPixels = lazy(() => import("./pages/admin/AdminTrackingPixels"));
+const AdminDiscountCodes = lazy(() => import("./pages/admin/AdminDiscountCodes"));
 
 const queryClient = new QueryClient();
 
@@ -36,11 +37,10 @@ function AdminFallback() {
   return <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">Loading…</div>;
 }
 
-const App = () => {
+function AppInner() {
   useApplyTheme();
   return (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+    <>
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -67,11 +67,21 @@ const App = () => {
             <Route path="theme" element={<Suspense fallback={<AdminFallback />}><AdminThemeEditor /></Suspense>} />
             <Route path="checkout-preview" element={<Suspense fallback={<AdminFallback />}><AdminCheckoutPreview /></Suspense>} />
             <Route path="tracking-pixels" element={<Suspense fallback={<AdminFallback />}><AdminTrackingPixels /></Suspense>} />
+            <Route path="discount-codes" element={<Suspense fallback={<AdminFallback />}><AdminDiscountCodes /></Suspense>} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+    </>
+  );
+}
+
+const App = () => {
+  return (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AppInner />
     </TooltipProvider>
   </QueryClientProvider>
   );
