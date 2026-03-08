@@ -24,9 +24,10 @@ interface CODCheckoutFormProps {
   quantity: number;
   unitPrice?: number;
   upsellItem?: UpsellItem | null;
+  freeDelivery?: boolean;
 }
 
-export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem }: CODCheckoutFormProps) {
+export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, freeDelivery = false }: CODCheckoutFormProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [wilayaCode, setWilayaCode] = useState("");
