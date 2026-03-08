@@ -247,7 +247,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   return (
     <Card className="border-border" dir="rtl">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg">الدفع عند الاستلام</CardTitle>
+        <CardTitle className="text-lg">{config.formTitle}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
