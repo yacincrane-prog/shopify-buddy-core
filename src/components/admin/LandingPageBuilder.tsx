@@ -85,6 +85,7 @@ export function LandingPageBuilder() {
 
   // Create form state
   const [newTitle, setNewTitle] = useState("");
+  const [newSlug, setNewSlug] = useState("");
   const [newProductId, setNewProductId] = useState("");
   const [newTemplate, setNewTemplate] = useState("classic");
 
@@ -97,14 +98,14 @@ export function LandingPageBuilder() {
     mutationFn: async () => {
       const product = products?.find((p) => p.id === newProductId);
       if (!product) throw new Error("Select a product");
-      const slug = product.slug;
+      const slug = newSlug.trim() || product.slug + "-" + Date.now().toString(36);
       const page = await createLandingPage({
         product_id: newProductId,
         title: newTitle || product.title,
         slug,
         template: newTemplate,
       });
-      if (!page) throw new Error("Failed to create");
+      if (!page) throw new Error("Failed to create — slug may already exist");
       const template = TEMPLATES.find((t) => t.id === newTemplate);
       if (template) {
         await bulkCreateSections(page.id, template.sections);
@@ -117,6 +118,7 @@ export function LandingPageBuilder() {
       setEditingPage(page as LandingPage);
       setView("edit");
       setNewTitle("");
+      setNewSlug("");
       setNewProductId("");
     },
     onError: (e: any) => toast.error(e.message || "Failed to create"),
@@ -169,6 +171,13 @@ export function LandingPageBuilder() {
               <div className="space-y-2">
                 <Label>Page Title</Label>
                 <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Leave empty to use product title" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Slug (URL)</Label>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <span>/offer/</span>
+                  <Input value={newSlug} onChange={(e) => setNewSlug(e.target.value.replace(/[^a-z0-9-]/g, ""))} placeholder="auto-generated if empty" className="font-mono text-xs" />
+                </div>
               </div>
             </div>
 
