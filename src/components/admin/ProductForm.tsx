@@ -215,3 +215,20 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading }: ProductF
     </form>
   );
 }
+
+function PreviewProductButton({ slug }: { slug: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+        <Eye className="w-4 h-4 mr-1" /> Preview
+      </Button>
+      <PreviewFrame
+        url={`/product/${slug}`}
+        open={open}
+        onOpenChange={setOpen}
+        title="Product Page Preview"
+      />
+    </>
+  );
+}
