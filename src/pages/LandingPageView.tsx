@@ -15,6 +15,7 @@ import { QuantitySelector } from "@/components/product/QuantitySelector";
 import { CODCheckoutForm } from "@/components/checkout/CODCheckoutForm";
 import { ExitIntentPopup } from "@/components/product/ExitIntentPopup";
 import { Button } from "@/components/ui/button";
+import { StickyOrderBar } from "@/components/product/StickyOrderBar";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
