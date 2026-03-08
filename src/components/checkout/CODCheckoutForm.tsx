@@ -232,9 +232,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
       <Card className="border-border" dir="rtl">
         <CardContent className="py-10 text-center space-y-4">
           <CheckCircle2 className="w-12 h-12 text-accent mx-auto" />
-          <h3 className="text-xl font-semibold">تم تأكيد الطلب!</h3>
+          <h3 className="text-xl font-semibold">{config.successTitle}</h3>
           <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-            تم تسجيل طلبك بنجاح. سنتواصل معك على الرقم {phone} لتأكيد التوصيل.
+            {config.successMessage}
           </p>
           <div className="bg-secondary rounded-lg p-3 text-sm inline-block">
             المجموع: <span className="font-bold">{finalTotal.toLocaleString()} د.ج</span>
