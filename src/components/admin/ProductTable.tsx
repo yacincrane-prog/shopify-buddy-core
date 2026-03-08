@@ -12,7 +12,7 @@ interface ProductTableProps {
   isLoading?: boolean;
 }
 
-export function ProductTable({ products, onEdit, onDelete, onView }: ProductTableProps) {
+export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: ProductTableProps) {
   const columns: DataTableColumn<Product>[] = [
     {
       key: "image",
