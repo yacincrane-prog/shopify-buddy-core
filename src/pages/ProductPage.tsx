@@ -4,10 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchProductBySlug } from "@/lib/products";
 import { fetchDiscountsForProduct, getDiscountedPrice } from "@/lib/quantity-discounts";
 import { fetchSectionsForProduct } from "@/lib/product-sections";
+import { fetchOffersForProduct, type QuantityOffer } from "@/lib/quantity-offers";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { QuantitySelector } from "@/components/product/QuantitySelector";
 import { QuantityPricing } from "@/components/product/QuantityPricing";
 import { BundleOffers } from "@/components/product/BundleOffers";
+import { SmartQuantityOffers } from "@/components/product/SmartQuantityOffers";
 import { UpsellModal } from "@/components/product/UpsellModal";
 import { CODCheckoutForm } from "@/components/checkout/CODCheckoutForm";
 import { ExitIntentPopup } from "@/components/product/ExitIntentPopup";
@@ -23,6 +25,7 @@ export default function ProductPage() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellItem, setUpsellItem] = useState<{ title: string; price: number; discountedPrice: number; quantity: number } | null>(null);
+  const [selectedOffer, setSelectedOffer] = useState<QuantityOffer | null>(null);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
@@ -39,6 +42,12 @@ export default function ProductPage() {
   const { data: customSections } = useQuery({
     queryKey: ["product-sections", product?.id],
     queryFn: () => fetchSectionsForProduct(product!.id),
+    enabled: !!product?.id,
+  });
+
+  const { data: quantityOffers } = useQuery({
+    queryKey: ["quantity-offers", product?.id],
+    queryFn: () => fetchOffersForProduct(product!.id),
     enabled: !!product?.id,
   });
 
@@ -65,7 +74,20 @@ export default function ProductPage() {
   }
 
   const basePrice = Number(product.price);
-  const unitPrice = discountTiers?.length ? getDiscountedPrice(basePrice, quantity, discountTiers) : basePrice;
+  const hasOffers = (quantityOffers?.length ?? 0) > 0;
+
+  // When a smart offer is selected, use its price; otherwise use discount tiers / base
+  const activeQuantity = selectedOffer ? selectedOffer.quantity : quantity;
+  const activeUnitPrice = selectedOffer
+    ? Number(selectedOffer.price) / selectedOffer.quantity
+    : discountTiers?.length
+      ? getDiscountedPrice(basePrice, quantity, discountTiers)
+      : basePrice;
+  const activeTotalProductPrice = selectedOffer
+    ? Number(selectedOffer.price)
+    : Math.round(activeUnitPrice) * quantity;
+  const freeDelivery = selectedOffer?.free_delivery ?? false;
+
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
   const inStock = product.inventory_quantity > 0;
   const hasCustomSections = (customSections?.length ?? 0) > 0;
@@ -91,27 +113,44 @@ export default function ProductPage() {
     setShowCheckout(true);
   };
 
+  const handleOfferSelect = (offer: QuantityOffer) => {
+    setSelectedOffer(offer);
+    setQuantity(offer.quantity);
+  };
+
+  /** The quantity/order block used in both default and custom layouts */
   const renderOrderBlock = () => (
     <div className="space-y-4">
       {inStock ? (
         <>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Quantity</label>
-            <QuantitySelector value={quantity} onChange={setQuantity} max={product.inventory_quantity} />
-            <p className="text-xs text-muted-foreground">{product.inventory_quantity} in stock</p>
-          </div>
+          {/* Smart Quantity Offers replace the standard selector when available */}
+          {hasOffers ? (
+            <SmartQuantityOffers
+              productId={product.id}
+              basePrice={basePrice}
+              selectedOfferId={selectedOffer?.id ?? null}
+              onSelect={handleOfferSelect}
+            />
+          ) : (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Quantity</label>
+              <QuantitySelector value={quantity} onChange={setQuantity} max={product.inventory_quantity} />
+              <p className="text-xs text-muted-foreground">{product.inventory_quantity} in stock</p>
+            </div>
+          )}
 
           {!showCheckout ? (
             <Button size="lg" className="w-full" onClick={handleOrderClick}>
               <ShoppingBag className="w-4 h-4 mr-2" />
-              Order now — {(Math.round(unitPrice) * quantity).toLocaleString()} DA
+              Order now — {activeTotalProductPrice.toLocaleString()} DA
             </Button>
           ) : (
             <CODCheckoutForm
               product={product}
-              quantity={quantity}
-              unitPrice={Math.round(unitPrice)}
+              quantity={activeQuantity}
+              unitPrice={Math.round(activeUnitPrice)}
               upsellItem={upsellItem}
+              freeDelivery={freeDelivery}
             />
           )}
         </>
@@ -122,6 +161,16 @@ export default function ProductPage() {
       )}
     </div>
   );
+
+  // Display price — use offer price when selected
+  const displayPrice = selectedOffer ? Number(selectedOffer.price) : Math.round(activeUnitPrice);
+  const displayComparePrice = selectedOffer
+    ? basePrice * selectedOffer.quantity
+    : hasDiscount
+      ? Number(product.compare_at_price)
+      : activeUnitPrice < basePrice
+        ? basePrice
+        : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -136,37 +185,33 @@ export default function ProductPage() {
 
       <main className="container py-8 md:py-12 max-w-5xl">
         {hasCustomSections ? (
-          /* ── Custom section-based layout ── */
           <div className="grid md:grid-cols-2 gap-8 md:gap-12">
-            {/* Price header is always shown */}
             <div className="md:col-span-2">
               <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
               <div className="flex items-baseline gap-3 mt-3">
-                <span className="text-2xl font-bold">{Math.round(unitPrice).toLocaleString()} DA</span>
-                {(hasDiscount || unitPrice < basePrice) && (
+                <span className="text-2xl font-bold">{displayPrice.toLocaleString()} DA</span>
+                {displayComparePrice && displayComparePrice > displayPrice && (
                   <span className="text-lg text-muted-foreground line-through">
-                    {(hasDiscount ? Number(product.compare_at_price) : basePrice).toLocaleString()} DA
+                    {displayComparePrice.toLocaleString()} DA
                   </span>
                 )}
-                {hasDiscount && (
+                {hasDiscount && !selectedOffer && (
                   <Badge variant="secondary" className="text-xs">
                     {Math.round((1 - product.price / product.compare_at_price!) * 100)}% off
                   </Badge>
                 )}
               </div>
             </div>
-
             <div className="md:col-span-2">
               <SectionRenderer
                 product={product}
                 basePrice={basePrice}
-                quantity={quantity}
+                quantity={activeQuantity}
                 renderOrderBlock={renderOrderBlock}
               />
             </div>
           </div>
         ) : (
-          /* ── Default layout (unchanged) ── */
           <div className="grid md:grid-cols-2 gap-8 md:gap-12">
             <ProductGallery images={product.images ?? []} title={product.title} />
 
@@ -174,13 +219,13 @@ export default function ProductPage() {
               <div>
                 <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
                 <div className="flex items-baseline gap-3 mt-3">
-                  <span className="text-2xl font-bold">{Math.round(unitPrice).toLocaleString()} DA</span>
-                  {(hasDiscount || unitPrice < basePrice) && (
+                  <span className="text-2xl font-bold">{displayPrice.toLocaleString()} DA</span>
+                  {displayComparePrice && displayComparePrice > displayPrice && (
                     <span className="text-lg text-muted-foreground line-through">
-                      {(hasDiscount ? Number(product.compare_at_price) : basePrice).toLocaleString()} DA
+                      {displayComparePrice.toLocaleString()} DA
                     </span>
                   )}
-                  {hasDiscount && (
+                  {hasDiscount && !selectedOffer && (
                     <Badge variant="secondary" className="text-xs">
                       {Math.round((1 - product.price / product.compare_at_price!) * 100)}% off
                     </Badge>
@@ -193,37 +238,13 @@ export default function ProductPage() {
               )}
 
               <div className="space-y-4 pt-2">
-                {inStock ? (
-                  <>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Quantity</label>
-                      <QuantitySelector value={quantity} onChange={setQuantity} max={product.inventory_quantity} />
-                      <p className="text-xs text-muted-foreground">{product.inventory_quantity} in stock</p>
-                    </div>
+                {renderOrderBlock()}
 
-                    <QuantityPricing productId={product.id} basePrice={basePrice} quantity={quantity} />
-
-                    {!showCheckout ? (
-                      <Button size="lg" className="w-full" onClick={handleOrderClick}>
-                        <ShoppingBag className="w-4 h-4 mr-2" />
-                        Order now — {(Math.round(unitPrice) * quantity).toLocaleString()} DA
-                      </Button>
-                    ) : (
-                      <CODCheckoutForm
-                        product={product}
-                        quantity={quantity}
-                        unitPrice={Math.round(unitPrice)}
-                        upsellItem={upsellItem}
-                      />
-                    )}
-
-                    <BundleOffers productId={product.id} />
-                  </>
-                ) : (
-                  <Button size="lg" className="w-full" disabled>
-                    Out of stock
-                  </Button>
+                {!hasOffers && (
+                  <QuantityPricing productId={product.id} basePrice={basePrice} quantity={quantity} />
                 )}
+
+                <BundleOffers productId={product.id} />
               </div>
             </div>
           </div>

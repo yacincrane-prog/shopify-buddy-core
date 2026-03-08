@@ -157,6 +157,10 @@ export default function AdminDashboard() {
             <TabsContent value="page-builder">
               <SectionBuilder />
             </TabsContent>
+
+            <TabsContent value="qty-offers">
+              <QuantityOfferManager />
+            </TabsContent>
           </Tabs>
         )}
       </main>
