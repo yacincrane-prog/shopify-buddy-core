@@ -112,23 +112,24 @@ export async function fetchTheme(): Promise<ThemeConfig> {
 }
 
 export async function saveTheme(theme: ThemeConfig): Promise<void> {
-  // Try update first, then insert
+  const value = JSON.parse(JSON.stringify(theme));
+  
   const { data } = await supabase
     .from("theme_settings")
     .select("id")
-    .eq("key", "storefront")
+    .eq("key" as any, "storefront")
     .single();
   
   if (data) {
     const { error } = await supabase
       .from("theme_settings")
-      .update({ value: theme as unknown as Record<string, unknown>, updated_at: new Date().toISOString() })
-      .eq("key", "storefront");
+      .update({ value, updated_at: new Date().toISOString() } as any)
+      .eq("key" as any, "storefront");
     if (error) throw error;
   } else {
     const { error } = await supabase
       .from("theme_settings")
-      .insert({ key: "storefront", value: theme as unknown as Record<string, unknown> });
+      .insert([{ key: "storefront", value }] as any);
     if (error) throw error;
   }
 }
