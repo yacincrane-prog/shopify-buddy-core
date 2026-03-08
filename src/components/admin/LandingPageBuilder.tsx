@@ -1,5 +1,22 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, forwardRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useProducts } from "@/hooks/useProducts";
 import {
   fetchAllLandingPages,
@@ -252,6 +269,73 @@ export function LandingPageBuilder() {
 }
 
 // ══════════════════════════════════════════════════════════════
+// Sortable Section Item
+// ══════════════════════════════════════════════════════════════
+
+function SortableSectionItem({
+  section,
+  index,
+  total,
+  isSelected,
+  onSelect,
+  onMoveUp,
+  onMoveDown,
+  sectionLabel,
+}: {
+  section: LPSection;
+  index: number;
+  total: number;
+  isSelected: boolean;
+  onSelect: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  sectionLabel: string;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : undefined,
+    opacity: isDragging ? 0.8 : undefined,
+  };
+
+  return (
+    <button
+      ref={setNodeRef}
+      style={style}
+      onClick={onSelect}
+      className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-left text-sm transition-colors group ${
+        isSelected
+          ? "bg-accent/10 text-accent border border-accent/30"
+          : "hover:bg-muted/60 border border-transparent"
+      } ${!section.is_visible ? "opacity-50" : ""} ${isDragging ? "shadow-lg bg-card" : ""}`}
+    >
+      <span {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing shrink-0 touch-none">
+        <GripVertical className="w-3.5 h-3.5 text-muted-foreground" />
+      </span>
+      <span className="flex-1 truncate text-xs font-medium">{sectionLabel}</span>
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
+          disabled={index === 0}
+          className="p-0.5 hover:text-accent disabled:opacity-30"
+        >
+          <ChevronUp className="w-3 h-3" />
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); onMoveDown(); }}
+          disabled={index === total - 1}
+          className="p-0.5 hover:text-accent disabled:opacity-30"
+        >
+          <ChevronDown className="w-3 h-3" />
+        </button>
+      </div>
+    </button>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
 // Visual Builder — 3-panel layout
 // ══════════════════════════════════════════════════════════════
 
@@ -293,6 +377,21 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
     mutationFn: reorderLPSections,
     onSuccess: invalidate,
   });
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !sections) return;
+    const oldIndex = sections.findIndex((s) => s.id === active.id);
+    const newIndex = sections.findIndex((s) => s.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(sections, oldIndex, newIndex);
+    moveMutation.mutate(reordered.map((s, i) => ({ id: s.id, position: i })));
+  };
 
   const moveSection = (index: number, dir: "up" | "down") => {
     if (!sections) return;
@@ -356,38 +455,25 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
             <div className="p-2 space-y-1">
               {isLoading ? (
                 <p className="text-xs text-muted-foreground p-2">Loading…</p>
-              ) : (
-                sections?.map((section, index) => (
-                  <button
-                    key={section.id}
-                    onClick={() => setSelectedId(section.id === selectedId ? null : section.id)}
-                    className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-left text-sm transition-colors group ${
-                      section.id === selectedId
-                        ? "bg-accent/10 text-accent border border-accent/30"
-                        : "hover:bg-muted/60 border border-transparent"
-                    } ${!section.is_visible ? "opacity-50" : ""}`}
-                  >
-                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <span className="flex-1 truncate text-xs font-medium">{sectionLabel(section.section_type)}</span>
-                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); moveSection(index, "up"); }}
-                        disabled={index === 0}
-                        className="p-0.5 hover:text-accent disabled:opacity-30"
-                      >
-                        <ChevronUp className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); moveSection(index, "down"); }}
-                        disabled={index === (sections?.length ?? 0) - 1}
-                        className="p-0.5 hover:text-accent disabled:opacity-30"
-                      >
-                        <ChevronDown className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </button>
-                ))
-              )}
+              ) : sections?.length ? (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                    {sections.map((section, index) => (
+                      <SortableSectionItem
+                        key={section.id}
+                        section={section}
+                        index={index}
+                        total={sections.length}
+                        isSelected={section.id === selectedId}
+                        onSelect={() => setSelectedId(section.id === selectedId ? null : section.id)}
+                        onMoveUp={() => moveSection(index, "up")}
+                        onMoveDown={() => moveSection(index, "down")}
+                        sectionLabel={sectionLabel(section.section_type)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              ) : null}
             </div>
           </ScrollArea>
 
