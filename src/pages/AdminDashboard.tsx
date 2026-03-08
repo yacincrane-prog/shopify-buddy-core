@@ -11,6 +11,7 @@ import { SectionBuilder } from "@/components/admin/SectionBuilder";
 import { QuantityOfferManager } from "@/components/admin/QuantityOfferManager";
 import { PostOrderUpsellManager } from "@/components/admin/PostOrderUpsellManager";
 import { AbandonedLeadsManager } from "@/components/admin/AbandonedLeadsManager";
+import { LandingPageBuilder } from "@/components/admin/LandingPageBuilder";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { Plus, Package, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
