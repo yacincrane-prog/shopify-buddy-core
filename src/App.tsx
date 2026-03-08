@@ -37,11 +37,10 @@ function AdminFallback() {
   return <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">Loading…</div>;
 }
 
-const App = () => {
+function AppInner() {
   useApplyTheme();
   return (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+    <>
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -74,6 +73,15 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+    </>
+  );
+}
+
+const App = () => {
+  return (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AppInner />
     </TooltipProvider>
   </QueryClientProvider>
   );
