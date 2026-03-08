@@ -169,6 +169,10 @@ export default function AdminDashboard() {
             <TabsContent value="post-upsell">
               <PostOrderUpsellManager />
             </TabsContent>
+
+            <TabsContent value="abandoned">
+              <AbandonedLeadsManager />
+            </TabsContent>
           </Tabs>
         )}
       </main>
