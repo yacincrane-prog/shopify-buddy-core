@@ -14,12 +14,7 @@ export default function Index() {
       <header className="border-b border-border bg-card">
         <div className="container flex items-center justify-between h-14">
           <h1 className="text-lg font-semibold tracking-tight">Store</h1>
-          <Link to="/admin">
-            <Button variant="ghost" size="sm">
-              <Settings className="w-4 h-4 mr-1" />
-              Admin
-            </Button>
-          </Link>
+          <span className="text-sm text-muted-foreground">🇩🇿</span>
         </div>
       </header>
 
