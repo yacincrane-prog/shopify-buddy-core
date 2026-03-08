@@ -388,38 +388,25 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
             <div className="p-2 space-y-1">
               {isLoading ? (
                 <p className="text-xs text-muted-foreground p-2">Loading…</p>
-              ) : (
-                sections?.map((section, index) => (
-                  <button
-                    key={section.id}
-                    onClick={() => setSelectedId(section.id === selectedId ? null : section.id)}
-                    className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-left text-sm transition-colors group ${
-                      section.id === selectedId
-                        ? "bg-accent/10 text-accent border border-accent/30"
-                        : "hover:bg-muted/60 border border-transparent"
-                    } ${!section.is_visible ? "opacity-50" : ""}`}
-                  >
-                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <span className="flex-1 truncate text-xs font-medium">{sectionLabel(section.section_type)}</span>
-                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); moveSection(index, "up"); }}
-                        disabled={index === 0}
-                        className="p-0.5 hover:text-accent disabled:opacity-30"
-                      >
-                        <ChevronUp className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); moveSection(index, "down"); }}
-                        disabled={index === (sections?.length ?? 0) - 1}
-                        className="p-0.5 hover:text-accent disabled:opacity-30"
-                      >
-                        <ChevronDown className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </button>
-                ))
-              )}
+              ) : sections?.length ? (
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                    {sections.map((section, index) => (
+                      <SortableSectionItem
+                        key={section.id}
+                        section={section}
+                        index={index}
+                        total={sections.length}
+                        isSelected={section.id === selectedId}
+                        onSelect={() => setSelectedId(section.id === selectedId ? null : section.id)}
+                        onMoveUp={() => moveSection(index, "up")}
+                        onMoveDown={() => moveSection(index, "down")}
+                        sectionLabel={sectionLabel(section.section_type)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              ) : null}
             </div>
           </ScrollArea>
 
