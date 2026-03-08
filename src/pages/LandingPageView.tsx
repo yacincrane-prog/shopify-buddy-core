@@ -66,6 +66,22 @@ export default function LandingPageView() {
   const [quantity, setQuantity] = useState(1);
   const [selectedOffer, setSelectedOffer] = useState<QuantityOffer | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
+  const { trackEvent } = useTrackingPixels();
+  const trackedRef = useRef(false);
+
+  // Track PageView + ViewContent for landing page
+  useEffect(() => {
+    if (!product || trackedRef.current) return;
+    trackedRef.current = true;
+    trackEvent("PageView");
+    trackEvent("ViewContent", {
+      content_name: product.title,
+      content_ids: [product.id],
+      content_type: "product",
+      value: Number(product.price),
+      currency: "DZD",
+    });
+  }, [product?.id]);
 
   if (pageLoading) {
     return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;

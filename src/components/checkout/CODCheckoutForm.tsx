@@ -106,6 +106,16 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
         total_price: totalPrice,
       });
       setOrderId(order.id);
+
+      // Fire Purchase event for all active pixels
+      trackEvent("Purchase", {
+        content_name: product.title,
+        content_ids: [product.id],
+        value: totalPrice,
+        currency: "DZD",
+        num_items: quantity,
+      });
+
       // Show post-order upsell instead of confirming immediately
       setPhase("post-upsell");
     } catch {

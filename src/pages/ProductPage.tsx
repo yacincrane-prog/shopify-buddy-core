@@ -108,6 +108,12 @@ export default function ProductPage() {
   const hasCustomSections = (customSections?.length ?? 0) > 0;
 
   const handleOrderClick = () => {
+    trackEvent("AddToCart", {
+      content_name: product.title,
+      content_ids: [product.id],
+      value: activeTotalProductPrice,
+      currency: "DZD",
+    });
     setShowUpsell(true);
   };
 
