@@ -128,45 +128,60 @@ export function LandingPageBuilder() {
           <CardHeader>
             <CardTitle>Create Landing Page</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Product</Label>
-              <Select value={newProductId} onValueChange={setNewProductId}>
-                <SelectTrigger><SelectValue placeholder="Select product…" /></SelectTrigger>
-                <SelectContent>
-                  {products?.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <CardContent className="space-y-6">
+            {/* Section: Product & Title */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Page Details</h3>
+              <p className="text-xs text-muted-foreground">Select a product and customize the page title</p>
             </div>
-            <div className="space-y-2">
-              <Label>Page Title</Label>
-              <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Leave empty to use product title" />
-            </div>
-            <div className="space-y-2">
-              <Label>Template</Label>
-              <div className="grid gap-2">
-                {TEMPLATES.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setNewTemplate(t.id)}
-                    className={`text-left p-3 rounded-lg border-2 transition-colors ${
-                      newTemplate === t.id ? "border-accent bg-accent/5" : "border-border"
-                    }`}
-                  >
-                    <p className="font-medium text-sm">{t.name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t.sections.length} sections: {t.sections.map((s) => LP_SECTION_TYPES.find((st) => st.value === s)?.label).join(", ")}
-                    </p>
-                  </button>
-                ))}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Product <span className="text-destructive">*</span></Label>
+                <Select value={newProductId} onValueChange={setNewProductId}>
+                  <SelectTrigger><SelectValue placeholder="Select product…" /></SelectTrigger>
+                  <SelectContent>
+                    {products?.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Page Title</Label>
+                <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Leave empty to use product title" />
               </div>
             </div>
-            <Button onClick={() => createMutation.mutate()} disabled={!newProductId || createMutation.isPending}>
-              <Rocket className="w-4 h-4 mr-1" /> Create Landing Page
-            </Button>
+
+            <div className="border-t border-border" />
+
+            {/* Section: Template */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Template</h3>
+              <p className="text-xs text-muted-foreground">Choose a pre-built template to start with</p>
+            </div>
+            <div className="grid gap-2">
+              {TEMPLATES.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setNewTemplate(t.id)}
+                  className={`text-left p-4 rounded-lg border-2 transition-all ${
+                    newTemplate === t.id ? "border-accent bg-accent/5 shadow-sm" : "border-border hover:border-muted-foreground/30"
+                  }`}
+                >
+                  <p className="font-medium text-sm">{t.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t.sections.length} sections: {t.sections.map((s) => LP_SECTION_TYPES.find((st) => st.value === s)?.label).join(", ")}
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-2 border-t border-border">
+              <Button onClick={() => createMutation.mutate()} disabled={!newProductId || createMutation.isPending}>
+                <Rocket className="w-4 h-4 mr-1" /> Create Landing Page
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

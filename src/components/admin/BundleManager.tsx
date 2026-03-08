@@ -75,50 +75,67 @@ export function BundleManager() {
 
       {creating && (
         <Card>
-          <CardContent className="pt-6 space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
+          <CardContent className="pt-6 space-y-6">
+            {/* Section: Bundle Details */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Bundle Details</h3>
+              <p className="text-xs text-muted-foreground">Name and description for this bundle</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>Bundle Title</Label>
+                <Label>Bundle Title <span className="text-destructive">*</span></Label>
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Summer Pack" />
               </div>
               <div className="space-y-1.5">
-                <Label>Bundle Price (DA)</Label>
-                <Input type="number" value={bundlePrice} onChange={(e) => setBundlePrice(e.target.value)} placeholder="0" />
+                <Label>Description</Label>
+                <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional description" />
               </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Description</Label>
-              <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional description" />
             </div>
 
-            <div className="space-y-2">
-              <Label>Select Products (min 2)</Label>
-              <div className="grid gap-2 max-h-48 overflow-y-auto border rounded-lg p-3">
-                {(products ?? []).map((p) => (
-                  <label key={p.id} className="flex items-center gap-2 cursor-pointer text-sm">
-                    <Checkbox
-                      checked={selectedProducts.includes(p.id)}
-                      onCheckedChange={() => toggleProduct(p.id)}
-                    />
-                    <span className="flex-1">{p.title}</span>
-                    <span className="text-muted-foreground">{Number(p.price).toLocaleString()} DA</span>
-                  </label>
-                ))}
-              </div>
-              {selectedProducts.length >= 2 && (
-                <p className="text-xs text-muted-foreground">
+            <div className="border-t border-border" />
+
+            {/* Section: Product Selection */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Product Selection</h3>
+              <p className="text-xs text-muted-foreground">Choose at least 2 products to bundle together</p>
+            </div>
+            <div className="grid gap-2 max-h-48 overflow-y-auto border border-border rounded-lg p-3 bg-muted/20">
+              {(products ?? []).map((p) => (
+                <label key={p.id} className="flex items-center gap-2.5 cursor-pointer text-sm hover:bg-muted/40 rounded-md px-2 py-1.5 -mx-1 transition-colors">
+                  <Checkbox
+                    checked={selectedProducts.includes(p.id)}
+                    onCheckedChange={() => toggleProduct(p.id)}
+                  />
+                  <span className="flex-1 font-medium">{p.title}</span>
+                  <span className="text-muted-foreground text-xs font-mono">{Number(p.price).toLocaleString()} DA</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="border-t border-border" />
+
+            {/* Section: Pricing */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Bundle Pricing</h3>
+              <p className="text-xs text-muted-foreground">Set a discounted price for the bundle</p>
+            </div>
+            <div className="max-w-xs space-y-2">
+              <Label>Bundle Price (DA) <span className="text-destructive">*</span></Label>
+              <Input type="number" value={bundlePrice} onChange={(e) => setBundlePrice(e.target.value)} placeholder="0" />
+            </div>
+            {selectedProducts.length >= 2 && (
+              <div className="rounded-lg bg-accent/10 border border-accent/20 px-3 py-2">
+                <p className="text-xs text-accent font-medium">
                   Individual total: {selectedTotal.toLocaleString()} DA →{" "}
-                  <span className="text-accent font-medium">
-                    Bundle: {Number(bundlePrice || 0).toLocaleString()} DA
-                    {Number(bundlePrice) < selectedTotal && Number(bundlePrice) > 0 && (
-                      <> (Save {Math.round((1 - Number(bundlePrice) / selectedTotal) * 100)}%)</>
-                    )}
-                  </span>
+                  Bundle: {Number(bundlePrice || 0).toLocaleString()} DA
+                  {Number(bundlePrice) < selectedTotal && Number(bundlePrice) > 0 && (
+                    <> (Save {Math.round((1 - Number(bundlePrice) / selectedTotal) * 100)}%)</>
+                  )}
                 </p>
-              )}
-            </div>
+              </div>
+            )}
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 pt-2 border-t border-border">
               <Button onClick={() => createMut.mutate()} disabled={!canSubmit || createMut.isPending}>
                 {createMut.isPending ? "Creating…" : "Create Bundle"}
               </Button>
