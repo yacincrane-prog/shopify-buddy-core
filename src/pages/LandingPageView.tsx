@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowLeft, ShoppingBag, Star, HelpCircle, Play, Shield, Clock } from "lucide-react";
 import type { Product } from "@/types/product";
+import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 
 export default function LandingPageView() {
   const { slug } = useParams<{ slug: string }>();
@@ -65,6 +66,22 @@ export default function LandingPageView() {
   const [quantity, setQuantity] = useState(1);
   const [selectedOffer, setSelectedOffer] = useState<QuantityOffer | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
+  const { trackEvent } = useTrackingPixels();
+  const trackedRef = useRef(false);
+
+  // Track PageView + ViewContent for landing page
+  useEffect(() => {
+    if (!product || trackedRef.current) return;
+    trackedRef.current = true;
+    trackEvent("PageView");
+    trackEvent("ViewContent", {
+      content_name: product.title,
+      content_ids: [product.id],
+      content_type: "product",
+      value: Number(product.price),
+      currency: "DZD",
+    });
+  }, [product?.id]);
 
   if (pageLoading) {
     return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading…</div>;

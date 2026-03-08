@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { PostOrderUpsellPage } from "@/components/checkout/PostOrderUpsellPage";
 import type { Product } from "@/types/product";
 import { useAbandonedLeadCapture } from "@/hooks/useAbandonedLeadCapture";
+import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 
 interface UpsellItem {
   title: string;
@@ -32,6 +33,7 @@ interface CODCheckoutFormProps {
 type CheckoutPhase = "form" | "post-upsell" | "confirmed";
 
 export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, freeDelivery = false }: CODCheckoutFormProps) {
+  const { trackEvent } = useTrackingPixels();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [wilayaCode, setWilayaCode] = useState("");
@@ -51,6 +53,17 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   }), [product.id, product.title, name, phone, wilayaCode, commune]);
 
   useAbandonedLeadCapture(getLeadData, phone.trim().length >= 5, phase !== "form");
+
+  // Track InitiateCheckout once this form mounts
+  useEffect(() => {
+    trackEvent("InitiateCheckout", {
+      content_name: product.title,
+      content_ids: [product.id],
+      value: effectiveUnitPrice * quantity,
+      currency: "DZD",
+    });
+  }, []);
+
   const [orderId, setOrderId] = useState<string | null>(null);
   const [postUpsellExtra, setPostUpsellExtra] = useState(0);
 
@@ -93,6 +106,16 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
         total_price: totalPrice,
       });
       setOrderId(order.id);
+
+      // Fire Purchase event for all active pixels
+      trackEvent("Purchase", {
+        content_name: product.title,
+        content_ids: [product.id],
+        value: totalPrice,
+        currency: "DZD",
+        num_items: quantity,
+      });
+
       // Show post-order upsell instead of confirming immediately
       setPhase("post-upsell");
     } catch {

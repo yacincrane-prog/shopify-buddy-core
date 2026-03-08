@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProductBySlug } from "@/lib/products";
@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import type { UpsellWithProduct } from "@/lib/upsells";
+import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -26,12 +27,26 @@ export default function ProductPage() {
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellItem, setUpsellItem] = useState<{ title: string; price: number; discountedPrice: number; quantity: number } | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<QuantityOffer | null>(null);
+  const { trackEvent } = useTrackingPixels();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => fetchProductBySlug(slug!),
     enabled: !!slug,
   });
+
+  // Track PageView + ViewContent
+  useEffect(() => {
+    if (!product) return;
+    trackEvent("PageView");
+    trackEvent("ViewContent", {
+      content_name: product.title,
+      content_ids: [product.id],
+      content_type: "product",
+      value: Number(product.price),
+      currency: "DZD",
+    });
+  }, [product?.id]);
 
   const { data: discountTiers } = useQuery({
     queryKey: ["quantity-discounts", product?.id],
@@ -93,6 +108,12 @@ export default function ProductPage() {
   const hasCustomSections = (customSections?.length ?? 0) > 0;
 
   const handleOrderClick = () => {
+    trackEvent("AddToCart", {
+      content_name: product.title,
+      content_ids: [product.id],
+      value: activeTotalProductPrice,
+      currency: "DZD",
+    });
     setShowUpsell(true);
   };
 
