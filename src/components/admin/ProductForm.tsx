@@ -5,9 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, X, Loader2, FileText, DollarSign, Image, Settings } from "lucide-react";
+import { Upload, X, Loader2, FileText, DollarSign, Image, Settings, Eye } from "lucide-react";
 import { uploadProductImage } from "@/lib/products";
 import type { Product, ProductFormData } from "@/types/product";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { toast } from "sonner";
 
 interface ProductFormProps {
