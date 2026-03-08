@@ -1,7 +1,12 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+
 export default function AdminAnalytics() {
   return (
     <div className="space-y-6">
-      <div><h1 className="text-2xl font-bold tracking-tight">Analytics</h1><p className="text-muted-foreground text-sm mt-1">Track performance and conversions</p></div>
+      <AdminPageHeader
+        title="Analytics"
+        description="Track store performance and conversions"
+      />
       <div className="rounded-lg border border-dashed border-border p-12 text-center text-muted-foreground">
         <p className="text-lg font-medium">Coming soon</p>
         <p className="text-sm mt-1">Analytics dashboard will be available here.</p>
