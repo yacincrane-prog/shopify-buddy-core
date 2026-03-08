@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useProducts } from "@/hooks/useProducts";
 import {
@@ -23,8 +23,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -32,12 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import {
   Plus,
   Trash2,
@@ -51,6 +45,10 @@ import {
   ArrowLeft,
   Globe,
   ExternalLink,
+  PanelRightOpen,
+  X,
+  Monitor,
+  Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -129,7 +127,6 @@ export function LandingPageBuilder() {
             <CardTitle>Create Landing Page</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Section: Product & Title */}
             <div className="space-y-1">
               <h3 className="text-sm font-semibold text-foreground">Page Details</h3>
               <p className="text-xs text-muted-foreground">Select a product and customize the page title</p>
@@ -154,7 +151,6 @@ export function LandingPageBuilder() {
 
             <div className="border-t border-border" />
 
-            {/* Section: Template */}
             <div className="space-y-1">
               <h3 className="text-sm font-semibold text-foreground">Template</h3>
               <p className="text-xs text-muted-foreground">Choose a pre-built template to start with</p>
@@ -190,16 +186,10 @@ export function LandingPageBuilder() {
 
   if (view === "edit" && editingPage) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => { setView("list"); setEditingPage(null); }}>
-            <ArrowLeft className="w-4 h-4 mr-1" /> Back
-          </Button>
-          <h2 className="font-semibold">{editingPage.title}</h2>
-          <Badge variant="secondary" className="text-xs">/offer/{editingPage.slug}</Badge>
-        </div>
-        <SectionEditor pageId={editingPage.id} />
-      </div>
+      <VisualBuilder
+        page={editingPage}
+        onBack={() => { setView("list"); setEditingPage(null); }}
+      />
     );
   }
 
@@ -230,7 +220,7 @@ export function LandingPageBuilder() {
                   <div className="flex gap-2 items-center">
                     <Badge variant="outline" className="text-xs font-mono">/offer/{page.slug}</Badge>
                     {page.is_published
-                      ? <Badge className="bg-success text-success-foreground text-xs">Live</Badge>
+                      ? <Badge className="bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))] text-xs">Live</Badge>
                       : <Badge variant="outline" className="text-xs">Draft</Badge>}
                   </div>
                 </div>
@@ -261,21 +251,30 @@ export function LandingPageBuilder() {
   );
 }
 
-// ── Section Editor (reorder, add, remove, edit content) ──
+// ══════════════════════════════════════════════════════════════
+// Visual Builder — 3-panel layout
+// ══════════════════════════════════════════════════════════════
 
-function SectionEditor({ pageId }: { pageId: string }) {
+function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void }) {
   const queryClient = useQueryClient();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addingType, setAddingType] = useState<LPSectionType | "">("");
+  const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
+  const [previewKey, setPreviewKey] = useState(0);
 
   const { data: sections, isLoading } = useQuery({
-    queryKey: ["lp-sections-admin", pageId],
-    queryFn: () => fetchLPSections(pageId),
+    queryKey: ["lp-sections-admin", page.id],
+    queryFn: () => fetchLPSections(page.id),
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["lp-sections-admin", pageId] });
+  const invalidate = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["lp-sections-admin", page.id] });
+    // Refresh preview iframe
+    setPreviewKey((k) => k + 1);
+  }, [queryClient, page.id]);
 
   const addMutation = useMutation({
-    mutationFn: (type: LPSectionType) => createLPSection(pageId, type, sections?.length ?? 0),
+    mutationFn: (type: LPSectionType) => createLPSection(page.id, type, sections?.length ?? 0),
     onSuccess: () => { invalidate(); toast.success("Section added"); setAddingType(""); },
   });
 
@@ -287,7 +286,7 @@ function SectionEditor({ pageId }: { pageId: string }) {
 
   const deleteMutation = useMutation({
     mutationFn: deleteLPSection,
-    onSuccess: () => { invalidate(); toast.success("Removed"); },
+    onSuccess: () => { invalidate(); toast.success("Removed"); setSelectedId(null); },
   });
 
   const moveMutation = useMutation({
@@ -305,82 +304,211 @@ function SectionEditor({ pageId }: { pageId: string }) {
   };
 
   const sectionLabel = (type: string) => LP_SECTION_TYPES.find((t) => t.value === type)?.label ?? type;
-
-  if (isLoading) return <p className="text-sm text-muted-foreground py-4">Loading sections…</p>;
+  const selectedSection = sections?.find((s) => s.id === selectedId) ?? null;
 
   return (
-    <div className="space-y-3">
-      {sections?.map((section, index) => (
-        <Card key={section.id} className={`border transition-colors ${!section.is_visible ? "opacity-50" : ""}`}>
-          <CardContent className="py-3 px-4">
-            <div className="flex items-center gap-2 mb-2">
-              <GripVertical className="w-4 h-4 text-muted-foreground" />
-              <Badge variant="secondary" className="text-xs">{sectionLabel(section.section_type)}</Badge>
-              <div className="ml-auto flex items-center gap-1">
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => moveSection(index, "up")} disabled={index === 0}>
-                  <ChevronUp className="w-3 h-3" />
+    <div className="flex flex-col h-[calc(100vh-120px)] -m-6">
+      {/* Top toolbar */}
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card shrink-0">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ArrowLeft className="w-4 h-4 mr-1" /> Back
+          </Button>
+          <div className="h-5 w-px bg-border" />
+          <h2 className="text-sm font-semibold truncate max-w-[200px]">{page.title}</h2>
+          <Badge variant="secondary" className="text-[10px] font-mono">/offer/{page.slug}</Badge>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center rounded-md border border-border p-0.5 bg-muted/30">
+            <Button
+              variant={previewMode === "desktop" ? "default" : "ghost"}
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setPreviewMode("desktop")}
+            >
+              <Monitor className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant={previewMode === "mobile" ? "default" : "ghost"}
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setPreviewMode("mobile")}
+            >
+              <Smartphone className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+          <Button size="sm" variant="outline" asChild>
+            <a href={`/offer/${page.slug}`} target="_blank" rel="noopener">
+              <ExternalLink className="w-3.5 h-3.5 mr-1" /> Preview
+            </a>
+          </Button>
+        </div>
+      </div>
+
+      {/* 3-panel body */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left: Section List */}
+        <div className="w-64 shrink-0 border-r border-border bg-card flex flex-col">
+          <div className="px-3 py-2.5 border-b border-border">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sections</p>
+          </div>
+          <ScrollArea className="flex-1">
+            <div className="p-2 space-y-1">
+              {isLoading ? (
+                <p className="text-xs text-muted-foreground p-2">Loading…</p>
+              ) : (
+                sections?.map((section, index) => (
+                  <button
+                    key={section.id}
+                    onClick={() => setSelectedId(section.id === selectedId ? null : section.id)}
+                    className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-left text-sm transition-colors group ${
+                      section.id === selectedId
+                        ? "bg-accent/10 text-accent border border-accent/30"
+                        : "hover:bg-muted/60 border border-transparent"
+                    } ${!section.is_visible ? "opacity-50" : ""}`}
+                  >
+                    <GripVertical className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <span className="flex-1 truncate text-xs font-medium">{sectionLabel(section.section_type)}</span>
+                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); moveSection(index, "up"); }}
+                        disabled={index === 0}
+                        className="p-0.5 hover:text-accent disabled:opacity-30"
+                      >
+                        <ChevronUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); moveSection(index, "down"); }}
+                        disabled={index === (sections?.length ?? 0) - 1}
+                        className="p-0.5 hover:text-accent disabled:opacity-30"
+                      >
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+
+          {/* Add section */}
+          <div className="p-2 border-t border-border space-y-2">
+            <Select value={addingType} onValueChange={(v) => setAddingType(v as LPSectionType)}>
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Add section…" />
+              </SelectTrigger>
+              <SelectContent>
+                {LP_SECTION_TYPES.map((t) => (
+                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              size="sm"
+              className="w-full h-8 text-xs"
+              onClick={() => addingType && addMutation.mutate(addingType as LPSectionType)}
+              disabled={!addingType}
+            >
+              <Plus className="w-3 h-3 mr-1" /> Add Section
+            </Button>
+          </div>
+        </div>
+
+        {/* Center: Live Preview */}
+        <div className="flex-1 bg-muted/30 flex items-start justify-center overflow-auto p-4">
+          <div
+            className={`bg-background border border-border rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${
+              previewMode === "mobile" ? "w-[375px]" : "w-full max-w-[900px]"
+            }`}
+            style={{ height: "calc(100vh - 200px)" }}
+          >
+            <iframe
+              key={previewKey}
+              src={`/offer/${page.slug}`}
+              className="w-full h-full border-0"
+              title="Landing page preview"
+            />
+          </div>
+        </div>
+
+        {/* Right: Section Editor */}
+        {selectedSection ? (
+          <div className="w-80 shrink-0 border-l border-border bg-card flex flex-col">
+            <div className="px-3 py-2.5 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0">
+                <Badge variant="secondary" className="text-[10px] shrink-0">{sectionLabel(selectedSection.section_type)}</Badge>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => updateMutation.mutate({ id: selectedSection.id, updates: { is_visible: !selectedSection.is_visible } })}
+                >
+                  {selectedSection.is_visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                 </Button>
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => moveSection(index, "down")} disabled={index === (sections?.length ?? 0) - 1}>
-                  <ChevronDown className="w-3 h-3" />
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7 text-destructive"
+                  onClick={() => deleteMutation.mutate(selectedSection.id)}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
                 </Button>
-                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => updateMutation.mutate({ id: section.id, updates: { is_visible: !section.is_visible } })}>
-                  {section.is_visible ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                </Button>
-                <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteMutation.mutate(section.id)}>
-                  <Trash2 className="w-3 h-3" />
+                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setSelectedId(null)}>
+                  <X className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
-            <LPSectionContentEditor
-              section={section}
-              onSave={(content) => updateMutation.mutate({ id: section.id, updates: { content } })}
-            />
-          </CardContent>
-        </Card>
-      ))}
-
-      <Card className="border-dashed border-2 border-accent/30">
-        <CardContent className="py-4 px-4">
-          <div className="flex items-end gap-2">
-            <div className="flex-1 space-y-2">
-              <Label className="text-xs">Add Section</Label>
-              <Select value={addingType} onValueChange={(v) => setAddingType(v as LPSectionType)}>
-                <SelectTrigger><SelectValue placeholder="Choose section type…" /></SelectTrigger>
-                <SelectContent>
-                  {LP_SECTION_TYPES.map((t) => (
-                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={() => addingType && addMutation.mutate(addingType as LPSectionType)} disabled={!addingType}>
-              <Plus className="w-4 h-4 mr-1" /> Add
-            </Button>
+            <ScrollArea className="flex-1">
+              <div className="p-3">
+                <SectionContentEditor
+                  key={selectedSection.id}
+                  section={selectedSection}
+                  onSave={(content) => updateMutation.mutate({ id: selectedSection.id, updates: { content } })}
+                />
+              </div>
+            </ScrollArea>
           </div>
-        </CardContent>
-      </Card>
+        ) : (
+          <div className="w-80 shrink-0 border-l border-border bg-card flex flex-col items-center justify-center text-center p-6">
+            <PanelRightOpen className="w-8 h-8 text-muted-foreground/40 mb-3" />
+            <p className="text-sm font-medium text-muted-foreground">No section selected</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">Click a section in the left panel to edit its content</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-// ── Content editor per section type ──
+// ══════════════════════════════════════════════════════════════
+// Section Content Editor (right panel)
+// ══════════════════════════════════════════════════════════════
 
-function LPSectionContentEditor({ section, onSave }: { section: LPSection; onSave: (c: Record<string, any>) => void }) {
+function SectionContentEditor({ section, onSave }: { section: LPSection; onSave: (c: Record<string, any>) => void }) {
   const [content, setContent] = useState(section.content);
   const hasChanges = JSON.stringify(content) !== JSON.stringify(section.content);
   const update = (key: string, value: any) => setContent({ ...content, [key]: value });
 
+  // Reset when section changes
+  useEffect(() => {
+    setContent(section.content);
+  }, [section.id, section.content]);
+
   const renderArrayEditor = (key: string, fields: { name: string; placeholder: string; type?: string }[]) => (
     <div className="space-y-2">
       {(content[key] ?? []).map((item: any, i: number) => (
-        <div key={i} className="border border-border rounded-md p-2 space-y-1">
+        <div key={i} className="border border-border rounded-lg p-2.5 space-y-1.5 bg-muted/20">
           {fields.map((f) => (
             <div key={f.name}>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{f.placeholder}</Label>
               {f.type === "textarea" ? (
                 <Textarea
                   placeholder={f.placeholder}
                   value={item[f.name] ?? ""}
                   rows={2}
+                  className="text-xs mt-0.5"
                   onChange={(e) => {
                     const items = [...(content[key] ?? [])];
                     items[i] = { ...items[i], [f.name]: e.target.value };
@@ -392,6 +520,7 @@ function LPSectionContentEditor({ section, onSave }: { section: LPSection; onSav
                   placeholder={f.placeholder}
                   value={item[f.name] ?? ""}
                   type={f.type ?? "text"}
+                  className="h-8 text-xs mt-0.5"
                   onChange={(e) => {
                     const items = [...(content[key] ?? [])];
                     items[i] = { ...items[i], [f.name]: e.target.value };
@@ -401,19 +530,19 @@ function LPSectionContentEditor({ section, onSave }: { section: LPSection; onSav
               )}
             </div>
           ))}
-          <Button size="sm" variant="ghost" className="h-6 text-xs text-destructive" onClick={() => {
+          <Button size="sm" variant="ghost" className="h-6 text-[10px] text-destructive" onClick={() => {
             update(key, (content[key] ?? []).filter((_: any, j: number) => j !== i));
           }}>
             <Trash2 className="w-3 h-3 mr-1" /> Remove
           </Button>
         </div>
       ))}
-      <Button size="sm" variant="outline" onClick={() => {
+      <Button size="sm" variant="outline" className="w-full h-7 text-xs" onClick={() => {
         const empty: any = {};
         fields.forEach((f) => (empty[f.name] = ""));
         update(key, [...(content[key] ?? []), empty]);
       }}>
-        <Plus className="w-3 h-3 mr-1" /> Add
+        <Plus className="w-3 h-3 mr-1" /> Add Item
       </Button>
     </div>
   );
@@ -422,84 +551,134 @@ function LPSectionContentEditor({ section, onSave }: { section: LPSection; onSav
     switch (section.section_type) {
       case "hero":
         return (
-          <div className="space-y-2">
-            <Input placeholder="Headline" value={content.headline ?? ""} onChange={(e) => update("headline", e.target.value)} />
-            <Input placeholder="Subtitle" value={content.subtitle ?? ""} onChange={(e) => update("subtitle", e.target.value)} />
-            <Input placeholder="Image URL" value={content.image_url ?? ""} onChange={(e) => update("image_url", e.target.value)} />
-            <Input placeholder="CTA Button Text" value={content.cta_text ?? ""} onChange={(e) => update("cta_text", e.target.value)} />
+          <div className="space-y-3">
+            <FieldGroup label="Headline">
+              <Input className="h-8 text-xs" placeholder="Headline" value={content.headline ?? ""} onChange={(e) => update("headline", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="Subtitle">
+              <Input className="h-8 text-xs" placeholder="Subtitle" value={content.subtitle ?? ""} onChange={(e) => update("subtitle", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="Image URL">
+              <Input className="h-8 text-xs" placeholder="Image URL" value={content.image_url ?? ""} onChange={(e) => update("image_url", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="CTA Button Text">
+              <Input className="h-8 text-xs" placeholder="Order Now" value={content.cta_text ?? ""} onChange={(e) => update("cta_text", e.target.value)} />
+            </FieldGroup>
           </div>
         );
       case "gallery":
       case "order_form":
-        return <p className="text-xs text-muted-foreground">Uses product data automatically.</p>;
+        return (
+          <div className="rounded-lg bg-muted/30 p-3">
+            <p className="text-xs text-muted-foreground">This section uses product data automatically. No configuration needed.</p>
+          </div>
+        );
       case "video":
         return (
-          <div className="space-y-2">
-            <Input placeholder="Video Title" value={content.title ?? ""} onChange={(e) => update("title", e.target.value)} />
-            <Input placeholder="Video URL (YouTube/Vimeo embed)" value={content.video_url ?? ""} onChange={(e) => update("video_url", e.target.value)} />
+          <div className="space-y-3">
+            <FieldGroup label="Video Title">
+              <Input className="h-8 text-xs" placeholder="Video Title" value={content.title ?? ""} onChange={(e) => update("title", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="Video URL">
+              <Input className="h-8 text-xs" placeholder="YouTube/Vimeo embed URL" value={content.video_url ?? ""} onChange={(e) => update("video_url", e.target.value)} />
+            </FieldGroup>
           </div>
         );
       case "benefits":
         return (
-          <div className="space-y-2">
-            <Input placeholder="Section Heading" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
-            {renderArrayEditor("items", [
-              { name: "icon", placeholder: "Icon (emoji)" },
-              { name: "title", placeholder: "Benefit title" },
-              { name: "description", placeholder: "Description", type: "textarea" },
-            ])}
+          <div className="space-y-3">
+            <FieldGroup label="Section Heading">
+              <Input className="h-8 text-xs" placeholder="Why Choose Us" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            </FieldGroup>
+            <div className="space-y-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Benefits</Label>
+              {renderArrayEditor("items", [
+                { name: "icon", placeholder: "Icon (emoji)" },
+                { name: "title", placeholder: "Benefit title" },
+                { name: "description", placeholder: "Description", type: "textarea" },
+              ])}
+            </div>
           </div>
         );
       case "reviews":
         return (
-          <div className="space-y-2">
-            <Input placeholder="Section Heading" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
-            {renderArrayEditor("items", [
-              { name: "name", placeholder: "Customer name" },
-              { name: "text", placeholder: "Review text", type: "textarea" },
-              { name: "image_url", placeholder: "Customer image URL (optional)" },
-            ])}
+          <div className="space-y-3">
+            <FieldGroup label="Section Heading">
+              <Input className="h-8 text-xs" placeholder="Customer Reviews" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            </FieldGroup>
+            <div className="space-y-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Reviews</Label>
+              {renderArrayEditor("items", [
+                { name: "name", placeholder: "Customer name" },
+                { name: "text", placeholder: "Review text", type: "textarea" },
+                { name: "image_url", placeholder: "Customer image URL (optional)" },
+              ])}
+            </div>
           </div>
         );
       case "before_after":
         return (
-          <div className="space-y-2">
-            <Input placeholder="Heading" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
-            <Input placeholder="Before Image URL" value={content.before_image ?? ""} onChange={(e) => update("before_image", e.target.value)} />
-            <Input placeholder="After Image URL" value={content.after_image ?? ""} onChange={(e) => update("after_image", e.target.value)} />
+          <div className="space-y-3">
+            <FieldGroup label="Heading">
+              <Input className="h-8 text-xs" placeholder="See the Difference" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="Before Image URL">
+              <Input className="h-8 text-xs" placeholder="Before Image URL" value={content.before_image ?? ""} onChange={(e) => update("before_image", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="After Image URL">
+              <Input className="h-8 text-xs" placeholder="After Image URL" value={content.after_image ?? ""} onChange={(e) => update("after_image", e.target.value)} />
+            </FieldGroup>
             <div className="grid grid-cols-2 gap-2">
-              <Input placeholder="Before Label" value={content.before_label ?? ""} onChange={(e) => update("before_label", e.target.value)} />
-              <Input placeholder="After Label" value={content.after_label ?? ""} onChange={(e) => update("after_label", e.target.value)} />
+              <FieldGroup label="Before Label">
+                <Input className="h-8 text-xs" placeholder="Before" value={content.before_label ?? ""} onChange={(e) => update("before_label", e.target.value)} />
+              </FieldGroup>
+              <FieldGroup label="After Label">
+                <Input className="h-8 text-xs" placeholder="After" value={content.after_label ?? ""} onChange={(e) => update("after_label", e.target.value)} />
+              </FieldGroup>
             </div>
           </div>
         );
       case "faq":
         return (
-          <div className="space-y-2">
-            <Input placeholder="Section Heading" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
-            {renderArrayEditor("items", [
-              { name: "question", placeholder: "Question" },
-              { name: "answer", placeholder: "Answer", type: "textarea" },
-            ])}
+          <div className="space-y-3">
+            <FieldGroup label="Section Heading">
+              <Input className="h-8 text-xs" placeholder="FAQ" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            </FieldGroup>
+            <div className="space-y-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Questions</Label>
+              {renderArrayEditor("items", [
+                { name: "question", placeholder: "Question" },
+                { name: "answer", placeholder: "Answer", type: "textarea" },
+              ])}
+            </div>
           </div>
         );
       case "countdown":
         return (
-          <div className="space-y-2">
-            <Input placeholder="Heading" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
-            <Input placeholder="Subtitle" value={content.subtitle ?? ""} onChange={(e) => update("subtitle", e.target.value)} />
-            <div className="space-y-1">
-              <Label className="text-xs">End Date & Time</Label>
-              <Input type="datetime-local" value={content.end_date ?? ""} onChange={(e) => update("end_date", e.target.value)} />
-            </div>
+          <div className="space-y-3">
+            <FieldGroup label="Heading">
+              <Input className="h-8 text-xs" placeholder="Limited Time Offer" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="Subtitle">
+              <Input className="h-8 text-xs" placeholder="Subtitle" value={content.subtitle ?? ""} onChange={(e) => update("subtitle", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="End Date & Time">
+              <Input className="h-8 text-xs" type="datetime-local" value={content.end_date ?? ""} onChange={(e) => update("end_date", e.target.value)} />
+            </FieldGroup>
           </div>
         );
       case "guarantee":
         return (
-          <div className="space-y-2">
-            <Input placeholder="Icon (emoji)" value={content.icon ?? ""} onChange={(e) => update("icon", e.target.value)} />
-            <Input placeholder="Heading" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
-            <Textarea placeholder="Guarantee text" value={content.text ?? ""} rows={3} onChange={(e) => update("text", e.target.value)} />
+          <div className="space-y-3">
+            <FieldGroup label="Icon (emoji)">
+              <Input className="h-8 text-xs" placeholder="🛡️" value={content.icon ?? ""} onChange={(e) => update("icon", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="Heading">
+              <Input className="h-8 text-xs" placeholder="Our Guarantee" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            </FieldGroup>
+            <FieldGroup label="Text">
+              <Textarea className="text-xs" placeholder="Guarantee details…" value={content.text ?? ""} rows={3} onChange={(e) => update("text", e.target.value)} />
+            </FieldGroup>
           </div>
         );
       default:
@@ -508,20 +687,22 @@ function LPSectionContentEditor({ section, onSave }: { section: LPSection; onSav
   };
 
   return (
-    <Accordion type="single" collapsible>
-      <AccordionItem value="content" className="border-0">
-        <AccordionTrigger className="py-1 text-xs text-muted-foreground hover:no-underline">
-          Edit Content
-        </AccordionTrigger>
-        <AccordionContent className="pt-2 space-y-3">
-          {renderFields()}
-          {hasChanges && (
-            <Button size="sm" onClick={() => onSave(content)}>
-              <Save className="w-3 h-3 mr-1" /> Save
-            </Button>
-          )}
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <div className="space-y-4">
+      {renderFields()}
+      {hasChanges && (
+        <Button size="sm" className="w-full" onClick={() => onSave(content)}>
+          <Save className="w-3 h-3 mr-1" /> Save Changes
+        </Button>
+      )}
+    </div>
+  );
+}
+
+function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</Label>
+      {children}
+    </div>
   );
 }
