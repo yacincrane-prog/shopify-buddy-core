@@ -97,12 +97,12 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
           </h2>
         </div>
 
-        <div className="flex gap-4 items-center bg-secondary/50 rounded-xl p-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start bg-secondary/50 rounded-xl p-3 sm:p-4">
           {upsell.product_image && (
             <img
               src={upsell.product_image}
               alt={upsell.product_title}
-              className="w-24 h-24 rounded-lg object-cover shrink-0"
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0"
             />
           )}
           <div className="flex-1 min-w-0 space-y-2">
