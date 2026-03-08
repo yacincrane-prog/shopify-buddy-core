@@ -1,13 +1,17 @@
 import { useState } from "react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useOrders, useUpdateOrderStatus, useDeleteOrder } from "@/hooks/useOrders";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Trash2, Search, Phone } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +48,7 @@ export default function AdminOrders() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const filtered = (orders ?? []).filter((o) => {
     const matchesSearch =
@@ -77,7 +82,7 @@ export default function AdminOrders() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <AdminPageHeader title="الطلبات" description="عرض وإدارة طلبات العملاء" />
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -91,7 +96,7 @@ export default function AdminOrders() {
           />
         </div>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-[160px]">
+          <SelectTrigger className="w-full sm:w-[160px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -106,10 +111,64 @@ export default function AdminOrders() {
       {isLoading ? (
         <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
       ) : !filtered.length ? (
-        <div className="rounded-lg border border-dashed border-border p-12 text-center text-muted-foreground">
+        <div className="rounded-lg border border-dashed border-border p-8 sm:p-12 text-center text-muted-foreground">
           <p className="text-lg font-medium">لا توجد طلبات</p>
         </div>
+      ) : isMobile ? (
+        /* Mobile card layout */
+        <div className="space-y-3">
+          {filtered.map((order) => (
+            <Card key={order.id} className="border-border">
+              <CardContent className="p-3 space-y-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-medium text-sm">{order.customer_name}</p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Phone className="h-3 w-3" />
+                      {order.customer_phone}
+                    </div>
+                  </div>
+                  <Badge className={`${statusColors[order.status]} border-0 text-xs`}>
+                    {statusLabels[order.status] || order.status}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground truncate max-w-[60%]">{order.product_title} × {order.quantity}</span>
+                  <span className="font-semibold">{Number(order.total_price).toLocaleString()} DA</span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{order.wilaya} · {order.delivery_type === "home" ? "المنزل" : "المكتب"}</span>
+                  <span>{new Date(order.created_at).toLocaleDateString("ar-DZ")}</span>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <Select
+                    value={order.status}
+                    onValueChange={(val) => handleStatusChange(order.id, val)}
+                  >
+                    <SelectTrigger className="h-8 text-xs flex-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUSES.map((s) => (
+                        <SelectItem key={s} value={s}>{statusLabels[s]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive/70 hover:text-destructive shrink-0"
+                    onClick={() => setDeleteId(order.id)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       ) : (
+        /* Desktop table layout */
         <div className="rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>

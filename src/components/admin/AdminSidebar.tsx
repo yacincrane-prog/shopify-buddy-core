@@ -62,13 +62,18 @@ const systemNav = [
 ];
 
 export function AdminSidebar() {
-  const { state } = useSidebar();
+  const { state, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
 
   const isActive = (path: string) => {
     if (path === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(path);
+  };
+
+  const handleNavClick = () => {
+    // Close mobile sidebar on navigation
+    setOpenMobile(false);
   };
 
   const renderGroup = (label: string, items: typeof mainNav) => (
@@ -88,6 +93,7 @@ export function AdminSidebar() {
                   end={item.url === "/admin"}
                   className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground transition-all duration-150 hover:text-foreground hover:bg-accent/10"
                   activeClassName="!bg-primary !text-primary-foreground shadow-sm"
+                  onClick={handleNavClick}
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
                   {!collapsed && <span>{item.title}</span>}
@@ -101,7 +107,7 @@ export function AdminSidebar() {
   );
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border">
+    <Sidebar collapsible="offcanvas" className="border-r border-border">
       <SidebarHeader className="p-4">
         <NavLink to="/" className="flex items-center gap-2.5 text-foreground hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
