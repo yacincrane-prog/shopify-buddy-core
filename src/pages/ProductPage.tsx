@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
 import type { UpsellWithProduct } from "@/lib/upsells";
+import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
