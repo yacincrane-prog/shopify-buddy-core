@@ -70,7 +70,9 @@ import {
   Smartphone,
   Copy,
   LayoutTemplate,
+  Maximize2,
 } from "lucide-react";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { toast } from "sonner";
 
 type View = "list" | "create" | "edit";
