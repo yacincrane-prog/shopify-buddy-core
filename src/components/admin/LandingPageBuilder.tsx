@@ -171,6 +171,13 @@ export function LandingPageBuilder() {
                 <Label>Page Title</Label>
                 <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Leave empty to use product title" />
               </div>
+              <div className="space-y-1.5">
+                <Label>Slug (URL)</Label>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <span>/offer/</span>
+                  <Input value={newSlug} onChange={(e) => setNewSlug(e.target.value.replace(/[^a-z0-9-]/g, ""))} placeholder="auto-generated if empty" className="font-mono text-xs" />
+                </div>
+              </div>
             </div>
 
             <div className="border-t border-border" />
