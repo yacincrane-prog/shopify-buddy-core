@@ -495,10 +495,10 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
         </div>
       </div>
 
-      {/* 3-panel body */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* 3-panel body - stacked on small screens, side-by-side on desktop */}
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Left: Section List */}
-        <div className="w-64 shrink-0 border-r border-border bg-card flex flex-col">
+        <div className="w-full lg:w-64 shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card flex flex-col max-h-[30vh] lg:max-h-none">
           <div className="px-3 py-2.5 border-b border-border">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sections</p>
           </div>
