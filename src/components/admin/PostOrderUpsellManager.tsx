@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Trash2, Save, Gift } from "lucide-react";
+import { PostOrderUpsellPreviewButton } from "@/components/admin/PostOrderUpsellPreview";
 import { toast } from "sonner";
 
 export function PostOrderUpsellManager() {
