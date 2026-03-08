@@ -58,10 +58,15 @@ export function UpsellManager() {
 
       {creating && (
         <Card>
-          <CardContent className="pt-6 space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
+          <CardContent className="pt-6 space-y-6">
+            {/* Section: Product Mapping */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Product Mapping</h3>
+              <p className="text-xs text-muted-foreground">Choose which product triggers the upsell and which product to suggest</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>When viewing product</Label>
+                <Label>When viewing product <span className="text-destructive">*</span></Label>
                 <Select value={sourceId} onValueChange={setSourceId}>
                   <SelectTrigger><SelectValue placeholder="Source product" /></SelectTrigger>
                   <SelectContent>
@@ -72,7 +77,7 @@ export function UpsellManager() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Suggest adding</Label>
+                <Label>Suggest adding <span className="text-destructive">*</span></Label>
                 <Select value={targetId} onValueChange={setTargetId}>
                   <SelectTrigger><SelectValue placeholder="Upsell product" /></SelectTrigger>
                   <SelectContent>
@@ -83,11 +88,29 @@ export function UpsellManager() {
                 </Select>
               </div>
             </div>
+
+            {sourceId && targetId && sourceId !== targetId && (
+              <div className="rounded-lg bg-muted/50 border border-border px-3 py-2">
+                <p className="text-xs text-muted-foreground">
+                  When a customer views <span className="font-medium text-foreground">{products?.find(p => p.id === sourceId)?.title}</span>,
+                  they'll see an offer for <span className="font-medium text-foreground">{products?.find(p => p.id === targetId)?.title}</span>
+                </p>
+              </div>
+            )}
+
+            <div className="border-t border-border" />
+
+            {/* Section: Discount */}
+            <div className="space-y-1">
+              <h3 className="text-sm font-semibold text-foreground">Discount</h3>
+              <p className="text-xs text-muted-foreground">Set the discount percentage for the upsell offer</p>
+            </div>
             <div className="space-y-1.5 max-w-[200px]">
-              <Label>Discount %</Label>
+              <Label>Discount % <span className="text-destructive">*</span></Label>
               <Input type="number" min={1} max={99} value={discount} onChange={(e) => setDiscount(e.target.value)} />
             </div>
-            <div className="flex gap-2">
+
+            <div className="flex gap-2 pt-2 border-t border-border">
               <Button onClick={() => createMut.mutate()} disabled={!canSubmit || createMut.isPending}>
                 {createMut.isPending ? "Creating…" : "Create Upsell"}
               </Button>
