@@ -6,7 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { WILAYAS, getWilayaByCode, getShippingPrice } from "@/data/algeria";
+import { WILAYAS } from "@/data/algeria";
+import { useActiveShippingRates, type ShippingRate } from "@/hooks/useShippingRates";
+import { createOrder } from "@/lib/orders";
 import { createOrder } from "@/lib/orders";
 import { Loader2, Truck, Building2, CheckCircle2, Ticket, X } from "lucide-react";
 import { toast } from "sonner";
