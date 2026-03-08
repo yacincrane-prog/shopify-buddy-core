@@ -137,8 +137,7 @@ export default function AdminCheckoutPreview() {
         {/* Left: Editor - full width on mobile, 60% on desktop */}
         <div className="flex-1 space-y-4">
           {/* Tabs - horizontal scroll on mobile */}
-          <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto"
-            >
+          <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto">
             <div className="flex gap-2 shrink-0">
               variant={activeTab === "fields" ? "default" : "ghost"}
               size="sm"
