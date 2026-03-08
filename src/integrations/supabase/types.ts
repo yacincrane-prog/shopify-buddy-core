@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      orders: {
+        Row: {
+          commune: string
+          created_at: string
+          customer_name: string
+          customer_phone: string
+          delivery_type: string
+          id: string
+          product_id: string | null
+          product_price: number
+          product_title: string
+          quantity: number
+          shipping_price: number
+          status: string
+          total_price: number
+          updated_at: string
+          wilaya: string
+        }
+        Insert: {
+          commune: string
+          created_at?: string
+          customer_name: string
+          customer_phone: string
+          delivery_type: string
+          id?: string
+          product_id?: string | null
+          product_price: number
+          product_title: string
+          quantity?: number
+          shipping_price?: number
+          status?: string
+          total_price: number
+          updated_at?: string
+          wilaya: string
+        }
+        Update: {
+          commune?: string
+          created_at?: string
+          customer_name?: string
+          customer_phone?: string
+          delivery_type?: string
+          id?: string
+          product_id?: string | null
+          product_price?: number
+          product_title?: string
+          quantity?: number
+          shipping_price?: number
+          status?: string
+          total_price?: number
+          updated_at?: string
+          wilaya?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           compare_at_price: number | null
