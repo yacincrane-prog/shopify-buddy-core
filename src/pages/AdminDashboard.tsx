@@ -7,6 +7,7 @@ import { BundleManager } from "@/components/admin/BundleManager";
 import { QuantityDiscountManager } from "@/components/admin/QuantityDiscountManager";
 import { UpsellManager } from "@/components/admin/UpsellManager";
 import { ExitIntentManager } from "@/components/admin/ExitIntentManager";
+import { SectionBuilder } from "@/components/admin/SectionBuilder";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { Plus, Package, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -120,6 +121,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="discounts">Qty Discounts</TabsTrigger>
               <TabsTrigger value="upsells">Upsells</TabsTrigger>
               <TabsTrigger value="exit-intent">Exit Intent</TabsTrigger>
+              <TabsTrigger value="page-builder">Page Builder</TabsTrigger>
             </TabsList>
 
             <TabsContent value="products">
@@ -148,6 +150,10 @@ export default function AdminDashboard() {
 
             <TabsContent value="exit-intent">
               <ExitIntentManager />
+            </TabsContent>
+
+            <TabsContent value="page-builder">
+              <SectionBuilder />
             </TabsContent>
           </Tabs>
         )}
