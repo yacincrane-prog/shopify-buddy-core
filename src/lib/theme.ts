@@ -112,10 +112,25 @@ export async function fetchTheme(): Promise<ThemeConfig> {
 }
 
 export async function saveTheme(theme: ThemeConfig): Promise<void> {
-  const { error } = await supabase
+  // Try update first, then insert
+  const { data } = await supabase
     .from("theme_settings")
-    .upsert({ key: "storefront", value: theme as unknown as Record<string, unknown>, updated_at: new Date().toISOString() }, { onConflict: "key" });
-  if (error) throw error;
+    .select("id")
+    .eq("key", "storefront")
+    .single();
+  
+  if (data) {
+    const { error } = await supabase
+      .from("theme_settings")
+      .update({ value: theme as unknown as Record<string, unknown>, updated_at: new Date().toISOString() })
+      .eq("key", "storefront");
+    if (error) throw error;
+  } else {
+    const { error } = await supabase
+      .from("theme_settings")
+      .insert({ key: "storefront", value: theme as unknown as Record<string, unknown> });
+    if (error) throw error;
+  }
 }
 
 /** Apply theme CSS variables to document root */
