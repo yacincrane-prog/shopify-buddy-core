@@ -251,90 +251,21 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Customer info */}
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <Label htmlFor="cod-name" className="text-sm">الاسم الكامل</Label>
-              <Input id="cod-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="أدخل اسمك الكامل" autoComplete="name" />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="cod-phone" className="text-sm">رقم الهاتف</Label>
-              <Input id="cod-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0555 123 456" type="tel" autoComplete="tel" dir="ltr" />
-            </div>
-          </div>
+          {/* Dynamic fields */}
+          {visibleFields.map((field, idx) => {
+            const showSeparator = idx > 0 && (
+              (field.type === "wilaya" && visibleFields[idx - 1]?.type !== "wilaya") ||
+              (field.type === "delivery_type" && visibleFields[idx - 1]?.type !== "delivery_type") ||
+              (!["wilaya", "commune", "delivery_type"].includes(field.type) && ["wilaya", "commune", "delivery_type"].includes(visibleFields[idx - 1]?.type))
+            );
 
-          <Separator />
-
-          {/* Location */}
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <Label className="text-sm">الولاية</Label>
-              <Select value={wilayaCode} onValueChange={handleWilayaChange}>
-                <SelectTrigger><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
-                <SelectContent className="max-h-60">
-                  {activeWilayas.map((w) => (
-                    <SelectItem key={w.code} value={w.code}>{w.code} - {w.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-sm">البلدية</Label>
-              <Select value={commune} onValueChange={setCommune} disabled={!communes.length}>
-                <SelectTrigger><SelectValue placeholder={communes.length ? "اختر البلدية" : "اختر الولاية أولاً"} /></SelectTrigger>
-                <SelectContent className="max-h-60">
-                  {communes.map((c) => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Delivery type */}
-          <div className="space-y-2">
-            <Label className="text-sm">نوع التوصيل</Label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setDeliveryType("home")}
-                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
-                  deliveryType === "home" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
-                }`}
-              >
-                <Truck className="w-4 h-4 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">المنزل</p>
-                  {selectedRate && (
-                    <p className="text-xs text-muted-foreground">
-                      {freeDelivery ? "مجاني" : `${selectedRate.home_delivery_price} د.ج`}
-                    </p>
-                  )}
-                </div>
-              </button>
-              {stopDeskEnabled && (
-                <button
-                  type="button"
-                  onClick={() => setDeliveryType("stop_desk")}
-                  className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
-                    deliveryType === "stop_desk" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
-                  }`}
-                >
-                  <Building2 className="w-4 h-4 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium">المكتب</p>
-                    {selectedRate && (
-                      <p className="text-xs text-muted-foreground">
-                        {freeDelivery ? "مجاني" : `${selectedRate.stop_desk_price} د.ج`}
-                      </p>
-                    )}
-                  </div>
-                </button>
-              )}
-            </div>
-          </div>
+            return (
+              <div key={field.id}>
+                {showSeparator && <Separator className="mb-5" />}
+                {renderFormField(field)}
+              </div>
+            );
+          })}
 
           <Separator />
 
