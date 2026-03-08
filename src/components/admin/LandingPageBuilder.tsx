@@ -29,8 +29,10 @@ import {
   deleteLPSection,
   reorderLPSections,
   bulkCreateSections,
+  duplicateLPSection,
   TEMPLATES,
   LP_SECTION_TYPES,
+  SECTION_PRESETS,
   type LandingPage,
   type LPSection,
   type LPSectionType,
@@ -66,6 +68,8 @@ import {
   X,
   Monitor,
   Smartphone,
+  Copy,
+  LayoutTemplate,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -280,6 +284,7 @@ function SortableSectionItem({
   onSelect,
   onMoveUp,
   onMoveDown,
+  onDuplicate,
   sectionLabel,
 }: {
   section: LPSection;
@@ -289,6 +294,7 @@ function SortableSectionItem({
   onSelect: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onDuplicate: () => void;
   sectionLabel: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
@@ -317,6 +323,13 @@ function SortableSectionItem({
       <span className="flex-1 truncate text-xs font-medium">{sectionLabel}</span>
       <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
         <button
+          onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
+          className="p-0.5 hover:text-accent"
+          title="Duplicate"
+        >
+          <Copy className="w-3 h-3" />
+        </button>
+        <button
           onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
           disabled={index === 0}
           className="p-0.5 hover:text-accent disabled:opacity-30"
@@ -343,6 +356,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addingType, setAddingType] = useState<LPSectionType | "">("");
+  const [addMode, setAddMode] = useState<"type" | "preset">("type");
   const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   const [previewKey, setPreviewKey] = useState(0);
 
@@ -371,6 +385,28 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
   const deleteMutation = useMutation({
     mutationFn: deleteLPSection,
     onSuccess: () => { invalidate(); toast.success("Removed"); setSelectedId(null); },
+  });
+
+  const duplicateMutation = useMutation({
+    mutationFn: (section: LPSection) => duplicateLPSection(section, sections?.length ?? 0),
+    onSuccess: () => { invalidate(); toast.success("Section duplicated"); },
+  });
+
+  const addPresetMutation = useMutation({
+    mutationFn: async (preset: typeof SECTION_PRESETS[number]) => {
+      const { data } = await (await import("@/integrations/supabase/client")).supabase
+        .from("landing_page_sections")
+        .insert({
+          landing_page_id: page.id,
+          section_type: preset.type,
+          position: sections?.length ?? 0,
+          content: preset.content,
+        })
+        .select()
+        .single();
+      return data;
+    },
+    onSuccess: () => { invalidate(); toast.success("Template section added"); },
   });
 
   const moveMutation = useMutation({
@@ -468,6 +504,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
                         onSelect={() => setSelectedId(section.id === selectedId ? null : section.id)}
                         onMoveUp={() => moveSection(index, "up")}
                         onMoveDown={() => moveSection(index, "down")}
+                        onDuplicate={() => duplicateMutation.mutate(section)}
                         sectionLabel={sectionLabel(section.section_type)}
                       />
                     ))}
@@ -479,24 +516,62 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
 
           {/* Add section */}
           <div className="p-2 border-t border-border space-y-2">
-            <Select value={addingType} onValueChange={(v) => setAddingType(v as LPSectionType)}>
-              <SelectTrigger className="h-8 text-xs">
-                <SelectValue placeholder="Add section…" />
-              </SelectTrigger>
-              <SelectContent>
-                {LP_SECTION_TYPES.map((t) => (
-                  <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              size="sm"
-              className="w-full h-8 text-xs"
-              onClick={() => addingType && addMutation.mutate(addingType as LPSectionType)}
-              disabled={!addingType}
-            >
-              <Plus className="w-3 h-3 mr-1" /> Add Section
-            </Button>
+            <div className="flex rounded-md border border-border p-0.5 bg-muted/30">
+              <button
+                onClick={() => setAddMode("type")}
+                className={`flex-1 text-[10px] font-medium py-1 rounded-sm transition-colors ${
+                  addMode === "type" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                }`}
+              >
+                <Plus className="w-3 h-3 inline mr-0.5" /> Blank
+              </button>
+              <button
+                onClick={() => setAddMode("preset")}
+                className={`flex-1 text-[10px] font-medium py-1 rounded-sm transition-colors ${
+                  addMode === "preset" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+                }`}
+              >
+                <LayoutTemplate className="w-3 h-3 inline mr-0.5" /> Templates
+              </button>
+            </div>
+
+            {addMode === "type" ? (
+              <>
+                <Select value={addingType} onValueChange={(v) => setAddingType(v as LPSectionType)}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="Add section…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LP_SECTION_TYPES.map((t) => (
+                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  size="sm"
+                  className="w-full h-8 text-xs"
+                  onClick={() => addingType && addMutation.mutate(addingType as LPSectionType)}
+                  disabled={!addingType}
+                >
+                  <Plus className="w-3 h-3 mr-1" /> Add Section
+                </Button>
+              </>
+            ) : (
+              <ScrollArea className="max-h-48">
+                <div className="space-y-1">
+                  {SECTION_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      onClick={() => addPresetMutation.mutate(preset)}
+                      disabled={addPresetMutation.isPending}
+                      className="w-full text-left px-2.5 py-2 rounded-md text-xs hover:bg-muted/60 border border-transparent hover:border-border transition-colors"
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+            )}
           </div>
         </div>
 
