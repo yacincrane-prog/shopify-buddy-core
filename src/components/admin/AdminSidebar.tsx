@@ -49,6 +49,7 @@ const marketingNav = [
 
 const systemNav = [
   { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
+  { title: "Theme Editor", url: "/admin/theme", icon: Palette },
   { title: "Page Builder", url: "/admin/page-builder", icon: Settings },
 ];
 

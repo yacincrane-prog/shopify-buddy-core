@@ -59,6 +59,7 @@ const App = () => (
             <Route path="abandoned" element={<Suspense fallback={<AdminFallback />}><AdminAbandoned /></Suspense>} />
             <Route path="analytics" element={<Suspense fallback={<AdminFallback />}><AdminAnalytics /></Suspense>} />
             <Route path="page-builder" element={<Suspense fallback={<AdminFallback />}><AdminPageBuilder /></Suspense>} />
+            <Route path="theme" element={<Suspense fallback={<AdminFallback />}><AdminThemeEditor /></Suspense>} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
