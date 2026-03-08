@@ -38,7 +38,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
 
   const selectedWilaya = useMemo(() => getWilayaByCode(wilayaCode), [wilayaCode]);
   const communes = selectedWilaya?.communes ?? [];
-  const shippingPrice = wilayaCode ? getShippingPrice(wilayaCode, deliveryType) : 0;
+  const shippingPrice = freeDelivery ? 0 : (wilayaCode ? getShippingPrice(wilayaCode, deliveryType) : 0);
 
   const effectiveUnitPrice = unitPrice ?? Number(product.price);
   const productTotal = effectiveUnitPrice * quantity;
