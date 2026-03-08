@@ -324,51 +324,185 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
             </>
           )}
 
-          <Separator />
-
-          {/* Price breakdown */}
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{product.title} × {quantity}</span>
-              <span>{productTotal.toLocaleString()} د.ج</span>
-            </div>
-            {upsellItem && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground flex items-center gap-1">
-                  {upsellItem.title}
-                  <Badge variant="secondary" className="text-xs mr-1">عرض إضافي</Badge>
-                </span>
-                <span>{upsellTotal.toLocaleString()} د.ج</span>
+          {config.showPriceBreakdown && (
+            <>
+              <Separator />
+              {/* Price breakdown */}
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{product.title} × {quantity}</span>
+                  <span>{productTotal.toLocaleString()} د.ج</span>
+                </div>
+                {upsellItem && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground flex items-center gap-1">
+                      {upsellItem.title}
+                      <Badge variant="secondary" className="text-xs mr-1">عرض إضافي</Badge>
+                    </span>
+                    <span>{upsellTotal.toLocaleString()} د.ج</span>
+                  </div>
+                )}
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-accent">
+                    <span className="flex items-center gap-1">
+                      خصم
+                      <Badge variant="outline" className="text-xs font-mono border-accent/30 text-accent">
+                        {appliedDiscount?.code}
+                      </Badge>
+                    </span>
+                    <span>-{discountAmount.toLocaleString()} د.ج</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">التوصيل</span>
+                  <span>{freeDelivery ? "مجاني" : (shippingPrice ? `${shippingPrice.toLocaleString()} د.ج` : "—")}</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between font-bold text-base">
+                  <span>المجموع</span>
+                  <span>{totalPrice.toLocaleString()} د.ج</span>
+                </div>
               </div>
-            )}
-            {discountAmount > 0 && (
-              <div className="flex justify-between text-accent">
-                <span className="flex items-center gap-1">
-                  خصم
-                  <Badge variant="outline" className="text-xs font-mono border-accent/30 text-accent">
-                    {appliedDiscount?.code}
-                  </Badge>
-                </span>
-                <span>-{discountAmount.toLocaleString()} د.ج</span>
-              </div>
-            )}
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">التوصيل</span>
-              <span>{freeDelivery ? "مجاني" : (shippingPrice ? `${shippingPrice.toLocaleString()} د.ج` : "—")}</span>
-            </div>
-            <Separator />
-            <div className="flex justify-between font-bold text-base">
-              <span>المجموع</span>
-              <span>{totalPrice.toLocaleString()} د.ج</span>
-            </div>
-          </div>
+            </>
+          )}
 
           <Button type="submit" size="lg" className="w-full" disabled={!isValid || submitting}>
             {submitting ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
-            تأكيد الطلب — {totalPrice.toLocaleString()} د.ج
+            {config.buttonText} — {totalPrice.toLocaleString()} د.ج
           </Button>
         </form>
       </CardContent>
     </Card>
   );
+
+  function renderFormField(field: CheckoutField) {
+    switch (field.type) {
+      case "wilaya":
+        return (
+          <div className="space-y-1.5">
+            <Label className="text-sm">{field.label}</Label>
+            <Select value={wilayaCode} onValueChange={handleWilayaChange}>
+              <SelectTrigger><SelectValue placeholder={field.placeholder || "اختر الولاية"} /></SelectTrigger>
+              <SelectContent className="max-h-60">
+                {activeWilayas.map((w) => (
+                  <SelectItem key={w.code} value={w.code}>{w.code} - {w.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      case "commune":
+        return (
+          <div className="space-y-1.5">
+            <Label className="text-sm">{field.label}</Label>
+            <Select value={commune} onValueChange={setCommune} disabled={!communes.length}>
+              <SelectTrigger><SelectValue placeholder={communes.length ? (field.placeholder || "اختر البلدية") : "اختر الولاية أولاً"} /></SelectTrigger>
+              <SelectContent className="max-h-60">
+                {communes.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        );
+      case "delivery_type":
+        return (
+          <div className="space-y-2">
+            <Label className="text-sm">{field.label}</Label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setDeliveryType("home")}
+                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
+                  deliveryType === "home" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
+                }`}
+              >
+                <Truck className="w-4 h-4 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">المنزل</p>
+                  {selectedRate && (
+                    <p className="text-xs text-muted-foreground">
+                      {freeDelivery ? "مجاني" : `${selectedRate.home_delivery_price} د.ج`}
+                    </p>
+                  )}
+                </div>
+              </button>
+              {stopDeskEnabled && (
+                <button
+                  type="button"
+                  onClick={() => setDeliveryType("stop_desk")}
+                  className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
+                    deliveryType === "stop_desk" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
+                  }`}
+                >
+                  <Building2 className="w-4 h-4 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">المكتب</p>
+                    {selectedRate && (
+                      <p className="text-xs text-muted-foreground">
+                        {freeDelivery ? "مجاني" : `${selectedRate.stop_desk_price} د.ج`}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      case "textarea":
+        return (
+          <div className="space-y-1.5">
+            <Label className="text-sm">{field.label} {field.required && <span className="text-destructive">*</span>}</Label>
+            <Textarea
+              value={customFields[field.id] ?? ""}
+              onChange={(e) => setCustomFields((prev) => ({ ...prev, [field.id]: e.target.value }))}
+              placeholder={field.placeholder}
+              rows={2}
+            />
+          </div>
+        );
+      case "tel":
+        if (field.id === "phone") {
+          return (
+            <div className="space-y-1.5">
+              <Label className="text-sm">{field.label}</Label>
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={field.placeholder} type="tel" autoComplete="tel" dir="ltr" />
+            </div>
+          );
+        }
+        return (
+          <div className="space-y-1.5">
+            <Label className="text-sm">{field.label} {field.required && <span className="text-destructive">*</span>}</Label>
+            <Input
+              value={customFields[field.id] ?? ""}
+              onChange={(e) => setCustomFields((prev) => ({ ...prev, [field.id]: e.target.value }))}
+              placeholder={field.placeholder}
+              type="tel"
+              dir="ltr"
+            />
+          </div>
+        );
+      default: // text, email
+        if (field.id === "name") {
+          return (
+            <div className="space-y-1.5">
+              <Label className="text-sm">{field.label}</Label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={field.placeholder} autoComplete="name" />
+            </div>
+          );
+        }
+        return (
+          <div className="space-y-1.5">
+            <Label className="text-sm">{field.label} {field.required && <span className="text-destructive">*</span>}</Label>
+            <Input
+              value={customFields[field.id] ?? ""}
+              onChange={(e) => setCustomFields((prev) => ({ ...prev, [field.id]: e.target.value }))}
+              placeholder={field.placeholder}
+              type={field.type}
+              dir={field.type === "email" ? "ltr" : undefined}
+            />
+          </div>
+        );
+    }
+  }
 }
