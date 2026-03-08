@@ -284,6 +284,7 @@ function SortableSectionItem({
   onSelect,
   onMoveUp,
   onMoveDown,
+  onDuplicate,
   sectionLabel,
 }: {
   section: LPSection;
@@ -293,6 +294,7 @@ function SortableSectionItem({
   onSelect: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onDuplicate: () => void;
   sectionLabel: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
@@ -320,6 +322,13 @@ function SortableSectionItem({
       </span>
       <span className="flex-1 truncate text-xs font-medium">{sectionLabel}</span>
       <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
+          className="p-0.5 hover:text-accent"
+          title="Duplicate"
+        >
+          <Copy className="w-3 h-3" />
+        </button>
         <button
           onClick={(e) => { e.stopPropagation(); onMoveUp(); }}
           disabled={index === 0}
