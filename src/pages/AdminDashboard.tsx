@@ -163,6 +163,10 @@ export default function AdminDashboard() {
             <TabsContent value="qty-offers">
               <QuantityOfferManager />
             </TabsContent>
+
+            <TabsContent value="post-upsell">
+              <PostOrderUpsellManager />
+            </TabsContent>
           </Tabs>
         )}
       </main>

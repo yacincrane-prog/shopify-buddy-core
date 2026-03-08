@@ -10,6 +10,7 @@ import { WILAYAS, getWilayaByCode, getShippingPrice } from "@/data/algeria";
 import { createOrder } from "@/lib/orders";
 import { Loader2, Truck, Building2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { PostOrderUpsellPage } from "@/components/checkout/PostOrderUpsellPage";
 import type { Product } from "@/types/product";
 
 interface UpsellItem {
@@ -27,6 +28,8 @@ interface CODCheckoutFormProps {
   freeDelivery?: boolean;
 }
 
+type CheckoutPhase = "form" | "post-upsell" | "confirmed";
+
 export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, freeDelivery = false }: CODCheckoutFormProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -34,7 +37,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [commune, setCommune] = useState("");
   const [deliveryType, setDeliveryType] = useState<"home" | "stop_desk">("home");
   const [submitting, setSubmitting] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [phase, setPhase] = useState<CheckoutPhase>("form");
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [postUpsellExtra, setPostUpsellExtra] = useState(0);
 
   const selectedWilaya = useMemo(() => getWilayaByCode(wilayaCode), [wilayaCode]);
   const communes = selectedWilaya?.communes ?? [];
@@ -61,7 +66,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
 
     setSubmitting(true);
     try {
-      await createOrder({
+      const order = await createOrder({
         product_id: product.id,
         product_title: product.title + (upsellItem ? ` + ${upsellItem.title} (upsell)` : ""),
         product_price: effectiveUnitPrice,
@@ -74,8 +79,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
         shipping_price: shippingPrice,
         total_price: totalPrice,
       });
-      setOrderPlaced(true);
-      toast.success("Order placed successfully!");
+      setOrderId(order.id);
+      // Show post-order upsell instead of confirming immediately
+      setPhase("post-upsell");
     } catch {
       toast.error("Failed to place order. Please try again.");
     } finally {
@@ -83,7 +89,28 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
     }
   };
 
-  if (orderPlaced) {
+  const handlePostUpsellComplete = (addedPrice: number | null) => {
+    if (addedPrice) {
+      setPostUpsellExtra(addedPrice);
+    }
+    setPhase("confirmed");
+    toast.success("Order placed successfully!");
+  };
+
+  // Post-order upsell phase
+  if (phase === "post-upsell" && orderId) {
+    return (
+      <PostOrderUpsellPage
+        orderId={orderId}
+        sourceProductId={product.id}
+        onComplete={handlePostUpsellComplete}
+      />
+    );
+  }
+
+  // Confirmed phase
+  if (phase === "confirmed") {
+    const finalTotal = totalPrice + postUpsellExtra;
     return (
       <Card className="border-border">
         <CardContent className="py-10 text-center space-y-4">
@@ -93,7 +120,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
             Your order has been placed. We'll contact you at {phone} to confirm delivery.
           </p>
           <div className="bg-secondary rounded-lg p-3 text-sm inline-block">
-            Total: <span className="font-bold">{totalPrice.toLocaleString()} DA</span>
+            Total: <span className="font-bold">{finalTotal.toLocaleString()} DA</span>
           </div>
         </CardContent>
       </Card>
@@ -163,7 +190,11 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                 <Truck className="w-4 h-4 flex-shrink-0" />
                 <div>
                   <p className="font-medium">Home</p>
-                  {selectedWilaya && <p className="text-xs text-muted-foreground">{selectedWilaya.homeDelivery} DA</p>}
+                  {selectedWilaya && (
+                    <p className="text-xs text-muted-foreground">
+                      {freeDelivery ? "Free" : `${selectedWilaya.homeDelivery} DA`}
+                    </p>
+                  )}
                 </div>
               </button>
               <button
@@ -176,7 +207,11 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                 <Building2 className="w-4 h-4 flex-shrink-0" />
                 <div>
                   <p className="font-medium">Stop Desk</p>
-                  {selectedWilaya && <p className="text-xs text-muted-foreground">{selectedWilaya.stopDesk} DA</p>}
+                  {selectedWilaya && (
+                    <p className="text-xs text-muted-foreground">
+                      {freeDelivery ? "Free" : `${selectedWilaya.stopDesk} DA`}
+                    </p>
+                  )}
                 </div>
               </button>
             </div>
@@ -201,7 +236,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
             )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">Shipping</span>
-              <span>{shippingPrice ? `${shippingPrice.toLocaleString()} DA` : "—"}</span>
+              <span>{freeDelivery ? "Free" : (shippingPrice ? `${shippingPrice.toLocaleString()} DA` : "—")}</span>
             </div>
             <Separator />
             <div className="flex justify-between font-bold text-base">
