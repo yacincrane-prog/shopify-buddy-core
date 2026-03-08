@@ -164,6 +164,8 @@ export default function ProductPage() {
         onAddUpsell={handleAddUpsell}
         onSkip={handleSkipUpsell}
       />
+
+      <ExitIntentPopup />
     </div>
   );
 }

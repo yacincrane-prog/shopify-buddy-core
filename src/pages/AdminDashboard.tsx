@@ -145,6 +145,10 @@ export default function AdminDashboard() {
             <TabsContent value="upsells">
               <UpsellManager />
             </TabsContent>
+
+            <TabsContent value="exit-intent">
+              <ExitIntentManager />
+            </TabsContent>
           </Tabs>
         )}
       </main>
