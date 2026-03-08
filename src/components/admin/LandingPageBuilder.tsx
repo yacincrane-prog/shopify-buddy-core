@@ -609,7 +609,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
 
         {/* Right: Section Editor */}
         {selectedSection ? (
-          <div className="w-80 shrink-0 border-l border-border bg-card flex flex-col">
+          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-border bg-card flex flex-col max-h-[40vh] lg:max-h-none">
             <div className="px-3 py-2.5 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
                 <Badge variant="secondary" className="text-[10px] shrink-0">{sectionLabel(selectedSection.section_type)}</Badge>
