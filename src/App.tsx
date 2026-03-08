@@ -28,6 +28,7 @@ const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminPageBuilder = lazy(() => import("./pages/admin/AdminPageBuilder"));
 const AdminThemeEditor = lazy(() => import("./pages/admin/AdminThemeEditor"));
 const AdminCheckoutPreview = lazy(() => import("./pages/admin/AdminCheckoutPreview"));
+const AdminTrackingPixels = lazy(() => import("./pages/admin/AdminTrackingPixels"));
 
 const queryClient = new QueryClient();
 
