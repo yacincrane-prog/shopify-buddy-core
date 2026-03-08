@@ -89,8 +89,24 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [postUpsellExtra, setPostUpsellExtra] = useState(0);
 
   const selectedWilaya = useMemo(() => getWilayaByCode(wilayaCode), [wilayaCode]);
+  const selectedRate = useMemo(() => getShippingRate(wilayaCode), [wilayaCode, shippingRates]);
   const communes = selectedWilaya?.communes ?? [];
-  const shippingPrice = freeDelivery ? 0 : (wilayaCode ? getShippingPrice(wilayaCode, deliveryType) : 0);
+
+  // Use DB rate if available, otherwise fall back to hardcoded
+  const shippingPrice = freeDelivery
+    ? 0
+    : selectedRate
+      ? (deliveryType === "home" ? selectedRate.home_delivery_price : selectedRate.stop_desk_price)
+      : (selectedWilaya ? (deliveryType === "home" ? selectedWilaya.homeDelivery : selectedWilaya.stopDesk) : 0);
+
+  const stopDeskEnabled = selectedRate ? selectedRate.stop_desk_enabled : true;
+
+  // Filter wilayas to only show active ones from DB
+  const activeWilayas = useMemo(() => {
+    if (!shippingRates) return WILAYAS;
+    const activeCodes = new Set(shippingRates.map((r) => r.wilaya_code));
+    return WILAYAS.filter((w) => activeCodes.has(w.code));
+  }, [shippingRates]);
 
   const subtotalBeforeDiscount = productTotal + upsellTotal;
   const discountAmount = appliedDiscount ? calculateDiscount(appliedDiscount, subtotalBeforeDiscount) : 0;
