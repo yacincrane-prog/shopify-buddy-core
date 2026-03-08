@@ -6,6 +6,7 @@ import { ProductTable } from "@/components/admin/ProductTable";
 import { BundleManager } from "@/components/admin/BundleManager";
 import { QuantityDiscountManager } from "@/components/admin/QuantityDiscountManager";
 import { UpsellManager } from "@/components/admin/UpsellManager";
+import { ExitIntentManager } from "@/components/admin/ExitIntentManager";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { Plus, Package, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
