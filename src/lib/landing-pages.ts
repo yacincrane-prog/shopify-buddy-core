@@ -169,6 +169,88 @@ export async function reorderLPSections(sections: { id: string; position: number
   );
 }
 
+export async function duplicateLPSection(section: LPSection, newPosition: number) {
+  const { data } = await supabase
+    .from("landing_page_sections")
+    .insert({
+      landing_page_id: section.landing_page_id,
+      section_type: section.section_type,
+      position: newPosition,
+      content: section.content,
+      is_visible: section.is_visible,
+    })
+    .select()
+    .single();
+  return data;
+}
+
+// Pre-filled section templates with ready-to-use content
+export const SECTION_PRESETS: { id: string; label: string; type: LPSectionType; content: Record<string, any> }[] = [
+  {
+    id: "hero_sale",
+    label: "🔥 Hero – Flash Sale",
+    type: "hero",
+    content: { headline: "Flash Sale – Up to 50% OFF!", subtitle: "Limited time offer. Don't miss out!", image_url: "", cta_text: "Shop Now" },
+  },
+  {
+    id: "hero_launch",
+    label: "🚀 Hero – Product Launch",
+    type: "hero",
+    content: { headline: "Introducing Our Latest Product", subtitle: "The solution you've been waiting for", image_url: "", cta_text: "Get Yours Now" },
+  },
+  {
+    id: "benefits_3",
+    label: "✅ 3 Key Benefits",
+    type: "benefits",
+    content: {
+      heading: "Why Choose Us",
+      items: [
+        { icon: "🚚", title: "Fast Delivery", description: "Get your order delivered quickly" },
+        { icon: "💰", title: "Best Price", description: "Guaranteed lowest price" },
+        { icon: "⭐", title: "Premium Quality", description: "Only the finest materials" },
+      ],
+    },
+  },
+  {
+    id: "reviews_social",
+    label: "⭐ Social Proof Reviews",
+    type: "reviews",
+    content: {
+      heading: "What Our Customers Say",
+      items: [
+        { name: "Ahmed K.", text: "Amazing product! Exactly what I needed.", image_url: "" },
+        { name: "Sara M.", text: "Fast delivery and great quality. Highly recommend!", image_url: "" },
+        { name: "Youssef B.", text: "Best purchase I've made this year.", image_url: "" },
+      ],
+    },
+  },
+  {
+    id: "faq_common",
+    label: "❓ Common FAQ",
+    type: "faq",
+    content: {
+      heading: "Frequently Asked Questions",
+      items: [
+        { question: "How long does delivery take?", answer: "Delivery takes 2-5 business days depending on your location." },
+        { question: "Can I return the product?", answer: "Yes, we offer a 30-day money-back guarantee." },
+        { question: "Is cash on delivery available?", answer: "Yes, we accept cash on delivery across all wilayas." },
+      ],
+    },
+  },
+  {
+    id: "guarantee_money",
+    label: "🛡️ Money-Back Guarantee",
+    type: "guarantee",
+    content: { heading: "30-Day Money-Back Guarantee", text: "If you're not 100% satisfied, return it within 30 days for a full refund. No questions asked.", icon: "🛡️" },
+  },
+  {
+    id: "countdown_urgency",
+    label: "⏰ Urgency Countdown",
+    type: "countdown",
+    content: { heading: "🔥 Offer Ends Soon!", subtitle: "Order now before it's too late!", end_date: "" },
+  },
+];
+
 export async function bulkCreateSections(pageId: string, types: LPSectionType[]) {
   const rows = types.map((type, i) => ({
     landing_page_id: pageId,
