@@ -39,6 +39,18 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [deliveryType, setDeliveryType] = useState<"home" | "stop_desk">("home");
   const [submitting, setSubmitting] = useState(false);
   const [phase, setPhase] = useState<CheckoutPhase>("form");
+
+  // Silent abandoned lead capture
+  const getLeadData = useCallback(() => ({
+    product_id: product.id,
+    product_title: product.title,
+    customer_name: name,
+    customer_phone: phone,
+    wilaya: wilayaCode ? (getWilayaByCode(wilayaCode)?.name ?? "") : "",
+    commune,
+  }), [product.id, product.title, name, phone, wilayaCode, commune]);
+
+  useAbandonedLeadCapture(getLeadData, phone.trim().length >= 5, phase !== "form");
   const [orderId, setOrderId] = useState<string | null>(null);
   const [postUpsellExtra, setPostUpsellExtra] = useState(0);
 
