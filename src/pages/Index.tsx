@@ -57,10 +57,10 @@ export default function Index() {
                     <CardContent className="p-3">
                       <p className="font-medium text-sm truncate">{product.title}</p>
                       <div className="flex items-baseline gap-2 mt-1">
-                        <span className="font-semibold text-sm">${Number(product.price).toFixed(2)}</span>
+                        <span className="font-semibold text-sm">{Number(product.price).toLocaleString()} DA</span>
                         {hasDiscount && (
                           <span className="text-xs text-muted-foreground line-through">
-                            ${Number(product.compare_at_price).toFixed(2)}
+                            {Number(product.compare_at_price).toLocaleString()} DA
                           </span>
                         )}
                       </div>
