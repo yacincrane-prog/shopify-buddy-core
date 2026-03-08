@@ -13,17 +13,29 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
+
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email, password });
+      setLoading(false);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب.");
+      }
     } else {
-      navigate("/admin");
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setLoading(false);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        navigate("/admin");
+      }
     }
   };
 
@@ -34,13 +46,15 @@ export default function AdminLogin() {
           <div className="mx-auto w-10 h-10 rounded-full bg-primary flex items-center justify-center">
             <Lock className="w-5 h-5 text-primary-foreground" />
           </div>
-          <CardTitle className="text-xl">Admin Login</CardTitle>
-          <p className="text-sm text-muted-foreground">Sign in to access the dashboard</p>
+          <CardTitle className="text-xl">{isSignUp ? "إنشاء حساب" : "تسجيل الدخول"}</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            {isSignUp ? "أنشئ حساب أدمن جديد" : "سجّل الدخول للوحة التحكم"}
+          </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">البريد الإلكتروني</Label>
               <Input
                 id="email"
                 type="email"
@@ -51,7 +65,7 @@ export default function AdminLogin() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">كلمة المرور</Label>
               <Input
                 id="password"
                 type="password"
@@ -59,13 +73,23 @@ export default function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
+                minLength={6}
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-              Sign In
+              {isSignUp ? "إنشاء حساب" : "تسجيل الدخول"}
             </Button>
           </form>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-primary hover:underline"
+            >
+              {isSignUp ? "لديك حساب؟ سجّل الدخول" : "ليس لديك حساب؟ أنشئ حساب جديد"}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>
