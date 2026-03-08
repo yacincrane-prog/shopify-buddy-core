@@ -293,9 +293,9 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                 <Truck className="w-4 h-4 flex-shrink-0" />
                 <div>
                   <p className="font-medium">المنزل</p>
-                  {selectedWilaya && (
+                  {selectedRate && (
                     <p className="text-xs text-muted-foreground">
-                      {freeDelivery ? "مجاني" : `${selectedWilaya.homeDelivery} د.ج`}
+                      {freeDelivery ? "مجاني" : `${selectedRate.home_delivery_price} د.ج`}
                     </p>
                   )}
                 </div>
