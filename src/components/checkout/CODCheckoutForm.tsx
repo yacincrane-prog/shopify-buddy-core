@@ -12,6 +12,7 @@ import { Loader2, Truck, Building2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { PostOrderUpsellPage } from "@/components/checkout/PostOrderUpsellPage";
 import type { Product } from "@/types/product";
+import { useAbandonedLeadCapture } from "@/hooks/useAbandonedLeadCapture";
 
 interface UpsellItem {
   title: string;
