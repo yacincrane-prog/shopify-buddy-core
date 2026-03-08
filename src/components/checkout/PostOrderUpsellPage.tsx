@@ -107,15 +107,15 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
           )}
           <div className="flex-1 min-w-0 space-y-2 text-center sm:text-right">
             <p className="font-semibold text-base sm:text-lg">{upsell.product_title}</p>
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-2xl font-bold text-accent">
+            <div className="flex items-baseline gap-2 flex-wrap justify-center sm:justify-start">
+              <span className="text-xl sm:text-2xl font-bold text-accent">
                 {discountedPrice.toLocaleString()} د.ج
               </span>
-              <span className="text-base text-muted-foreground line-through">
+              <span className="text-sm sm:text-base text-muted-foreground line-through">
                 {upsell.product_price.toLocaleString()} د.ج
               </span>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap justify-center sm:justify-start">
               <Badge className="bg-accent text-accent-foreground text-xs">
                 خصم {upsell.discount_percent}%
               </Badge>
