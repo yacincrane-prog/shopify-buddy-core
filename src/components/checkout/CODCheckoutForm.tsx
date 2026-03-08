@@ -300,23 +300,25 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                   )}
                 </div>
               </button>
-              <button
-                type="button"
-                onClick={() => setDeliveryType("stop_desk")}
-                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
-                  deliveryType === "stop_desk" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
-                }`}
-              >
-                <Building2 className="w-4 h-4 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">المكتب</p>
-                  {selectedWilaya && (
-                    <p className="text-xs text-muted-foreground">
-                      {freeDelivery ? "مجاني" : `${selectedWilaya.stopDesk} د.ج`}
-                    </p>
-                  )}
-                </div>
-              </button>
+              {stopDeskEnabled && (
+                <button
+                  type="button"
+                  onClick={() => setDeliveryType("stop_desk")}
+                  className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
+                    deliveryType === "stop_desk" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
+                  }`}
+                >
+                  <Building2 className="w-4 h-4 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">المكتب</p>
+                    {selectedRate && (
+                      <p className="text-xs text-muted-foreground">
+                        {freeDelivery ? "مجاني" : `${selectedRate.stop_desk_price} د.ج`}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 
