@@ -3,7 +3,9 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface DataTableColumn<T> {
   key: string;
@@ -13,6 +15,10 @@ export interface DataTableColumn<T> {
   headerClassName?: string;
   render: (row: T) => ReactNode;
   sortValue?: (row: T) => string | number;
+  /** Hide this column on mobile card view */
+  hideOnMobile?: boolean;
+  /** Label for mobile card view */
+  mobileLabel?: string;
 }
 
 interface DataTableProps<T> {
@@ -22,6 +28,8 @@ interface DataTableProps<T> {
   pageSize?: number;
   emptyMessage?: string;
   isLoading?: boolean;
+  /** Force card layout on mobile */
+  mobileCards?: boolean;
 }
 
 export function DataTable<T>({
@@ -31,10 +39,12 @@ export function DataTable<T>({
   pageSize = 10,
   emptyMessage = "No data found",
   isLoading,
+  mobileCards = true,
 }: DataTableProps<T>) {
   const [page, setPage] = useState(0);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const isMobile = useIsMobile();
 
   const handleSort = (key: string) => {
     if (sortKey === key) {
@@ -83,6 +93,59 @@ export function DataTable<T>({
     );
   }
 
+  const renderPagination = () => {
+    if (sorted.length <= pageSize) return null;
+    return (
+      <div className="flex items-center justify-between gap-4 border-t border-border px-4 py-3 bg-muted/30">
+        <p className="text-xs text-muted-foreground">
+          {from}–{to} of {sorted.length}
+        </p>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={safePage === 0} onClick={() => setPage(0)}>
+            <ChevronsLeft className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={safePage === 0} onClick={() => setPage(safePage - 1)}>
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </Button>
+          <span className="text-xs text-muted-foreground px-2">
+            {safePage + 1} / {totalPages}
+          </span>
+          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={safePage >= totalPages - 1} onClick={() => setPage(safePage + 1)}>
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-7 w-7" disabled={safePage >= totalPages - 1} onClick={() => setPage(totalPages - 1)}>
+            <ChevronsRight className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  // Mobile card layout
+  if (isMobile && mobileCards) {
+    return (
+      <div className="space-y-2">
+        {paged.map((row) => (
+          <Card key={keyExtractor(row)} className="border-border">
+            <CardContent className="p-3 space-y-2">
+              {columns.filter(c => !c.hideOnMobile).map((col) => (
+                <div key={col.key} className="flex items-start justify-between gap-2">
+                  {col.mobileLabel && (
+                    <span className="text-xs text-muted-foreground shrink-0">{col.mobileLabel}</span>
+                  )}
+                  <div className={`${col.mobileLabel ? 'text-right' : 'w-full'} text-sm`}>
+                    {col.render(row)}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        ))}
+        {renderPagination()}
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       {/* Scrollable table area with sticky header */}
@@ -93,7 +156,7 @@ export function DataTable<T>({
               {columns.map((col) => (
                 <TableHead
                   key={col.key}
-                  className={`h-11 text-xs font-semibold uppercase tracking-wider text-muted-foreground ${col.headerClassName ?? ""} ${col.sortable ? "cursor-pointer select-none" : ""}`}
+                  className={`h-11 text-xs font-semibold uppercase tracking-wider text-muted-foreground whitespace-nowrap ${col.headerClassName ?? ""} ${col.sortable ? "cursor-pointer select-none" : ""}`}
                   onClick={col.sortable ? () => handleSort(col.key) : undefined}
                 >
                   <span className="inline-flex items-center gap-1.5">
@@ -127,31 +190,7 @@ export function DataTable<T>({
         </Table>
       </div>
 
-      {/* Pagination footer */}
-      {sorted.length > pageSize && (
-        <div className="flex items-center justify-between gap-4 border-t border-border px-4 py-3 bg-muted/30">
-          <p className="text-xs text-muted-foreground">
-            {from}–{to} of {sorted.length}
-          </p>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={safePage === 0} onClick={() => setPage(0)}>
-              <ChevronsLeft className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={safePage === 0} onClick={() => setPage(safePage - 1)}>
-              <ChevronLeft className="h-3.5 w-3.5" />
-            </Button>
-            <span className="text-xs text-muted-foreground px-2">
-              {safePage + 1} / {totalPages}
-            </span>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={safePage >= totalPages - 1} onClick={() => setPage(safePage + 1)}>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" disabled={safePage >= totalPages - 1} onClick={() => setPage(totalPages - 1)}>
-              <ChevronsRight className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </div>
-      )}
+      {renderPagination()}
     </div>
   );
 }

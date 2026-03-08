@@ -40,23 +40,23 @@ export default function AdminOverview() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">لوحة التحكم</h1>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">لوحة التحكم</h1>
         <p className="text-muted-foreground text-sm mt-1">مرحباً بك. إليك نظرة عامة على متجرك.</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {stats.map((s) => (
           <Link to={s.href} key={s.label}>
             <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-4 flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${s.color}`}>
-                  <s.icon className="w-5 h-5" />
+              <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 ${s.color}`}>
+                  <s.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
-                <div>
-                  <p className="text-xl font-bold">{s.value}</p>
-                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                <div className="min-w-0">
+                  <p className="text-base sm:text-xl font-bold truncate">{s.value}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{s.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -72,12 +72,12 @@ export default function AdminOverview() {
           </CardHeader>
           <CardContent className="space-y-2">
             {orders.slice(0, 5).map((o) => (
-              <div key={o.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                <div>
-                  <p className="text-sm font-medium">{o.customer_name}</p>
-                  <p className="text-xs text-muted-foreground">{o.product_title} × {o.quantity}</p>
+              <div key={o.id} className="flex items-center justify-between gap-2 py-2 border-b last:border-0">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">{o.customer_name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{o.product_title} × {o.quantity}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-right shrink-0">
                   <p className="text-sm font-semibold">{Number(o.total_price).toLocaleString()} DA</p>
                   <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("ar-DZ")}</p>
                 </div>
