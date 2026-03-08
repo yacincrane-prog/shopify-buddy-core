@@ -29,6 +29,12 @@ export default function ProductPage() {
   const [selectedOffer, setSelectedOffer] = useState<QuantityOffer | null>(null);
   const { trackEvent } = useTrackingPixels();
 
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ["product", slug],
+    queryFn: () => fetchProductBySlug(slug!),
+    enabled: !!slug,
+  });
+
   // Track PageView + ViewContent
   useEffect(() => {
     if (!product) return;
@@ -41,12 +47,6 @@ export default function ProductPage() {
       currency: "DZD",
     });
   }, [product?.id]);
-
-  const { data: product, isLoading, error } = useQuery({
-    queryKey: ["product", slug],
-    queryFn: () => fetchProductBySlug(slug!),
-    enabled: !!slug,
-  });
 
   const { data: discountTiers } = useQuery({
     queryKey: ["quantity-discounts", product?.id],
