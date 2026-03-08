@@ -287,6 +287,50 @@ export type Database = {
           },
         ]
       }
+      quantity_offers: {
+        Row: {
+          created_at: string
+          free_delivery: boolean
+          id: string
+          is_best_offer: boolean
+          label: string
+          position: number
+          price: number
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          free_delivery?: boolean
+          id?: string
+          is_best_offer?: boolean
+          label?: string
+          position?: number
+          price: number
+          product_id: string
+          quantity: number
+        }
+        Update: {
+          created_at?: string
+          free_delivery?: boolean
+          id?: string
+          is_best_offer?: boolean
+          label?: string
+          position?: number
+          price?: number
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quantity_offers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       upsells: {
         Row: {
           discount_percent: number
