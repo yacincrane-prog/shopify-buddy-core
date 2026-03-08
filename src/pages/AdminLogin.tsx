@@ -26,7 +26,8 @@ export default function AdminLogin() {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب.");
+        toast.success("تم إنشاء الحساب بنجاح!");
+        navigate("/admin");
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
