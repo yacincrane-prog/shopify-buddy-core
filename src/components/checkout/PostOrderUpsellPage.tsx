@@ -105,8 +105,8 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
               className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0"
             />
           )}
-          <div className="flex-1 min-w-0 space-y-2">
-            <p className="font-semibold text-lg">{upsell.product_title}</p>
+          <div className="flex-1 min-w-0 space-y-2 text-center sm:text-right">
+            <p className="font-semibold text-base sm:text-lg">{upsell.product_title}</p>
             <div className="flex items-baseline gap-2 flex-wrap">
               <span className="text-2xl font-bold text-accent">
                 {discountedPrice.toLocaleString()} د.ج
