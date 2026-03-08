@@ -64,6 +64,7 @@ const App = () => {
             <Route path="analytics" element={<Suspense fallback={<AdminFallback />}><AdminAnalytics /></Suspense>} />
             <Route path="page-builder" element={<Suspense fallback={<AdminFallback />}><AdminPageBuilder /></Suspense>} />
             <Route path="theme" element={<Suspense fallback={<AdminFallback />}><AdminThemeEditor /></Suspense>} />
+            <Route path="checkout-preview" element={<Suspense fallback={<AdminFallback />}><AdminCheckoutPreview /></Suspense>} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
