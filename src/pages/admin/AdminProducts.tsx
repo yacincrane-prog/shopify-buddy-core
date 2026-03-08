@@ -9,14 +9,8 @@ import { Plus, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import type { Product, ProductFormData } from "@/types/product";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
 type View = "list" | "create" | "edit";
@@ -140,19 +134,12 @@ export default function AdminProducts() {
         }}
       />
 
-      <Card>
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="text-center py-16 text-muted-foreground">Loading…</div>
-          ) : !filtered.length ? (
-            <div className="text-center py-16 text-muted-foreground">
-              {search || statusFilter !== "all" ? "No products match your filters" : "No products yet"}
-            </div>
-          ) : (
-            <ProductTable products={filtered} onEdit={startEdit} onDelete={setDeleteId} />
-          )}
-        </CardContent>
-      </Card>
+      <ProductTable
+        products={filtered}
+        onEdit={startEdit}
+        onDelete={setDeleteId}
+        isLoading={isLoading}
+      />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
