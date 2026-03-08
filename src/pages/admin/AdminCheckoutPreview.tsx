@@ -133,15 +133,16 @@ export default function AdminCheckoutPreview() {
         description="تعديل تصميم نموذج الشراء وإضافة أو حذف الحقول"
       />
 
-      <div className="flex flex-col xl:flex-row gap-6">
-        {/* Left: Editor */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left: Editor - full width on mobile, 60% on desktop */}
         <div className="flex-1 space-y-4">
-          {/* Tabs */}
-          <div className="flex items-center gap-2 border-b border-border pb-2">
+          {/* Tabs - horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto">
             <Button
               variant={activeTab === "fields" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("fields")}
+              className="shrink-0"
             >
               <GripVertical className="w-3.5 h-3.5 ml-1" /> الحقول
             </Button>
@@ -149,14 +150,15 @@ export default function AdminCheckoutPreview() {
               variant={activeTab === "settings" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("settings")}
+              className="shrink-0"
             >
               <Settings2 className="w-3.5 h-3.5 ml-1" /> الإعدادات
             </Button>
             <div className="flex-1" />
-            <Button variant="outline" size="sm" onClick={handleReset}>
+            <Button variant="outline" size="sm" onClick={handleReset} className="shrink-0">
               <RotateCcw className="w-3.5 h-3.5 ml-1" /> استعادة
             </Button>
-            <Button size="sm" onClick={handleSave} disabled={saveMutation.isPending}>
+            <Button size="sm" onClick={handleSave} disabled={saveMutation.isPending} className="shrink-0">
               {saveMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin ml-1" /> : <Save className="w-3.5 h-3.5 ml-1" />}
               حفظ
             </Button>
@@ -330,8 +332,8 @@ export default function AdminCheckoutPreview() {
           )}
         </div>
 
-        {/* Right: Live Preview */}
-        <div className="xl:w-[500px] shrink-0 space-y-3">
+        {/* Right: Live Preview - separate section on mobile */}
+        <div className="w-full lg:w-[500px] shrink-0 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">معاينة مباشرة</span>
             <div className="flex items-center rounded-md border border-border p-0.5 bg-muted/30">

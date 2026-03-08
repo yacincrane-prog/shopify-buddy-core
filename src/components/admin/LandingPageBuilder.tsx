@@ -495,10 +495,10 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
         </div>
       </div>
 
-      {/* 3-panel body */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* 3-panel body - stacked on small screens, side-by-side on desktop */}
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Left: Section List */}
-        <div className="w-64 shrink-0 border-r border-border bg-card flex flex-col">
+        <div className="w-full lg:w-64 shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card flex flex-col max-h-[30vh] lg:max-h-none">
           <div className="px-3 py-2.5 border-b border-border">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sections</p>
           </div>
@@ -591,9 +591,9 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
         </div>
 
         {/* Center: Live Preview */}
-        <div className="flex-1 bg-muted/30 flex items-start justify-center overflow-auto p-4">
+        <div className="flex-1 bg-muted/30 flex items-start justify-center overflow-auto p-4 min-h-[40vh] lg:min-h-0">
           <div
-            className={`bg-background border border-border rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${
+            className={`bg-background border border-border rounded-lg shadow-lg overflow-hidden transition-all duration-300 w-full ${
               previewMode === "mobile" ? "w-[375px]" : "w-full max-w-[900px]"
             }`}
             style={{ height: "calc(100vh - 200px)" }}
@@ -609,7 +609,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
 
         {/* Right: Section Editor */}
         {selectedSection ? (
-          <div className="w-80 shrink-0 border-l border-border bg-card flex flex-col">
+          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-border bg-card flex flex-col max-h-[40vh] lg:max-h-none">
             <div className="px-3 py-2.5 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
                 <Badge variant="secondary" className="text-[10px] shrink-0">{sectionLabel(selectedSection.section_type)}</Badge>
@@ -647,7 +647,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
             </ScrollArea>
           </div>
         ) : (
-          <div className="w-80 shrink-0 border-l border-border bg-card flex flex-col items-center justify-center text-center p-6">
+          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-border bg-card flex flex-col items-center justify-center text-center p-6 min-h-[200px] lg:min-h-0">
             <PanelRightOpen className="w-8 h-8 text-muted-foreground/40 mb-3" />
             <p className="text-sm font-medium text-muted-foreground">No section selected</p>
             <p className="text-xs text-muted-foreground/70 mt-1">Click a section in the left panel to edit its content</p>

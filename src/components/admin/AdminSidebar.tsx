@@ -108,7 +108,7 @@ export function AdminSidebar() {
 
   return (
     <Sidebar collapsible="offcanvas" className="border-r border-border">
-      <SidebarHeader className="p-4">
+      <SidebarHeader className="p-4 flex flex-row items-center justify-between lg:justify-start">
         <NavLink to="/" className="flex items-center gap-2.5 text-foreground hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <Package className="h-4 w-4 text-primary-foreground" />

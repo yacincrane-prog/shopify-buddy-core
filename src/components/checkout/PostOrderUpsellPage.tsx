@@ -87,7 +87,7 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
     <Card className="border-accent/30 overflow-hidden" dir="rtl">
       <div className="h-1 bg-accent w-full" />
 
-      <CardContent className="py-8 px-6 space-y-6">
+      <CardContent className="py-6 sm:py-8 px-4 sm:px-6 space-y-4 sm:space-y-6">
         <div className="text-center space-y-2">
           <div className="w-14 h-14 rounded-full bg-accent/15 flex items-center justify-center mx-auto">
             <Gift className="w-7 h-7 text-accent" />
@@ -97,25 +97,25 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
           </h2>
         </div>
 
-        <div className="flex gap-4 items-center bg-secondary/50 rounded-xl p-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start bg-secondary/50 rounded-xl p-3 sm:p-4">
           {upsell.product_image && (
             <img
               src={upsell.product_image}
               alt={upsell.product_title}
-              className="w-24 h-24 rounded-lg object-cover shrink-0"
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover shrink-0"
             />
           )}
-          <div className="flex-1 min-w-0 space-y-2">
-            <p className="font-semibold text-lg">{upsell.product_title}</p>
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-2xl font-bold text-accent">
+          <div className="flex-1 min-w-0 space-y-2 text-center sm:text-right">
+            <p className="font-semibold text-base sm:text-lg">{upsell.product_title}</p>
+            <div className="flex items-baseline gap-2 flex-wrap justify-center sm:justify-start">
+              <span className="text-xl sm:text-2xl font-bold text-accent">
                 {discountedPrice.toLocaleString()} د.ج
               </span>
-              <span className="text-base text-muted-foreground line-through">
+              <span className="text-sm sm:text-base text-muted-foreground line-through">
                 {upsell.product_price.toLocaleString()} د.ج
               </span>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap justify-center sm:justify-start">
               <Badge className="bg-accent text-accent-foreground text-xs">
                 خصم {upsell.discount_percent}%
               </Badge>
