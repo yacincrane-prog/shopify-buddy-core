@@ -25,6 +25,7 @@ const AdminExitIntent = lazy(() => import("./pages/admin/AdminExitIntent"));
 const AdminAbandoned = lazy(() => import("./pages/admin/AdminAbandoned"));
 const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminPageBuilder = lazy(() => import("./pages/admin/AdminPageBuilder"));
+const AdminThemeEditor = lazy(() => import("./pages/admin/AdminThemeEditor"));
 
 const queryClient = new QueryClient();
 
