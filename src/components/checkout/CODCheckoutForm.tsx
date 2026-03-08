@@ -6,7 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { WILAYAS, getWilayaByCode, getShippingPrice } from "@/data/algeria";
+import { WILAYAS } from "@/data/algeria";
+import { useActiveShippingRates, type ShippingRate } from "@/hooks/useShippingRates";
 import { createOrder } from "@/lib/orders";
 import { Loader2, Truck, Building2, CheckCircle2, Ticket, X } from "lucide-react";
 import { toast } from "sonner";
@@ -39,6 +40,7 @@ interface CODCheckoutFormProps {
 type CheckoutPhase = "form" | "post-upsell" | "confirmed";
 
 export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, freeDelivery = false }: CODCheckoutFormProps) {
+  const { data: shippingRates } = useActiveShippingRates();
   const { trackEvent } = useTrackingPixels();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -52,6 +54,10 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
   const [discountError, setDiscountError] = useState("");
   const [validatingCode, setValidatingCode] = useState(false);
+
+  const getWilayaByCode = (code: string) => WILAYAS.find((w) => w.code === code);
+  const getShippingRate = (code: string): ShippingRate | undefined =>
+    shippingRates?.find((r) => r.wilaya_code === code);
 
   const getLeadData = useCallback(() => ({
     product_id: product.id,
@@ -81,8 +87,24 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [postUpsellExtra, setPostUpsellExtra] = useState(0);
 
   const selectedWilaya = useMemo(() => getWilayaByCode(wilayaCode), [wilayaCode]);
+  const selectedRate = useMemo(() => getShippingRate(wilayaCode), [wilayaCode, shippingRates]);
   const communes = selectedWilaya?.communes ?? [];
-  const shippingPrice = freeDelivery ? 0 : (wilayaCode ? getShippingPrice(wilayaCode, deliveryType) : 0);
+
+  // Use DB rate if available, otherwise fall back to hardcoded
+  const shippingPrice = freeDelivery
+    ? 0
+    : selectedRate
+      ? (deliveryType === "home" ? selectedRate.home_delivery_price : selectedRate.stop_desk_price)
+      : (selectedWilaya ? (deliveryType === "home" ? selectedWilaya.homeDelivery : selectedWilaya.stopDesk) : 0);
+
+  const stopDeskEnabled = selectedRate ? selectedRate.stop_desk_enabled : true;
+
+  // Filter wilayas to only show active ones from DB
+  const activeWilayas = useMemo(() => {
+    if (!shippingRates) return WILAYAS;
+    const activeCodes = new Set(shippingRates.map((r) => r.wilaya_code));
+    return WILAYAS.filter((w) => activeCodes.has(w.code));
+  }, [shippingRates]);
 
   const subtotalBeforeDiscount = productTotal + upsellTotal;
   const discountAmount = appliedDiscount ? calculateDiscount(appliedDiscount, subtotalBeforeDiscount) : 0;
@@ -91,6 +113,11 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const handleWilayaChange = (code: string) => {
     setWilayaCode(code);
     setCommune("");
+    // Auto-switch to home if stop desk not available
+    const rate = shippingRates?.find((r) => r.wilaya_code === code);
+    if (rate && !rate.stop_desk_enabled && deliveryType === "stop_desk") {
+      setDeliveryType("home");
+    }
   };
 
   const isValid = name.trim().length >= 3 && phone.trim().length >= 9 && wilayaCode && commune;
@@ -236,7 +263,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
               <Select value={wilayaCode} onValueChange={handleWilayaChange}>
                 <SelectTrigger><SelectValue placeholder="اختر الولاية" /></SelectTrigger>
                 <SelectContent className="max-h-60">
-                  {WILAYAS.map((w) => (
+                  {activeWilayas.map((w) => (
                     <SelectItem key={w.code} value={w.code}>{w.code} - {w.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -271,30 +298,32 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
                 <Truck className="w-4 h-4 flex-shrink-0" />
                 <div>
                   <p className="font-medium">المنزل</p>
-                  {selectedWilaya && (
+                  {selectedRate && (
                     <p className="text-xs text-muted-foreground">
-                      {freeDelivery ? "مجاني" : `${selectedWilaya.homeDelivery} د.ج`}
+                      {freeDelivery ? "مجاني" : `${selectedRate.home_delivery_price} د.ج`}
                     </p>
                   )}
                 </div>
               </button>
-              <button
-                type="button"
-                onClick={() => setDeliveryType("stop_desk")}
-                className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
-                  deliveryType === "stop_desk" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
-                }`}
-              >
-                <Building2 className="w-4 h-4 flex-shrink-0" />
-                <div>
-                  <p className="font-medium">المكتب</p>
-                  {selectedWilaya && (
-                    <p className="text-xs text-muted-foreground">
-                      {freeDelivery ? "مجاني" : `${selectedWilaya.stopDesk} د.ج`}
-                    </p>
-                  )}
-                </div>
-              </button>
+              {stopDeskEnabled && (
+                <button
+                  type="button"
+                  onClick={() => setDeliveryType("stop_desk")}
+                  className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-right text-sm ${
+                    deliveryType === "stop_desk" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
+                  }`}
+                >
+                  <Building2 className="w-4 h-4 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">المكتب</p>
+                    {selectedRate && (
+                      <p className="text-xs text-muted-foreground">
+                        {freeDelivery ? "مجاني" : `${selectedRate.stop_desk_price} د.ج`}
+                      </p>
+                    )}
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 

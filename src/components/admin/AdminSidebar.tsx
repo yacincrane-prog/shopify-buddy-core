@@ -16,6 +16,7 @@ import {
   CreditCard,
   Activity,
   Ticket,
+  Truck,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -53,6 +54,7 @@ const marketingNav = [
 
 const systemNav = [
   { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
+  { title: "Shipping", url: "/admin/shipping", icon: Truck },
   { title: "Tracking Pixels", url: "/admin/tracking-pixels", icon: Activity },
   { title: "Theme Editor", url: "/admin/theme", icon: Palette },
   { title: "Checkout Preview", url: "/admin/checkout-preview", icon: CreditCard },

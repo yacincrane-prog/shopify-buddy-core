@@ -601,6 +601,42 @@ export type Database = {
           },
         ]
       }
+      shipping_rates: {
+        Row: {
+          created_at: string
+          home_delivery_price: number
+          id: string
+          is_active: boolean
+          stop_desk_enabled: boolean
+          stop_desk_price: number
+          updated_at: string
+          wilaya_code: string
+          wilaya_name: string
+        }
+        Insert: {
+          created_at?: string
+          home_delivery_price?: number
+          id?: string
+          is_active?: boolean
+          stop_desk_enabled?: boolean
+          stop_desk_price?: number
+          updated_at?: string
+          wilaya_code: string
+          wilaya_name: string
+        }
+        Update: {
+          created_at?: string
+          home_delivery_price?: number
+          id?: string
+          is_active?: boolean
+          stop_desk_enabled?: boolean
+          stop_desk_price?: number
+          updated_at?: string
+          wilaya_code?: string
+          wilaya_name?: string
+        }
+        Relationships: []
+      }
       theme_settings: {
         Row: {
           id: string
