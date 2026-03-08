@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import { DataTable, type DataTableColumn } from "@/components/admin/DataTable";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import type { Product } from "@/types/product";
 
 interface ProductTableProps {
