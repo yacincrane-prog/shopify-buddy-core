@@ -102,34 +102,34 @@ export const COLOR_PRESETS: { name: string; colors: Partial<ThemeColors> }[] = [
 ];
 
 export async function fetchTheme(): Promise<ThemeConfig> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("theme_settings")
     .select("value")
     .eq("key", "storefront")
     .single();
   if (error || !data) return DEFAULT_THEME;
-  return data.value as unknown as ThemeConfig;
+  return data.value as ThemeConfig;
 }
 
 export async function saveTheme(theme: ThemeConfig): Promise<void> {
   const value = JSON.parse(JSON.stringify(theme));
   
-  const { data } = await supabase
+  const { data } = await (supabase as any)
     .from("theme_settings")
     .select("id")
-    .eq("key" as any, "storefront")
+    .eq("key", "storefront")
     .single();
   
   if (data) {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("theme_settings")
-      .update({ value, updated_at: new Date().toISOString() } as any)
-      .eq("key" as any, "storefront");
+      .update({ value, updated_at: new Date().toISOString() })
+      .eq("key", "storefront");
     if (error) throw error;
   } else {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("theme_settings")
-      .insert([{ key: "storefront", value }] as any);
+      .insert([{ key: "storefront", value }]);
     if (error) throw error;
   }
 }
