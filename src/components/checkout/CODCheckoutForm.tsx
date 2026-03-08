@@ -53,6 +53,17 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   }), [product.id, product.title, name, phone, wilayaCode, commune]);
 
   useAbandonedLeadCapture(getLeadData, phone.trim().length >= 5, phase !== "form");
+
+  // Track InitiateCheckout once this form mounts
+  useEffect(() => {
+    trackEvent("InitiateCheckout", {
+      content_name: product.title,
+      content_ids: [product.id],
+      value: effectiveUnitPrice * quantity,
+      currency: "DZD",
+    });
+  }, []);
+
   const [orderId, setOrderId] = useState<string | null>(null);
   const [postUpsellExtra, setPostUpsellExtra] = useState(0);
 
