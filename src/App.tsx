@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { useApplyTheme } from "@/hooks/useApplyTheme";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
 import NotFound from "./pages/NotFound";
@@ -34,7 +35,7 @@ const AdminDiscountCodes = lazy(() => import("./pages/admin/AdminDiscountCodes")
 const queryClient = new QueryClient();
 
 function AdminFallback() {
-  return <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">Loading…</div>;
+  return <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">جاري التحميل…</div>;
 }
 
 function AppInner() {
@@ -79,11 +80,13 @@ function AppInner() {
 
 const App = () => {
   return (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AppInner />
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AppInner />
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
   );
 };
 
