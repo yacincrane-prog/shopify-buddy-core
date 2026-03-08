@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { useApplyTheme } from "@/hooks/useApplyTheme";
 import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
 import NotFound from "./pages/NotFound";
@@ -25,6 +26,7 @@ const AdminExitIntent = lazy(() => import("./pages/admin/AdminExitIntent"));
 const AdminAbandoned = lazy(() => import("./pages/admin/AdminAbandoned"));
 const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
 const AdminPageBuilder = lazy(() => import("./pages/admin/AdminPageBuilder"));
+const AdminThemeEditor = lazy(() => import("./pages/admin/AdminThemeEditor"));
 
 const queryClient = new QueryClient();
 
@@ -32,7 +34,9 @@ function AdminFallback() {
   return <div className="flex items-center justify-center py-20 text-muted-foreground text-sm">Loading…</div>;
 }
 
-const App = () => (
+const App = () => {
+  useApplyTheme();
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -58,6 +62,7 @@ const App = () => (
             <Route path="abandoned" element={<Suspense fallback={<AdminFallback />}><AdminAbandoned /></Suspense>} />
             <Route path="analytics" element={<Suspense fallback={<AdminFallback />}><AdminAnalytics /></Suspense>} />
             <Route path="page-builder" element={<Suspense fallback={<AdminFallback />}><AdminPageBuilder /></Suspense>} />
+            <Route path="theme" element={<Suspense fallback={<AdminFallback />}><AdminThemeEditor /></Suspense>} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
@@ -65,6 +70,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
