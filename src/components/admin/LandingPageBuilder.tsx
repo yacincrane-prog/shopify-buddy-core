@@ -311,6 +311,21 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
     onSuccess: invalidate,
   });
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !sections) return;
+    const oldIndex = sections.findIndex((s) => s.id === active.id);
+    const newIndex = sections.findIndex((s) => s.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(sections, oldIndex, newIndex);
+    moveMutation.mutate(reordered.map((s, i) => ({ id: s.id, position: i })));
+  };
+
   const moveSection = (index: number, dir: "up" | "down") => {
     if (!sections) return;
     const arr = [...sections];
