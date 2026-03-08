@@ -87,7 +87,7 @@ export function PostOrderUpsellPage({ orderId, sourceProductId, onComplete }: Po
     <Card className="border-accent/30 overflow-hidden" dir="rtl">
       <div className="h-1 bg-accent w-full" />
 
-      <CardContent className="py-8 px-6 space-y-6">
+      <CardContent className="py-6 sm:py-8 px-4 sm:px-6 space-y-4 sm:space-y-6">
         <div className="text-center space-y-2">
           <div className="w-14 h-14 rounded-full bg-accent/15 flex items-center justify-center mx-auto">
             <Gift className="w-7 h-7 text-accent" />
