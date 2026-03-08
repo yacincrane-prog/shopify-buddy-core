@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchProductBySlug } from "@/lib/products";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { QuantitySelector } from "@/components/product/QuantitySelector";
+import { CODCheckoutForm } from "@/components/checkout/CODCheckoutForm";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ShoppingBag } from "lucide-react";
-import { toast } from "sonner";
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
