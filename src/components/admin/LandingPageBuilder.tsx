@@ -591,9 +591,9 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
         </div>
 
         {/* Center: Live Preview */}
-        <div className="flex-1 bg-muted/30 flex items-start justify-center overflow-auto p-4">
+        <div className="flex-1 bg-muted/30 flex items-start justify-center overflow-auto p-4 min-h-[40vh] lg:min-h-0">
           <div
-            className={`bg-background border border-border rounded-lg shadow-lg overflow-hidden transition-all duration-300 ${
+            className={`bg-background border border-border rounded-lg shadow-lg overflow-hidden transition-all duration-300 w-full ${
               previewMode === "mobile" ? "w-[375px]" : "w-full max-w-[900px]"
             }`}
             style={{ height: "calc(100vh - 200px)" }}
