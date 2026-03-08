@@ -175,6 +175,10 @@ export default function AdminDashboard() {
             <TabsContent value="abandoned">
               <AbandonedLeadsManager />
             </TabsContent>
+
+            <TabsContent value="landing-pages">
+              <LandingPageBuilder />
+            </TabsContent>
           </Tabs>
         )}
       </main>
