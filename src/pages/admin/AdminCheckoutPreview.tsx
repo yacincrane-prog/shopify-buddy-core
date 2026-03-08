@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,273 +6,506 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { WILAYAS, getWilayaByCode, getShippingPrice } from "@/data/algeria";
-import { useProducts } from "@/hooks/useProducts";
-import { Monitor, Smartphone, Tablet, Truck, Building2, ShoppingBag, RotateCcw } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  useCheckoutConfig,
+  useSaveCheckoutConfig,
+  DEFAULT_CONFIG,
+  type CheckoutConfig,
+  type CheckoutField,
+} from "@/hooks/useCheckoutConfig";
+import { toast } from "sonner";
+import {
+  GripVertical,
+  Plus,
+  Trash2,
+  Save,
+  Loader2,
+  Eye,
+  EyeOff,
+  Monitor,
+  Smartphone,
+  Settings2,
+  Type,
+  Phone,
+  Mail,
+  AlignLeft,
+  Truck,
+  Building2,
+  RotateCcw,
+  ShoppingBag,
+} from "lucide-react";
 
-const VIEWPORTS = [
+const FIELD_TYPE_OPTIONS = [
+  { value: "text", label: "نص", icon: Type },
+  { value: "tel", label: "هاتف", icon: Phone },
+  { value: "email", label: "بريد إلكتروني", icon: Mail },
+  { value: "textarea", label: "نص طويل", icon: AlignLeft },
+];
+
+const VIEWPORT_OPTIONS = [
   { id: "desktop" as const, icon: Monitor, width: "480px", label: "Desktop" },
-  { id: "tablet" as const, icon: Tablet, width: "420px", label: "Tablet" },
   { id: "mobile" as const, icon: Smartphone, width: "340px", label: "Mobile" },
 ];
 
 export default function AdminCheckoutPreview() {
-  const { data: products } = useProducts();
-  const [viewport, setViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const { data: savedConfig, isLoading } = useCheckoutConfig();
+  const saveMutation = useSaveCheckoutConfig();
+  const [config, setConfig] = useState<CheckoutConfig>(DEFAULT_CONFIG);
+  const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
+  const [activeTab, setActiveTab] = useState<"fields" | "settings">("fields");
 
-  // Simulated form state
-  const [productId, setProductId] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [name, setName] = useState("Ahmed Benali");
-  const [phone, setPhone] = useState("0555 123 456");
-  const [wilayaCode, setWilayaCode] = useState("");
-  const [commune, setCommune] = useState("");
-  const [deliveryType, setDeliveryType] = useState<"home" | "stop_desk">("home");
-  const [freeDelivery, setFreeDelivery] = useState(false);
+  useEffect(() => {
+    if (savedConfig) setConfig(savedConfig);
+  }, [savedConfig]);
 
-  const selectedProduct = products?.find((p) => p.id === productId);
-  const selectedWilaya = useMemo(() => getWilayaByCode(wilayaCode), [wilayaCode]);
-  const communes = selectedWilaya?.communes ?? [];
-  const shippingPrice = freeDelivery ? 0 : (wilayaCode ? getShippingPrice(wilayaCode, deliveryType) : 0);
-
-  const unitPrice = selectedProduct ? Number(selectedProduct.price) : 2500;
-  const productTotal = unitPrice * quantity;
-  const totalPrice = productTotal + shippingPrice;
-
-  const handleWilayaChange = (code: string) => {
-    setWilayaCode(code);
-    setCommune("");
+  const updateConfig = (partial: Partial<CheckoutConfig>) => {
+    setConfig((prev) => ({ ...prev, ...partial }));
   };
 
-  const resetForm = () => {
-    setName("Ahmed Benali");
-    setPhone("0555 123 456");
-    setWilayaCode("");
-    setCommune("");
-    setDeliveryType("home");
-    setQuantity(1);
+  const updateField = (id: string, updates: Partial<CheckoutField>) => {
+    setConfig((prev) => ({
+      ...prev,
+      fields: prev.fields.map((f) => (f.id === id ? { ...f, ...updates } : f)),
+    }));
   };
 
-  const currentVp = VIEWPORTS.find((v) => v.id === viewport)!;
+  const addField = () => {
+    const newId = `custom_${Date.now()}`;
+    const newField: CheckoutField = {
+      id: newId,
+      type: "text",
+      label: "حقل جديد",
+      placeholder: "أدخل القيمة...",
+      required: false,
+      visible: true,
+      position: config.fields.length,
+      isSystem: false,
+    };
+    setConfig((prev) => ({ ...prev, fields: [...prev.fields, newField] }));
+  };
+
+  const removeField = (id: string) => {
+    setConfig((prev) => ({
+      ...prev,
+      fields: prev.fields.filter((f) => f.id !== id),
+    }));
+  };
+
+  const moveField = (id: string, direction: "up" | "down") => {
+    setConfig((prev) => {
+      const fields = [...prev.fields];
+      const idx = fields.findIndex((f) => f.id === id);
+      if (idx < 0) return prev;
+      const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+      if (swapIdx < 0 || swapIdx >= fields.length) return prev;
+      [fields[idx], fields[swapIdx]] = [fields[swapIdx], fields[idx]];
+      return { ...prev, fields: fields.map((f, i) => ({ ...f, position: i })) };
+    });
+  };
+
+  const handleSave = async () => {
+    try {
+      await saveMutation.mutateAsync(config);
+      toast.success("تم حفظ إعدادات الشراء");
+    } catch {
+      toast.error("فشل في الحفظ");
+    }
+  };
+
+  const handleReset = () => {
+    setConfig(DEFAULT_CONFIG);
+  };
+
+  const currentVp = VIEWPORT_OPTIONS.find((v) => v.id === viewport)!;
+  const visibleFields = config.fields.filter((f) => f.visible);
+
+  if (isLoading) {
+    return <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>;
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <AdminPageHeader
-        title="Checkout Preview"
-        description="Test how the order form looks and verify shipping calculations"
+        title="تخصيص صفحة الشراء"
+        description="تعديل تصميم نموذج الشراء وإضافة أو حذف الحقول"
       />
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left: Controls */}
-        <Card className="lg:w-80 shrink-0">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Test Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-xs">Test Product</Label>
-              <Select value={productId} onValueChange={setProductId}>
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="Select a product…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {products?.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.title} — {Number(p.price).toLocaleString()} DA</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-xs">Quantity</Label>
-              <Input type="number" min={1} max={99} value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} className="h-9" />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input type="checkbox" id="free-del" checked={freeDelivery} onChange={(e) => setFreeDelivery(e.target.checked)} className="rounded" />
-              <Label htmlFor="free-del" className="text-xs cursor-pointer">Free delivery</Label>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Viewport</Label>
-              <div className="flex items-center rounded-md border border-border p-0.5 bg-muted/30">
-                {VIEWPORTS.map((vp) => (
-                  <Button
-                    key={vp.id}
-                    variant={viewport === vp.id ? "default" : "ghost"}
-                    size="icon"
-                    className="h-7 w-7 flex-1"
-                    onClick={() => setViewport(vp.id)}
-                    title={vp.label}
-                  >
-                    <vp.icon className="w-3.5 h-3.5" />
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            <Button variant="outline" size="sm" className="w-full" onClick={resetForm}>
-              <RotateCcw className="w-3.5 h-3.5 mr-1" /> Reset Form
+      <div className="flex flex-col xl:flex-row gap-6">
+        {/* Left: Editor */}
+        <div className="flex-1 space-y-4">
+          {/* Tabs */}
+          <div className="flex items-center gap-2 border-b border-border pb-2">
+            <Button
+              variant={activeTab === "fields" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setActiveTab("fields")}
+            >
+              <GripVertical className="w-3.5 h-3.5 ml-1" /> الحقول
             </Button>
+            <Button
+              variant={activeTab === "settings" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => setActiveTab("settings")}
+            >
+              <Settings2 className="w-3.5 h-3.5 ml-1" /> الإعدادات
+            </Button>
+            <div className="flex-1" />
+            <Button variant="outline" size="sm" onClick={handleReset}>
+              <RotateCcw className="w-3.5 h-3.5 ml-1" /> استعادة
+            </Button>
+            <Button size="sm" onClick={handleSave} disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin ml-1" /> : <Save className="w-3.5 h-3.5 ml-1" />}
+              حفظ
+            </Button>
+          </div>
 
-            {/* Shipping reference */}
-            {wilayaCode && selectedWilaya && (
-              <>
-                <Separator />
-                <div className="space-y-2">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Shipping Info</Label>
-                  <div className="text-xs space-y-1.5 p-3 rounded-lg bg-muted/30 border border-border">
-                    <p><span className="text-muted-foreground">Wilaya:</span> <span className="font-medium">{selectedWilaya.name}</span></p>
-                    <p><span className="text-muted-foreground">Home:</span> <span className="font-medium">{selectedWilaya.homeDelivery} DA</span></p>
-                    <p><span className="text-muted-foreground">Stop Desk:</span> <span className="font-medium">{selectedWilaya.stopDesk} DA</span></p>
-                    <p><span className="text-muted-foreground">Current:</span> <span className="font-bold text-accent">{freeDelivery ? "Free" : `${shippingPrice} DA`}</span></p>
-                  </div>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+          {activeTab === "fields" ? (
+            <div className="space-y-3">
+              {config.fields.map((field, idx) => (
+                <Card key={field.id} className={`transition-all ${!field.visible ? "opacity-50" : ""}`}>
+                  <CardContent className="p-3">
+                    <div className="flex items-start gap-3">
+                      {/* Reorder */}
+                      <div className="flex flex-col gap-0.5 pt-1">
+                        <button
+                          onClick={() => moveField(field.id, "up")}
+                          disabled={idx === 0}
+                          className="text-muted-foreground hover:text-foreground disabled:opacity-30 text-xs"
+                        >▲</button>
+                        <button
+                          onClick={() => moveField(field.id, "down")}
+                          disabled={idx === config.fields.length - 1}
+                          className="text-muted-foreground hover:text-foreground disabled:opacity-30 text-xs"
+                        >▼</button>
+                      </div>
 
-        {/* Right: Form preview */}
-        <div className="flex-1 flex justify-center">
-          <div
-            className="transition-all duration-300"
-            style={{ width: currentVp.width, maxWidth: "100%" }}
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <Badge variant="secondary" className="text-[10px]">
-                Preview — {currentVp.label} ({currentVp.width})
-              </Badge>
-              <Badge variant="outline" className="text-[10px]">
-                Not a real order
-              </Badge>
+                      {/* Field config */}
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge variant={field.isSystem ? "secondary" : "outline"} className="text-[10px]">
+                            {field.isSystem ? "نظام" : "مخصص"}
+                          </Badge>
+                          <Badge variant="outline" className="text-[10px] font-mono">
+                            {field.type}
+                          </Badge>
+                          {field.required && (
+                            <Badge variant="destructive" className="text-[10px]">مطلوب</Badge>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground">العنوان</Label>
+                            <Input
+                              value={field.label}
+                              onChange={(e) => updateField(field.id, { label: e.target.value })}
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          {!["wilaya", "commune", "delivery_type"].includes(field.type) && (
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">النص التوضيحي</Label>
+                              <Input
+                                value={field.placeholder}
+                                onChange={(e) => updateField(field.id, { placeholder: e.target.value })}
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        {!field.isSystem && (
+                          <div className="flex gap-3">
+                            <div className="space-y-1">
+                              <Label className="text-xs text-muted-foreground">النوع</Label>
+                              <Select
+                                value={field.type}
+                                onValueChange={(v) => updateField(field.id, { type: v as CheckoutField["type"] })}
+                              >
+                                <SelectTrigger className="h-8 w-36 text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {FIELD_TYPE_OPTIONS.map((opt) => (
+                                    <SelectItem key={opt.value} value={opt.value}>
+                                      {opt.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-col gap-1.5 items-center pt-1">
+                        <div className="flex items-center gap-1.5">
+                          <Label className="text-[10px] text-muted-foreground">إظهار</Label>
+                          <Switch
+                            checked={field.visible}
+                            onCheckedChange={(v) => updateField(field.id, { visible: v })}
+                          />
+                        </div>
+                        {!field.isSystem && (
+                          <>
+                            <div className="flex items-center gap-1.5">
+                              <Label className="text-[10px] text-muted-foreground">مطلوب</Label>
+                              <Switch
+                                checked={field.required}
+                                onCheckedChange={(v) => updateField(field.id, { required: v })}
+                              />
+                            </div>
+                            <button
+                              onClick={() => removeField(field.id)}
+                              className="text-destructive hover:text-destructive/80 mt-1"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              <Button variant="outline" className="w-full" onClick={addField}>
+                <Plus className="w-4 h-4 ml-1" /> إضافة حقل جديد
+              </Button>
             </div>
-
-            <Card className="border-border shadow-lg">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg">Cash on Delivery</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-5">
-                  {/* Customer info */}
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="prev-name" className="text-sm">Full Name</Label>
-                      <Input id="prev-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="prev-phone" className="text-sm">Phone Number</Label>
-                      <Input id="prev-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="0555 123 456" type="tel" />
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Location */}
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-sm">Wilaya</Label>
-                      <Select value={wilayaCode} onValueChange={handleWilayaChange}>
-                        <SelectTrigger><SelectValue placeholder="Select wilaya" /></SelectTrigger>
-                        <SelectContent className="max-h-60">
-                          {WILAYAS.map((w) => (
-                            <SelectItem key={w.code} value={w.code}>{w.code} - {w.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-sm">Commune</Label>
-                      <Select value={commune} onValueChange={setCommune} disabled={!communes.length}>
-                        <SelectTrigger><SelectValue placeholder={communes.length ? "Select commune" : "Select wilaya first"} /></SelectTrigger>
-                        <SelectContent className="max-h-60">
-                          {communes.map((c) => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Delivery type */}
-                  <div className="space-y-2">
-                    <Label className="text-sm">Delivery Type</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setDeliveryType("home")}
-                        className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left text-sm ${
-                          deliveryType === "home" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
-                        }`}
-                      >
-                        <Truck className="w-4 h-4 flex-shrink-0" />
-                        <div>
-                          <p className="font-medium">Home</p>
-                          {selectedWilaya && (
-                            <p className="text-xs text-muted-foreground">
-                              {freeDelivery ? "Free" : `${selectedWilaya.homeDelivery} DA`}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDeliveryType("stop_desk")}
-                        className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-colors text-left text-sm ${
-                          deliveryType === "stop_desk" ? "border-accent bg-accent/10" : "border-border hover:border-muted-foreground"
-                        }`}
-                      >
-                        <Building2 className="w-4 h-4 flex-shrink-0" />
-                        <div>
-                          <p className="font-medium">Stop Desk</p>
-                          {selectedWilaya && (
-                            <p className="text-xs text-muted-foreground">
-                              {freeDelivery ? "Free" : `${selectedWilaya.stopDesk} DA`}
-                            </p>
-                          )}
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Price breakdown */}
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{selectedProduct?.title ?? "Product"} × {quantity}</span>
-                      <span>{productTotal.toLocaleString()} DA</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Shipping</span>
-                      <span>{freeDelivery ? "Free" : (shippingPrice ? `${shippingPrice.toLocaleString()} DA` : "—")}</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between font-bold text-base">
-                      <span>Total</span>
-                      <span>{totalPrice.toLocaleString()} DA</span>
-                    </div>
-                  </div>
-
-                  <Button size="lg" className="w-full pointer-events-none opacity-80">
-                    <ShoppingBag className="w-4 h-4 mr-2" />
-                    Confirm Order — {totalPrice.toLocaleString()} DA
-                  </Button>
-
-                  <p className="text-[10px] text-center text-muted-foreground/60 uppercase tracking-wider">
-                    Preview mode — no order will be placed
-                  </p>
+          ) : (
+            <Card>
+              <CardContent className="p-4 space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-sm">عنوان النموذج</Label>
+                  <Input
+                    value={config.formTitle}
+                    onChange={(e) => updateConfig({ formTitle: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-sm">نص زر التأكيد</Label>
+                  <Input
+                    value={config.buttonText}
+                    onChange={(e) => updateConfig({ buttonText: e.target.value })}
+                  />
+                </div>
+                <Separator />
+                <div className="space-y-1.5">
+                  <Label className="text-sm">عنوان التأكيد</Label>
+                  <Input
+                    value={config.successTitle}
+                    onChange={(e) => updateConfig({ successTitle: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-sm">رسالة التأكيد</Label>
+                  <Textarea
+                    value={config.successMessage}
+                    onChange={(e) => updateConfig({ successMessage: e.target.value })}
+                    rows={2}
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">إظهار كود الخصم</Label>
+                  <Switch
+                    checked={config.showDiscountCode}
+                    onCheckedChange={(v) => updateConfig({ showDiscountCode: v })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">إظهار تفاصيل السعر</Label>
+                  <Switch
+                    checked={config.showPriceBreakdown}
+                    onCheckedChange={(v) => updateConfig({ showPriceBreakdown: v })}
+                  />
                 </div>
               </CardContent>
             </Card>
+          )}
+        </div>
+
+        {/* Right: Live Preview */}
+        <div className="xl:w-[500px] shrink-0 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-muted-foreground">معاينة مباشرة</span>
+            <div className="flex items-center rounded-md border border-border p-0.5 bg-muted/30">
+              {VIEWPORT_OPTIONS.map((vp) => (
+                <Button
+                  key={vp.id}
+                  variant={viewport === vp.id ? "default" : "ghost"}
+                  size="icon"
+                  className="h-7 w-7"
+                  onClick={() => setViewport(vp.id)}
+                  title={vp.label}
+                >
+                  <vp.icon className="w-3.5 h-3.5" />
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <div
+              className="transition-all duration-300"
+              style={{ width: currentVp.width, maxWidth: "100%" }}
+            >
+              <Card className="border-border shadow-lg" dir="rtl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg">{config.formTitle}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {visibleFields.map((field, idx) => {
+                      if (idx > 0 && visibleFields[idx - 1] &&
+                        ((["wilaya", "commune"].includes(field.type) && !["wilaya", "commune"].includes(visibleFields[idx - 1].type)) ||
+                        (field.type === "delivery_type" && visibleFields[idx - 1].type !== "delivery_type"))) {
+                        return (
+                          <div key={field.id}>
+                            <Separator className="mb-4" />
+                            {renderPreviewField(field)}
+                          </div>
+                        );
+                      }
+                      return <div key={field.id}>{renderPreviewField(field)}</div>;
+                    })}
+
+                    {config.showDiscountCode && (
+                      <>
+                        <Separator />
+                        <div className="space-y-1.5">
+                          <Label className="text-sm">كود الخصم</Label>
+                          <div className="flex gap-2">
+                            <Input placeholder="أدخل الكود" className="font-mono" dir="ltr" disabled />
+                            <Button variant="outline" size="sm" disabled>تطبيق</Button>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {config.showPriceBreakdown && (
+                      <>
+                        <Separator />
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">المنتج × 1</span>
+                            <span>2,500 د.ج</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">التوصيل</span>
+                            <span>400 د.ج</span>
+                          </div>
+                          <Separator />
+                          <div className="flex justify-between font-bold text-base">
+                            <span>المجموع</span>
+                            <span>2,900 د.ج</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    <Button size="lg" className="w-full pointer-events-none">
+                      <ShoppingBag className="w-4 h-4 ml-2" />
+                      {config.buttonText} — 2,900 د.ج
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <p className="text-[10px] text-center text-muted-foreground/60 mt-2">
+                معاينة — لن يتم تقديم طلب
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+function renderPreviewField(field: CheckoutField) {
+  const labelEl = (
+    <Label className="text-sm">
+      {field.label}
+      {field.required && <span className="text-destructive mr-0.5">*</span>}
+    </Label>
+  );
+
+  switch (field.type) {
+    case "wilaya":
+      return (
+        <div className="space-y-1.5">
+          {labelEl}
+          <Select disabled>
+            <SelectTrigger><SelectValue placeholder={field.placeholder || "اختر الولاية"} /></SelectTrigger>
+            <SelectContent><SelectItem value="x">16 - Alger</SelectItem></SelectContent>
+          </Select>
+        </div>
+      );
+    case "commune":
+      return (
+        <div className="space-y-1.5">
+          {labelEl}
+          <Select disabled>
+            <SelectTrigger><SelectValue placeholder={field.placeholder || "اختر البلدية"} /></SelectTrigger>
+            <SelectContent><SelectItem value="x">Alger Centre</SelectItem></SelectContent>
+          </Select>
+        </div>
+      );
+    case "delivery_type":
+      return (
+        <div className="space-y-2">
+          {labelEl}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 p-3 rounded-lg border-2 border-accent bg-accent/10 text-right text-sm">
+              <Truck className="w-4 h-4 flex-shrink-0" />
+              <div>
+                <p className="font-medium">المنزل</p>
+                <p className="text-xs text-muted-foreground">400 د.ج</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-lg border-2 border-border text-right text-sm">
+              <Building2 className="w-4 h-4 flex-shrink-0" />
+              <div>
+                <p className="font-medium">المكتب</p>
+                <p className="text-xs text-muted-foreground">250 د.ج</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    case "textarea":
+      return (
+        <div className="space-y-1.5">
+          {labelEl}
+          <Textarea placeholder={field.placeholder} disabled rows={2} />
+        </div>
+      );
+    case "tel":
+      return (
+        <div className="space-y-1.5">
+          {labelEl}
+          <Input type="tel" placeholder={field.placeholder} disabled dir="ltr" />
+        </div>
+      );
+    case "email":
+      return (
+        <div className="space-y-1.5">
+          {labelEl}
+          <Input type="email" placeholder={field.placeholder} disabled dir="ltr" />
+        </div>
+      );
+    default:
+      return (
+        <div className="space-y-1.5">
+          {labelEl}
+          <Input placeholder={field.placeholder} disabled />
+        </div>
+      );
+  }
 }
