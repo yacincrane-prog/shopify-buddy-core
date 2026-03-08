@@ -97,6 +97,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
       keyExtractor={(p) => p.id}
       emptyMessage="No products yet. Create your first product to get started."
       pageSize={10}
+      isLoading={isLoading}
     />
   );
 }
