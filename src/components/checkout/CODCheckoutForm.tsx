@@ -33,6 +33,7 @@ interface CODCheckoutFormProps {
 type CheckoutPhase = "form" | "post-upsell" | "confirmed";
 
 export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, freeDelivery = false }: CODCheckoutFormProps) {
+  const { trackEvent } = useTrackingPixels();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [wilayaCode, setWilayaCode] = useState("");
