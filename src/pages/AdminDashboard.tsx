@@ -9,6 +9,7 @@ import { UpsellManager } from "@/components/admin/UpsellManager";
 import { ExitIntentManager } from "@/components/admin/ExitIntentManager";
 import { SectionBuilder } from "@/components/admin/SectionBuilder";
 import { QuantityOfferManager } from "@/components/admin/QuantityOfferManager";
+import { PostOrderUpsellManager } from "@/components/admin/PostOrderUpsellManager";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { Plus, Package, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
