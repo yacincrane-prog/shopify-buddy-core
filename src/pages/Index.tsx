@@ -1,14 +1,80 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Link } from "react-router-dom";
+import { useProducts } from "@/hooks/useProducts";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Settings } from "lucide-react";
 
-const Index = () => {
+export default function Index() {
+  const { data: products, isLoading } = useProducts();
+  const activeProducts = products?.filter((p) => p.is_active) ?? [];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border bg-card">
+        <div className="container flex items-center justify-between h-14">
+          <h1 className="text-lg font-semibold tracking-tight">Store</h1>
+          <Link to="/admin">
+            <Button variant="ghost" size="sm">
+              <Settings className="w-4 h-4 mr-1" />
+              Admin
+            </Button>
+          </Link>
+        </div>
+      </header>
+
+      <main className="container py-8 md:py-12">
+        {isLoading ? (
+          <div className="text-center py-16 text-muted-foreground">Loading…</div>
+        ) : !activeProducts.length ? (
+          <div className="text-center py-16">
+            <p className="text-lg text-muted-foreground">No products available</p>
+            <Link to="/admin" className="mt-4 inline-block">
+              <Button variant="outline">Add your first product</Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {activeProducts.map((product) => {
+              const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
+              return (
+                <Link key={product.id} to={`/product/${product.slug}`} className="group">
+                  <Card className="overflow-hidden border-border hover:border-accent transition-colors">
+                    <div className="aspect-square bg-muted overflow-hidden">
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt={product.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                    <CardContent className="p-3">
+                      <p className="font-medium text-sm truncate">{product.title}</p>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="font-semibold text-sm">${Number(product.price).toFixed(2)}</span>
+                        {hasDiscount && (
+                          <span className="text-xs text-muted-foreground line-through">
+                            ${Number(product.compare_at_price).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                      {product.inventory_quantity <= 0 && (
+                        <Badge variant="secondary" className="mt-2 text-xs">Sold out</Badge>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </main>
     </div>
   );
-};
-
-export default Index;
+}
