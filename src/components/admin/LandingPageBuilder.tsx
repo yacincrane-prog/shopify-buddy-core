@@ -98,14 +98,14 @@ export function LandingPageBuilder() {
     mutationFn: async () => {
       const product = products?.find((p) => p.id === newProductId);
       if (!product) throw new Error("Select a product");
-      const slug = product.slug;
+      const slug = newSlug.trim() || product.slug + "-" + Date.now().toString(36);
       const page = await createLandingPage({
         product_id: newProductId,
         title: newTitle || product.title,
         slug,
         template: newTemplate,
       });
-      if (!page) throw new Error("Failed to create");
+      if (!page) throw new Error("Failed to create — slug may already exist");
       const template = TEMPLATES.find((t) => t.id === newTemplate);
       if (template) {
         await bulkCreateSections(page.id, template.sections);
