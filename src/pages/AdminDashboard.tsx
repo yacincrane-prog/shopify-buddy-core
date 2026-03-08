@@ -11,6 +11,7 @@ import { SectionBuilder } from "@/components/admin/SectionBuilder";
 import { QuantityOfferManager } from "@/components/admin/QuantityOfferManager";
 import { PostOrderUpsellManager } from "@/components/admin/PostOrderUpsellManager";
 import { AbandonedLeadsManager } from "@/components/admin/AbandonedLeadsManager";
+import { LandingPageBuilder } from "@/components/admin/LandingPageBuilder";
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/useProducts";
 import { Plus, Package, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -128,6 +129,7 @@ export default function AdminDashboard() {
               <TabsTrigger value="qty-offers">Qty Offers</TabsTrigger>
               <TabsTrigger value="post-upsell">Post-Order</TabsTrigger>
               <TabsTrigger value="abandoned">Abandoned</TabsTrigger>
+              <TabsTrigger value="landing-pages">Landing Pages</TabsTrigger>
             </TabsList>
 
             <TabsContent value="products">
@@ -172,6 +174,10 @@ export default function AdminDashboard() {
 
             <TabsContent value="abandoned">
               <AbandonedLeadsManager />
+            </TabsContent>
+
+            <TabsContent value="landing-pages">
+              <LandingPageBuilder />
             </TabsContent>
           </Tabs>
         )}
