@@ -56,6 +56,7 @@ const systemNav = [
   { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
   { title: "Shipping", url: "/admin/shipping", icon: Truck },
   { title: "Tracking Pixels", url: "/admin/tracking-pixels", icon: Activity },
+  { title: "Google Sheets", url: "/admin/google-sheets", icon: FileSpreadsheet },
   { title: "Theme Editor", url: "/admin/theme", icon: Palette },
   { title: "Checkout Preview", url: "/admin/checkout-preview", icon: CreditCard },
   { title: "Page Builder", url: "/admin/page-builder", icon: Settings },
