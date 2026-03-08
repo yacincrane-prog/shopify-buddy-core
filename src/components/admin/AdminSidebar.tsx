@@ -43,6 +43,7 @@ const marketingNav = [
   { title: "Bundles", url: "/admin/bundles", icon: Gift },
   { title: "Upsells", url: "/admin/upsells", icon: TrendingUp },
   { title: "Post-Order Upsell", url: "/admin/post-upsell", icon: Zap },
+  { title: "Discount Codes", url: "/admin/discount-codes", icon: Ticket },
   { title: "Qty Offers", url: "/admin/qty-offers", icon: Tags },
   { title: "Qty Discounts", url: "/admin/discounts", icon: Layers },
   { title: "Exit Intent", url: "/admin/exit-intent", icon: LogOut },
