@@ -645,6 +645,13 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
           </div>
         )}
       </div>
+      <PreviewFrame
+        url={`/offer/${page.slug}`}
+        open={fullPreview}
+        onOpenChange={setFullPreview}
+        title={`${page.title} — Full Preview`}
+        refreshKey={previewKey}
+      />
     </div>
   );
 }
