@@ -331,8 +331,8 @@ export default function AdminCheckoutPreview() {
           )}
         </div>
 
-        {/* Right: Live Preview */}
-        <div className="xl:w-[500px] shrink-0 space-y-3">
+        {/* Right: Live Preview - separate section on mobile */}
+        <div className="w-full lg:w-[500px] shrink-0 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-muted-foreground">معاينة مباشرة</span>
             <div className="flex items-center rounded-md border border-border p-0.5 bg-muted/30">

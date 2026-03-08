@@ -88,10 +88,10 @@ export function ExitIntentManager() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="content" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="content" className="gap-1"><Settings2 className="w-3.5 h-3.5" /> المحتوى</TabsTrigger>
-                <TabsTrigger value="timing" className="gap-1"><Clock className="w-3.5 h-3.5" /> التوقيت</TabsTrigger>
-                <TabsTrigger value="design" className="gap-1"><Palette className="w-3.5 h-3.5" /> التصميم</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
+                <TabsTrigger value="content" className="gap-1 px-2 sm:px-4"><Settings2 className="w-3.5 h-3.5" /> المحتوى</TabsTrigger>
+                <TabsTrigger value="timing" className="gap-1 px-2 sm:px-4"><Clock className="w-3.5 h-3.5" /> التوقيت</TabsTrigger>
+                <TabsTrigger value="design" className="gap-1 px-2 sm:px-4"><Palette className="w-3.5 h-3.5" /> التصميم</TabsTrigger>
               </TabsList>
 
               {/* ── Content Tab ── */}
