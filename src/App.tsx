@@ -8,7 +8,9 @@ import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
 import NotFound from "./pages/NotFound";
 import LandingPageView from "./pages/LandingPageView";
+import AdminLogin from "./pages/AdminLogin";
 import AdminLayout from "./components/admin/AdminLayout";
+import { RequireAuth } from "./hooks/useAuth";
 
 const AdminOverview = lazy(() => import("./pages/admin/AdminOverview"));
 const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
@@ -40,8 +42,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/product/:slug" element={<ProductPage />} />
           <Route path="/offer/:slug" element={<LandingPageView />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
 
-          <Route path="/admin" element={<AdminLayout />}>
+          <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
             <Route index element={<Suspense fallback={<AdminFallback />}><AdminOverview /></Suspense>} />
             <Route path="products" element={<Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>} />
             <Route path="orders" element={<Suspense fallback={<AdminFallback />}><AdminOrders /></Suspense>} />
@@ -57,7 +60,6 @@ const App = () => (
             <Route path="page-builder" element={<Suspense fallback={<AdminFallback />}><AdminPageBuilder /></Suspense>} />
           </Route>
 
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
