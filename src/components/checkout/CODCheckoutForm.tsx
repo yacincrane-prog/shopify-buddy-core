@@ -16,6 +16,7 @@ import { PostOrderUpsellPage } from "@/components/checkout/PostOrderUpsellPage";
 import type { Product } from "@/types/product";
 import { useAbandonedLeadCapture } from "@/hooks/useAbandonedLeadCapture";
 import { useTrackingPixels } from "@/hooks/useTrackingPixels";
+import { Textarea } from "@/components/ui/textarea";
 import {
   validateDiscountCode,
   calculateDiscount,
