@@ -94,7 +94,7 @@ export function QuantityDiscountManager() {
                 />
               </div>
               <div className="flex-1 space-y-1">
-                <Label className="text-xs">Discount %</Label>
+                <Label className="text-xs">نسبة الخصم %</Label>
                 <Input
                   type="number"
                   min={1}
