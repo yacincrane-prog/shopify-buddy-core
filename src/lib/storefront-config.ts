@@ -85,6 +85,8 @@ export const DEFAULT_STOREFRONT: StorefrontConfig = {
     imagePosition: "right",
     showStockBadge: true,
     showShareButtons: false,
+    checkoutFormPosition: "below_title",
+    alwaysShowCheckoutForm: true,
   },
 };
 
