@@ -183,13 +183,13 @@ export default function AdminThemeEditor() {
         <Tabs defaultValue="colors" className="w-full">
           <TabsList className="w-full grid grid-cols-3 mb-4">
             <TabsTrigger value="colors" className="text-xs gap-1">
-              <Palette className="w-3.5 h-3.5" /> Colors
+              <Palette className="w-3.5 h-3.5" /> الألوان
             </TabsTrigger>
             <TabsTrigger value="fonts" className="text-xs gap-1">
-              <Type className="w-3.5 h-3.5" /> Fonts
+              <Type className="w-3.5 h-3.5" /> الخطوط
             </TabsTrigger>
             <TabsTrigger value="style" className="text-xs gap-1">
-              <Paintbrush className="w-3.5 h-3.5" /> Style
+              <Paintbrush className="w-3.5 h-3.5" /> الأنماط
             </TabsTrigger>
           </TabsList>
 
