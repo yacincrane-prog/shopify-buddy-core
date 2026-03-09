@@ -106,7 +106,7 @@ export default function AdminDashboard() {
         {(view === "create" || view === "edit") ? (
           <Card>
             <CardHeader>
-              <CardTitle>{view === "create" ? "New product" : "Edit product"}</CardTitle>
+              <CardTitle>{view === "create" ? "منتج جديد" : "تعديل المنتج"}</CardTitle>
             </CardHeader>
             <CardContent>
               <ProductForm
