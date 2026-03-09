@@ -43,6 +43,7 @@ import {
   Check,
   Loader2,
   Eye,
+  Store,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
