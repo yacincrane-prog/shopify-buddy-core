@@ -219,7 +219,7 @@ export default function AdminThemeEditor() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Customize Colors</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">تخصيص الألوان</Label>
               <div className="space-y-2">
                 {(Object.keys(COLOR_LABELS) as (keyof ThemeColors)[]).map((key) => (
                   <div key={key} className="flex items-center gap-2">
