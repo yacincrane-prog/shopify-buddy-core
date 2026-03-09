@@ -159,6 +159,9 @@ export default function AdminStorefront() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [catForm, setCatForm] = useState({ name: "", slug: "", image: "", description: "", position: 0 });
   const [uploading, setUploading] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
+  const [previewKey, setPreviewKey] = useState(0);
+  const [previewViewport, setPreviewViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
