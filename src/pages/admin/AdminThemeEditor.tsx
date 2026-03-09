@@ -172,7 +172,7 @@ export default function AdminThemeEditor() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20 text-muted-foreground">
-        <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading theme…
+        <Loader2 className="w-5 h-5 animate-spin mr-2" /> جاري تحميل المظهر…
       </div>
     );
   }
