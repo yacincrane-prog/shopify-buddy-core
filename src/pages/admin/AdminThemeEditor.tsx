@@ -244,7 +244,7 @@ export default function AdminThemeEditor() {
           <TabsContent value="fonts" className="mt-0 space-y-5">
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label className="text-xs">Heading Font</Label>
+                <Label className="text-xs">خط العناوين</Label>
                 <Select value={theme.fonts.heading} onValueChange={(v) => updateFont("heading", v)}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
