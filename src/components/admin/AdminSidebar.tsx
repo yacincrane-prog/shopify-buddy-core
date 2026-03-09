@@ -117,7 +117,7 @@ export function AdminSidebar() {
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <Package className="h-4 w-4 text-primary-foreground" />
           </div>
-          {!collapsed && <span className="text-base font-bold tracking-tight">Store Admin</span>}
+          {!collapsed && <span className="text-base font-bold tracking-tight">لوحة التحكم</span>}
         </NavLink>
       </SidebarHeader>
 
