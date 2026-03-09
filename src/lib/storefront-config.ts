@@ -46,33 +46,33 @@ export interface StorefrontConfig {
 }
 
 export const DEFAULT_STOREFRONT: StorefrontConfig = {
-  storeName: "المتجر",
-  storeNameEn: "Store",
+  storeName: "متجر الجزائر",
+  storeNameEn: "DZ Store",
   logo: "",
   announcementBar: {
-    enabled: false,
-    text: "🚚 توصيل مجاني للطلبات فوق 5000 د.ج",
+    enabled: true,
+    text: "🚚 توصيل سريع لجميع الولايات — الدفع عند الاستلام",
     bgColor: "primary",
     textColor: "primary-foreground",
   },
   hero: {
-    enabled: false,
-    title: "أفضل المنتجات بأسعار لا تُقاوم",
-    subtitle: "توصيل سريع لجميع ولايات الجزائر 🇩🇿",
-    buttonText: "تسوق الآن",
+    enabled: true,
+    title: "اكتشف أفضل المنتجات بأسعار لا تُقاوم",
+    subtitle: "توصيل سريع لجميع 58 ولاية 🇩🇿 مع الدفع عند الاستلام",
+    buttonText: "تسوّق الآن",
     buttonLink: "#products",
     backgroundImage: "",
     overlay: true,
   },
   featuredSection: {
     enabled: true,
-    title: "منتجاتنا",
+    title: "أحدث المنتجات",
     showCategories: true,
     layout: "grid-4",
   },
   footer: {
     enabled: true,
-    text: "© 2025 جميع الحقوق محفوظة",
+    text: "© 2025 متجر الجزائر — جميع الحقوق محفوظة",
     phone: "",
     email: "",
     socialLinks: { facebook: "", instagram: "", tiktok: "" },
