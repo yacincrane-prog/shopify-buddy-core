@@ -35,6 +35,7 @@ const AdminDiscountCodes = lazy(() => import("./pages/admin/AdminDiscountCodes")
 const AdminShipping = lazy(() => import("./pages/admin/AdminShipping"));
 const AdminGoogleSheets = lazy(() => import("./pages/admin/AdminGoogleSheets"));
 const AdminCredentials = lazy(() => import("./pages/admin/AdminCredentials"));
+const AdminStorefront = lazy(() => import("./pages/admin/AdminStorefront"));
 
 const queryClient = new QueryClient();
 
