@@ -286,26 +286,39 @@ export default function AdminStorefront() {
     );
   }
 
+  const VIEWPORTS = [
+    { id: "desktop" as const, icon: Monitor, width: "100%", label: "سطح المكتب" },
+    { id: "tablet" as const, icon: Tablet, width: "768px", label: "جهاز لوحي" },
+    { id: "mobile" as const, icon: Smartphone, width: "375px", label: "هاتف" },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <AdminPageHeader
           title="تخصيص المتجر"
           description="تحكم في مظهر متجرك: الصفحة الرئيسية، الفئات، صفحة المنتج، والمزيد"
         />
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <a href="/" target="_blank" rel="noopener noreferrer">
-              <Eye className="w-4 h-4 me-1" /> معاينة المتجر
-            </a>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPreview((p) => !p)}
+            className="hidden lg:flex"
+          >
+            {showPreview ? <PanelRightClose className="w-4 h-4 me-1" /> : <PanelRightOpen className="w-4 h-4 me-1" />}
+            {showPreview ? "إخفاء المعاينة" : "إظهار المعاينة"}
           </Button>
-          <Button onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending}>
+          <Button onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending} size="sm">
             {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : <Save className="w-4 h-4 me-1" />}
             حفظ التغييرات
           </Button>
         </div>
       </div>
 
+      <div className={`flex gap-4 ${showPreview ? "" : ""}`}>
+        {/* Settings Panel */}
+        <div className={`min-w-0 ${showPreview ? "w-1/2 hidden lg:block" : "w-full"} lg:block w-full`}>
       <Tabs defaultValue="homepage" className="w-full">
         <TabsList className="w-full grid grid-cols-2 sm:grid-cols-5 mb-4 h-auto">
           <TabsTrigger value="homepage" className="text-xs gap-1.5 py-2">
