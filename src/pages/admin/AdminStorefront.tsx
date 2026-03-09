@@ -76,6 +76,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminStorefront() {
   const queryClient = useQueryClient();
