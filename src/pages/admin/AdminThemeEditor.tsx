@@ -258,7 +258,7 @@ export default function AdminThemeEditor() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs">Body Font</Label>
+                <Label className="text-xs">خط النص</Label>
                 <Select value={theme.fonts.body} onValueChange={(v) => updateFont("body", v)}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
