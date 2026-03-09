@@ -47,7 +47,7 @@ export default function AdminDashboard() {
         toast.success("تم إنشاء المنتج");
         setView("list");
       },
-      onError: () => toast.error("Failed to create product"),
+      onError: () => toast.error("فشل في إنشاء المنتج"),
     });
   };
 
