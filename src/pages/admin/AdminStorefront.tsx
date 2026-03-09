@@ -215,6 +215,25 @@ export default function AdminStorefront() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
   });
 
+  const handleCategoryDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = categories.findIndex((c) => c.id === active.id);
+    const newIndex = categories.findIndex((c) => c.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = [...categories];
+    const [moved] = reordered.splice(oldIndex, 1);
+    reordered.splice(newIndex, 0, moved);
+    queryClient.setQueryData(["categories"], reordered);
+    try {
+      await Promise.all(reordered.map((cat, i) => updateCategory(cat.id, { position: i })));
+      toast.success("تم تحديث ترتيب الفئات");
+    } catch {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.error("فشل في تحديث الترتيب");
+    }
+  }, [categories, queryClient]);
+
   const resetCatForm = () => setCatForm({ name: "", slug: "", image: "", description: "", position: 0 });
 
   const openEditCategory = (cat: Category) => {
