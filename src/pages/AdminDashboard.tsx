@@ -70,7 +70,7 @@ export default function AdminDashboard() {
     if (!deleteId) return;
     deleteMutation.mutate(deleteId, {
       onSuccess: () => {
-        toast.success("Product deleted");
+        toast.success("تم حذف المنتج");
         setDeleteId(null);
       },
       onError: () => toast.error("Failed to delete product"),
