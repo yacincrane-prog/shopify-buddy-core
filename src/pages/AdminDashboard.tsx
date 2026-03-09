@@ -136,7 +136,7 @@ export default function AdminDashboard() {
               <Card>
                 <CardContent className="p-0">
                   {isLoading ? (
-                    <div className="text-center py-16 text-muted-foreground">Loading…</div>
+                    <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
                   ) : (
                     <ProductTable products={products ?? []} onEdit={startEdit} onDelete={setDeleteId} />
                   )}
