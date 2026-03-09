@@ -42,6 +42,8 @@ export interface StorefrontConfig {
     imagePosition: "right" | "left";
     showStockBadge: boolean;
     showShareButtons: boolean;
+    checkoutFormPosition: "below_title" | "below_gallery" | "below_description" | "bottom";
+    alwaysShowCheckoutForm: boolean;
   };
 }
 
@@ -83,6 +85,8 @@ export const DEFAULT_STOREFRONT: StorefrontConfig = {
     imagePosition: "right",
     showStockBadge: true,
     showShareButtons: false,
+    checkoutFormPosition: "below_title",
+    alwaysShowCheckoutForm: true,
   },
 };
 
