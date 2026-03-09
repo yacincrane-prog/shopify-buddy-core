@@ -382,11 +382,11 @@ export default function AdminThemeEditor() {
             ))}
           </div>
           <Button size="sm" variant="outline" onClick={resetTheme}>
-            <RotateCcw className="w-3.5 h-3.5 mr-1" /> Reset
+            <RotateCcw className="w-3.5 h-3.5 mr-1" /> إعادة تعيين
           </Button>
           <Button size="sm" onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending}>
             {saveMutation.isPending ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1" />}
-            Save & Apply
+            حفظ وتطبيق
           </Button>
         </div>
       </div>
