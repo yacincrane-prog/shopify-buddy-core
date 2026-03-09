@@ -79,7 +79,7 @@ export function QuantityDiscountManager() {
           </div>
 
           {tiers.length === 0 && (
-            <p className="text-sm text-muted-foreground py-4 text-center">No tiers set. Add one above.</p>
+            <p className="text-sm text-muted-foreground py-4 text-center">لا توجد مستويات. أضف واحداً أعلاه.</p>
           )}
 
           {tiers.map((tier, i) => (
