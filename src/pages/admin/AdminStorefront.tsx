@@ -81,6 +81,69 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
+function SortableCategoryCard({ cat, onToggle, onEdit, onDelete }: {
+  cat: Category;
+  onToggle: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: cat.id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
+
+  return (
+    <Card ref={setNodeRef} style={style}>
+      <CardContent className="p-3 flex items-center gap-3">
+        <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none shrink-0">
+          <GripVertical className="w-4 h-4 text-muted-foreground/40" />
+        </button>
+        {cat.image ? (
+          <img src={cat.image} alt={cat.name} className="w-10 h-10 rounded-lg object-cover border border-border" />
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+            <FolderTree className="w-4 h-4 text-muted-foreground" />
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate">{cat.name}</p>
+          <p className="text-[10px] text-muted-foreground">/{cat.slug}</p>
+        </div>
+        <Badge variant={cat.is_active ? "default" : "secondary"} className="text-[10px]">
+          {cat.is_active ? "نشطة" : "معطلة"}
+        </Badge>
+        <div className="flex gap-1">
+          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onToggle}>
+            {cat.is_active ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+          </Button>
+          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onEdit}>
+            <Pencil className="w-3.5 h-3.5" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive">
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>حذف الفئة؟</AlertDialogTitle>
+                <AlertDialogDescription>
+                  سيتم حذف الفئة "{cat.name}" نهائياً. المنتجات المرتبطة لن تُحذف.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete} className="bg-destructive text-destructive-foreground">
+                  حذف
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminStorefront() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
