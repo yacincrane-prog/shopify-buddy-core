@@ -543,63 +543,21 @@ export default function AdminStorefront() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-2">
-              {categories.map((cat) => (
-                <Card key={cat.id}>
-                  <CardContent className="p-3 flex items-center gap-3">
-                    <GripVertical className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                    {cat.image ? (
-                      <img src={cat.image} alt={cat.name} className="w-10 h-10 rounded-lg object-cover border border-border" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                        <FolderTree className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{cat.name}</p>
-                      <p className="text-[10px] text-muted-foreground">/{cat.slug}</p>
-                    </div>
-                    <Badge variant={cat.is_active ? "default" : "secondary"} className="text-[10px]">
-                      {cat.is_active ? "نشطة" : "معطلة"}
-                    </Badge>
-                    <div className="flex gap-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7"
-                        onClick={() => toggleCatMutation.mutate({ id: cat.id, is_active: !cat.is_active })}
-                      >
-                        {cat.is_active ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEditCategory(cat)}>
-                        <Pencil className="w-3.5 h-3.5" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>حذف الفئة؟</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              سيتم حذف الفئة "{cat.name}" نهائياً. المنتجات المرتبطة لن تُحذف.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteCatMutation.mutate(cat.id)} className="bg-destructive text-destructive-foreground">
-                              حذف
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+              <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-2">
+                  {categories.map((cat) => (
+                    <SortableCategoryCard
+                      key={cat.id}
+                      cat={cat}
+                      onToggle={() => toggleCatMutation.mutate({ id: cat.id, is_active: !cat.is_active })}
+                      onEdit={() => openEditCategory(cat)}
+                      onDelete={() => deleteCatMutation.mutate(cat.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </TabsContent>
 
