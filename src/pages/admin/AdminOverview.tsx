@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Package, ShoppingCart, TrendingUp, UserX, DollarSign, Truck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/hooks/useLanguage";
 
 function useAbandonedCount() {
   return useQuery({
@@ -24,6 +25,7 @@ export default function AdminOverview() {
   const { data: products } = useProducts();
   const { data: orders } = useOrders();
   const { data: abandonedCount } = useAbandonedCount();
+  const { t, lang } = useLanguage();
 
   const totalOrders = orders?.length ?? 0;
   const totalRevenue = orders?.reduce((sum, o) => sum + Number(o.total_price), 0) ?? 0;
@@ -31,19 +33,19 @@ export default function AdminOverview() {
   const deliveredOrders = orders?.filter((o) => o.status === "delivered").length ?? 0;
 
   const stats = [
-    { label: "المنتجات", value: products?.length ?? 0, icon: Package, href: "/admin/products", color: "text-blue-600 bg-blue-50" },
-    { label: "إجمالي الطلبات", value: totalOrders, icon: ShoppingCart, href: "/admin/orders", color: "text-amber-600 bg-amber-50" },
-    { label: "قيد الانتظار", value: pendingOrders, icon: Truck, href: "/admin/orders", color: "text-purple-600 bg-purple-50" },
-    { label: "تم التسليم", value: deliveredOrders, icon: TrendingUp, href: "/admin/orders", color: "text-emerald-600 bg-emerald-50" },
-    { label: "الإيرادات", value: `${totalRevenue.toLocaleString()} DA`, icon: DollarSign, href: "/admin/orders", color: "text-green-600 bg-green-50" },
-    { label: "متروكين", value: abandonedCount ?? 0, icon: UserX, href: "/admin/abandoned", color: "text-rose-600 bg-rose-50" },
+    { label: t("overview.products"), value: products?.length ?? 0, icon: Package, href: "/admin/products", color: "text-blue-600 bg-blue-50" },
+    { label: t("overview.totalOrders"), value: totalOrders, icon: ShoppingCart, href: "/admin/orders", color: "text-amber-600 bg-amber-50" },
+    { label: t("overview.pending"), value: pendingOrders, icon: Truck, href: "/admin/orders", color: "text-purple-600 bg-purple-50" },
+    { label: t("overview.delivered"), value: deliveredOrders, icon: TrendingUp, href: "/admin/orders", color: "text-emerald-600 bg-emerald-50" },
+    { label: t("overview.revenue"), value: `${totalRevenue.toLocaleString()} DA`, icon: DollarSign, href: "/admin/orders", color: "text-green-600 bg-green-50" },
+    { label: t("overview.abandoned"), value: abandonedCount ?? 0, icon: UserX, href: "/admin/abandoned", color: "text-rose-600 bg-rose-50" },
   ];
 
   return (
     <div className="space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">لوحة التحكم</h1>
-        <p className="text-muted-foreground text-sm mt-1">مرحباً بك. إليك نظرة عامة على متجرك.</p>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">{t("overview.title")}</h1>
+        <p className="text-muted-foreground text-sm mt-1">{t("overview.welcome")}</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -64,11 +66,10 @@ export default function AdminOverview() {
         ))}
       </div>
 
-      {/* Recent orders */}
       {orders && orders.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">آخر الطلبات</CardTitle>
+            <CardTitle className="text-base">{t("overview.recentOrders")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {orders.slice(0, 5).map((o) => (
@@ -77,9 +78,9 @@ export default function AdminOverview() {
                   <p className="text-sm font-medium truncate">{o.customer_name}</p>
                   <p className="text-xs text-muted-foreground truncate">{o.product_title} × {o.quantity}</p>
                 </div>
-                <div className="text-right shrink-0">
+                <div className="text-end shrink-0">
                   <p className="text-sm font-semibold">{Number(o.total_price).toLocaleString()} DA</p>
-                  <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString("ar-DZ")}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleDateString(lang === "ar" ? "ar-DZ" : "en")}</p>
                 </div>
               </div>
             ))}

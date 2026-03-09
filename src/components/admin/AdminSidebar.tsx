@@ -35,50 +35,49 @@ import {
   SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
-
-const mainNav = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Products", url: "/admin/products", icon: Package },
-  { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
-  { title: "Landing Pages", url: "/admin/landing-pages", icon: FileText },
-];
-
-const marketingNav = [
-  { title: "Bundles", url: "/admin/bundles", icon: Gift },
-  { title: "Upsells", url: "/admin/upsells", icon: TrendingUp },
-  { title: "Post-Order Upsell", url: "/admin/post-upsell", icon: Zap },
-  { title: "Discount Codes", url: "/admin/discount-codes", icon: Ticket },
-  { title: "Qty Offers", url: "/admin/qty-offers", icon: Tags },
-  { title: "Qty Discounts", url: "/admin/discounts", icon: Layers },
-  { title: "Exit Intent", url: "/admin/exit-intent", icon: LogOut },
-  { title: "Abandoned Leads", url: "/admin/abandoned", icon: UserX },
-];
-
-const systemNav = [
-  { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
-  { title: "Shipping", url: "/admin/shipping", icon: Truck },
-  { title: "Tracking Pixels", url: "/admin/tracking-pixels", icon: Activity },
-  { title: "Google Sheets", url: "/admin/google-sheets", icon: FileSpreadsheet },
-  { title: "بيانات الدخول", url: "/admin/credentials", icon: KeyRound },
-  { title: "Theme Editor", url: "/admin/theme", icon: Palette },
-  { title: "Checkout Preview", url: "/admin/checkout-preview", icon: CreditCard },
-  { title: "Page Builder", url: "/admin/page-builder", icon: Settings },
-];
+import { useLanguage } from "@/hooks/useLanguage";
 
 export function AdminSidebar() {
   const { state, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const { t } = useLanguage();
+
+  const mainNav = [
+    { title: t("nav.dashboard"), url: "/admin", icon: LayoutDashboard },
+    { title: t("nav.products"), url: "/admin/products", icon: Package },
+    { title: t("nav.orders"), url: "/admin/orders", icon: ShoppingCart },
+    { title: t("nav.landingPages"), url: "/admin/landing-pages", icon: FileText },
+  ];
+
+  const marketingNav = [
+    { title: t("nav.bundles"), url: "/admin/bundles", icon: Gift },
+    { title: t("nav.upsells"), url: "/admin/upsells", icon: TrendingUp },
+    { title: t("nav.postUpsell"), url: "/admin/post-upsell", icon: Zap },
+    { title: t("nav.discountCodes"), url: "/admin/discount-codes", icon: Ticket },
+    { title: t("nav.qtyOffers"), url: "/admin/qty-offers", icon: Tags },
+    { title: t("nav.qtyDiscounts"), url: "/admin/discounts", icon: Layers },
+    { title: t("nav.exitIntent"), url: "/admin/exit-intent", icon: LogOut },
+    { title: t("nav.abandoned"), url: "/admin/abandoned", icon: UserX },
+  ];
+
+  const systemNav = [
+    { title: t("nav.analytics"), url: "/admin/analytics", icon: BarChart3 },
+    { title: t("nav.shipping"), url: "/admin/shipping", icon: Truck },
+    { title: t("nav.trackingPixels"), url: "/admin/tracking-pixels", icon: Activity },
+    { title: t("nav.googleSheets"), url: "/admin/google-sheets", icon: FileSpreadsheet },
+    { title: t("nav.credentials"), url: "/admin/credentials", icon: KeyRound },
+    { title: t("nav.themeEditor"), url: "/admin/theme", icon: Palette },
+    { title: t("nav.checkoutPreview"), url: "/admin/checkout-preview", icon: CreditCard },
+    { title: t("nav.pageBuilder"), url: "/admin/page-builder", icon: Settings },
+  ];
 
   const isActive = (path: string) => {
     if (path === "/admin") return location.pathname === "/admin";
     return location.pathname.startsWith(path);
   };
 
-  const handleNavClick = () => {
-    // Close mobile sidebar on navigation
-    setOpenMobile(false);
-  };
+  const handleNavClick = () => setOpenMobile(false);
 
   const renderGroup = (label: string, items: typeof mainNav) => (
     <SidebarGroup>
@@ -86,7 +85,7 @@ export function AdminSidebar() {
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem key={item.url}>
               <SidebarMenuButton
                 asChild
                 isActive={isActive(item.url)}
@@ -117,19 +116,19 @@ export function AdminSidebar() {
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <Package className="h-4 w-4 text-primary-foreground" />
           </div>
-          {!collapsed && <span className="text-base font-bold tracking-tight">لوحة التحكم</span>}
+          {!collapsed && <span className="text-base font-bold tracking-tight">{t("nav.controlPanel")}</span>}
         </NavLink>
       </SidebarHeader>
 
       <SidebarContent className="px-2 gap-1">
-        {renderGroup("Main", mainNav)}
-        {renderGroup("Marketing", marketingNav)}
-        {renderGroup("System", systemNav)}
+        {renderGroup(t("nav.main"), mainNav)}
+        {renderGroup(t("nav.marketing"), marketingNav)}
+        {renderGroup(t("nav.system"), systemNav)}
       </SidebarContent>
 
       <SidebarFooter className="p-3">
         {!collapsed && (
-          <p className="text-[10px] text-muted-foreground/50 text-center">الإصدار 1.0 · لوحة الإدارة</p>
+          <p className="text-[10px] text-muted-foreground/50 text-center">{t("nav.version")}</p>
         )}
       </SidebarFooter>
     </Sidebar>

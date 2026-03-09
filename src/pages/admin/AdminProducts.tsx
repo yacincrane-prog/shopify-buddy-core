@@ -8,6 +8,7 @@ import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } fro
 import { Plus, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import type { Product, ProductFormData } from "@/types/product";
+import { useLanguage } from "@/hooks/useLanguage";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -22,6 +23,7 @@ export default function AdminProducts() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+  const { t } = useLanguage();
 
   const { data: products, isLoading } = useProducts();
   const createMutation = useCreateProduct();
@@ -46,27 +48,24 @@ export default function AdminProducts() {
 
   const handleCreate = (data: ProductFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => { toast.success("تم إنشاء المنتج"); setView("list"); },
-      onError: () => toast.error("فشل في إنشاء المنتج"),
+      onSuccess: () => { toast.success(t("products.created")); setView("list"); },
+      onError: () => toast.error(t("products.createFail")),
     });
   };
 
   const handleUpdate = (data: ProductFormData) => {
     if (!editingProduct) return;
-    updateMutation.mutate(
-      { id: editingProduct.id, data },
-      {
-        onSuccess: () => { toast.success("تم تحديث المنتج"); setView("list"); setEditingProduct(null); },
-        onError: () => toast.error("فشل في تحديث المنتج"),
-      }
-    );
+    updateMutation.mutate({ id: editingProduct.id, data }, {
+      onSuccess: () => { toast.success(t("products.updated")); setView("list"); setEditingProduct(null); },
+      onError: () => toast.error(t("products.updateFail")),
+    });
   };
 
   const handleDelete = () => {
     if (!deleteId) return;
     deleteMutation.mutate(deleteId, {
-      onSuccess: () => { toast.success("تم حذف المنتج"); setDeleteId(null); },
-      onError: () => toast.error("فشل في حذف المنتج"),
+      onSuccess: () => { toast.success(t("products.deleted")); setDeleteId(null); },
+      onError: () => toast.error(t("products.deleteFail")),
     });
   };
 
@@ -76,10 +75,10 @@ export default function AdminProducts() {
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" onClick={() => { setView("list"); setEditingProduct(null); }}>
-          <ArrowLeft className="w-4 h-4 mr-1" /> العودة للمنتجات
+          <ArrowLeft className="w-4 h-4 me-1" /> {t("products.backToProducts")}
         </Button>
         <Card>
-          <CardHeader><CardTitle>{view === "create" ? "منتج جديد" : "تعديل المنتج"}</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{view === "create" ? t("products.new") : t("products.editProduct")}</CardTitle></CardHeader>
           <CardContent>
             <ProductForm
               product={view === "edit" ? editingProduct! : undefined}
@@ -96,28 +95,28 @@ export default function AdminProducts() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="المنتجات"
-        description="إدارة كتالوج منتجات متجرك"
+        title={t("products.title")}
+        description={t("products.description")}
         count={products?.length}
         action={{
-          label: "إضافة منتج",
-          icon: <Plus className="w-4 h-4 mr-1" />,
+          label: t("products.add"),
+          icon: <Plus className="w-4 h-4 me-1" />,
           onClick: () => setView("create"),
         }}
         search={{
           value: search,
           onChange: setSearch,
-          placeholder: "بحث في المنتجات…",
+          placeholder: t("products.searchPlaceholder"),
         }}
         filters={[
           {
-            label: "الحالة",
+            label: t("common.status"),
             value: statusFilter,
             onChange: setStatusFilter,
             options: [
-              { label: "جميع الحالات", value: "all" },
-              { label: "نشط", value: "active" },
-              { label: "غير نشط", value: "inactive" },
+              { label: t("common.allStatuses"), value: "all" },
+              { label: t("common.active"), value: "active" },
+              { label: t("common.inactive"), value: "inactive" },
             ],
           },
         ]}
@@ -125,11 +124,11 @@ export default function AdminProducts() {
           value: sortBy,
           onChange: setSortBy,
           options: [
-            { label: "الأحدث أولاً", value: "newest" },
-            { label: "الأقدم أولاً", value: "oldest" },
-            { label: "السعر: الأعلى → الأقل", value: "price-high" },
-            { label: "السعر: الأقل → الأعلى", value: "price-low" },
-            { label: "الاسم أ-ي", value: "name" },
+            { label: t("products.newest"), value: "newest" },
+            { label: t("products.oldest"), value: "oldest" },
+            { label: t("products.priceHigh"), value: "price-high" },
+            { label: t("products.priceLow"), value: "price-low" },
+            { label: t("products.nameAZ"), value: "name" },
           ],
         }}
       />
@@ -144,12 +143,12 @@ export default function AdminProducts() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>حذف المنتج؟</AlertDialogTitle>
-            <AlertDialogDescription>لا يمكن التراجع عن هذا الإجراء.</AlertDialogDescription>
+            <AlertDialogTitle>{t("products.deleteConfirm")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("products.deleteWarning")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>حذف</AlertDialogAction>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>{t("common.delete")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

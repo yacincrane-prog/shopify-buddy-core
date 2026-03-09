@@ -1,4 +1,4 @@
-import { Bell, Search, LogOut } from "lucide-react";
+import { Bell, Search, LogOut, Languages } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface AdminHeaderProps {
   title?: string;
@@ -17,6 +18,7 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ title }: AdminHeaderProps) {
   const { session, signOut } = useAuth();
+  const { lang, setLang, t } = useLanguage();
   const email = session?.user?.email ?? "";
   const initial = email ? email[0].toUpperCase() : "A";
 
@@ -29,12 +31,23 @@ export function AdminHeader({ title }: AdminHeaderProps) {
       <div className="flex-1" />
 
       <div className="relative hidden md:block w-64">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="بحث…"
-          className="pl-9 h-9 bg-secondary/50 border-0 focus-visible:ring-1"
+          placeholder={t("common.search")}
+          className="ps-9 h-9 bg-secondary/50 border-0 focus-visible:ring-1"
         />
       </div>
+
+      {/* Language toggle */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="shrink-0 gap-1.5 text-xs font-medium"
+        onClick={() => setLang(lang === "ar" ? "en" : "ar")}
+      >
+        <Languages className="h-4 w-4" />
+        <span className="hidden sm:inline">{t("lang.switch")}</span>
+      </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -43,7 +56,7 @@ export function AdminHeader({ title }: AdminHeaderProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
-          <DropdownMenuItem>لا توجد إشعارات جديدة</DropdownMenuItem>
+          <DropdownMenuItem>{t("nav.noNotifications")}</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -57,7 +70,7 @@ export function AdminHeader({ title }: AdminHeaderProps) {
           <DropdownMenuItem disabled className="text-xs text-muted-foreground">{email}</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut} className="text-destructive">
-            <LogOut className="w-3.5 h-3.5 mr-2" /> تسجيل الخروج
+            <LogOut className="w-3.5 h-3.5 me-2" /> {t("auth.logout")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
