@@ -344,11 +344,13 @@ export default function AdminStorefront() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs">رابط الشعار (اختياري)</Label>
-                <Input
+                <Label className="text-xs">الشعار</Label>
+                <ImageUploadField
                   value={config.logo}
-                  onChange={(e) => setConfig((p) => ({ ...p, logo: e.target.value }))}
+                  onChange={(url) => setConfig((p) => ({ ...p, logo: url }))}
+                  folder="storefront/logo"
                   placeholder="https://example.com/logo.png"
+                  previewClassName="w-16 h-16 rounded-lg"
                 />
               </div>
             </CardContent>
