@@ -39,7 +39,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
     },
     {
       key: "price",
-      header: "Price",
+      header: "السعر",
       sortable: true,
       sortValue: (p) => Number(p.price),
       render: (p) => (
