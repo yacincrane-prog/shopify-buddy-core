@@ -195,7 +195,7 @@ export default function AdminThemeEditor() {
 
           <TabsContent value="colors" className="mt-0 space-y-5">
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Quick Presets</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">أنماط سريعة</Label>
               <div className="grid grid-cols-3 gap-1.5">
                 {COLOR_PRESETS.map((preset) => (
                   <button
