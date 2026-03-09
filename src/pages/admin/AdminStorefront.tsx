@@ -193,9 +193,15 @@ export default function AdminStorefront() {
           title="تخصيص المتجر"
           description="تحكم في مظهر متجرك: الصفحة الرئيسية، الفئات، صفحة المنتج، والمزيد"
         />
-        <Button onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending}>
-          {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : <Save className="w-4 h-4 me-1" />}
-          حفظ التغييرات
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/" target="_blank" rel="noopener noreferrer">
+              <Eye className="w-4 h-4 me-1" /> معاينة المتجر
+            </a>
+          </Button>
+          <Button onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending}>
+            {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : <Save className="w-4 h-4 me-1" />}
+            حفظ التغييرات
         </Button>
       </div>
 
