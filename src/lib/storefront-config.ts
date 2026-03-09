@@ -42,6 +42,8 @@ export interface StorefrontConfig {
     imagePosition: "right" | "left";
     showStockBadge: boolean;
     showShareButtons: boolean;
+    checkoutFormPosition: "below_title" | "below_gallery" | "below_description" | "bottom";
+    alwaysShowCheckoutForm: boolean;
   };
 }
 
