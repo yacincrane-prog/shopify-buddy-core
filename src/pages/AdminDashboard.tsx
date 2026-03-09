@@ -120,16 +120,16 @@ export default function AdminDashboard() {
         ) : (
           <Tabs defaultValue="products">
             <TabsList className="mb-6">
-              <TabsTrigger value="products">Products</TabsTrigger>
-              <TabsTrigger value="bundles">Bundles</TabsTrigger>
-              <TabsTrigger value="discounts">Qty Discounts</TabsTrigger>
-              <TabsTrigger value="upsells">Upsells</TabsTrigger>
-              <TabsTrigger value="exit-intent">Exit Intent</TabsTrigger>
-              <TabsTrigger value="page-builder">Page Builder</TabsTrigger>
-              <TabsTrigger value="qty-offers">Qty Offers</TabsTrigger>
-              <TabsTrigger value="post-upsell">Post-Order</TabsTrigger>
-              <TabsTrigger value="abandoned">Abandoned</TabsTrigger>
-              <TabsTrigger value="landing-pages">Landing Pages</TabsTrigger>
+              <TabsTrigger value="products">المنتجات</TabsTrigger>
+              <TabsTrigger value="bundles">الحزم</TabsTrigger>
+              <TabsTrigger value="discounts">خصومات الكمية</TabsTrigger>
+              <TabsTrigger value="upsells">العروض الإضافية</TabsTrigger>
+              <TabsTrigger value="exit-intent">منبثق الخروج</TabsTrigger>
+              <TabsTrigger value="page-builder">منشئ الصفحات</TabsTrigger>
+              <TabsTrigger value="qty-offers">عروض الكمية</TabsTrigger>
+              <TabsTrigger value="post-upsell">عروض ما بعد الطلب</TabsTrigger>
+              <TabsTrigger value="abandoned">العملاء المهجورون</TabsTrigger>
+              <TabsTrigger value="landing-pages">صفحات الهبوط</TabsTrigger>
             </TabsList>
 
             <TabsContent value="products">
