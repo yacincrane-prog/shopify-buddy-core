@@ -163,6 +163,15 @@ export default function AdminStorefront() {
   const [previewKey, setPreviewKey] = useState(0);
   const [previewViewport, setPreviewViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Send config to iframe for instant preview
+  useEffect(() => {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "storefront-config-preview", config },
+      "*"
+    );
+  }, [config]);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const { data: savedConfig, isLoading: configLoading } = useQuery({
@@ -845,10 +854,18 @@ export default function AdminStorefront() {
                 }}
               >
                 <iframe
+                  ref={iframeRef}
                   key={previewKey}
                   src="/"
                   className="w-full h-full border-0"
                   title="معاينة الصفحة الرئيسية"
+                  onLoad={() => {
+                    // Send current config once iframe loads
+                    iframeRef.current?.contentWindow?.postMessage(
+                      { type: "storefront-config-preview", config },
+                      "*"
+                    );
+                  }}
                 />
               </div>
             </div>

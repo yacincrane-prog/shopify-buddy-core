@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useProducts } from "@/hooks/useProducts";
-import { fetchStorefrontConfig } from "@/lib/storefront-config";
+import { fetchStorefrontConfig, type StorefrontConfig } from "@/lib/storefront-config";
 import { fetchActiveCategories } from "@/lib/categories";
 import { Button } from "@/components/ui/button";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
@@ -12,7 +12,7 @@ import { StorefrontSearch } from "@/components/storefront/StorefrontSearch";
 
 export default function Index() {
   const { data: products, isLoading } = useProducts();
-  const { data: config } = useQuery({
+  const { data: savedConfig } = useQuery({
     queryKey: ["storefront-config"],
     queryFn: fetchStorefrontConfig,
     staleTime: 5 * 60 * 1000,
@@ -22,6 +22,20 @@ export default function Index() {
     queryFn: fetchActiveCategories,
     staleTime: 5 * 60 * 1000,
   });
+
+  // Support instant preview via postMessage from admin
+  const [previewConfig, setPreviewConfig] = useState<StorefrontConfig | null>(null);
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === "storefront-config-preview") {
+        setPreviewConfig(e.data.config);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const config = previewConfig ?? savedConfig;
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
