@@ -67,7 +67,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
           variant={p.is_active ? "default" : "secondary"}
           className={p.is_active ? "bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))]" : ""}
         >
-          {p.is_active ? "Active" : "Draft"}
+          {p.is_active ? "نشط" : "مسودة"}
         </Badge>
       ),
     },
