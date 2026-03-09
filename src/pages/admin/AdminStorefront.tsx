@@ -153,6 +153,7 @@ export default function AdminStorefront() {
   const [catForm, setCatForm] = useState({ name: "", slug: "", image: "", description: "", position: 0 });
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const { data: savedConfig, isLoading: configLoading } = useQuery({
     queryKey: ["storefront-config"],
