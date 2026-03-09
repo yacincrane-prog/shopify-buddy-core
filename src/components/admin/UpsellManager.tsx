@@ -24,20 +24,20 @@ export function UpsellManager() {
     mutationFn: () => createUpsell(sourceId, targetId, Number(discount)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["upsells"] });
-      toast.success("Upsell created");
+      toast.success("تم إنشاء عرض الترقية");
       setCreating(false);
       setSourceId("");
       setTargetId("");
       setDiscount("30");
     },
-    onError: () => toast.error("Failed to create upsell"),
+    onError: () => toast.error("فشل إنشاء عرض الترقية"),
   });
 
   const deleteMut = useMutation({
     mutationFn: deleteUpsell,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["upsells"] });
-      toast.success("Upsell removed");
+      toast.success("تم حذف عرض الترقية");
     },
   });
 
@@ -48,11 +48,11 @@ export function UpsellManager() {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-accent" />
-          Upsells
+          عروض الترقية
         </h2>
         {!creating && (
           <Button size="sm" onClick={() => setCreating(true)}>
-            <Plus className="w-4 h-4 mr-1" /> New Upsell
+            <Plus className="w-4 h-4 ml-1" /> عرض جديد
           </Button>
         )}
       </div>
@@ -60,16 +60,16 @@ export function UpsellManager() {
       {creating && (
         <Card>
           <CardContent className="pt-6 space-y-6">
-            {/* Section: Product Mapping */}
+            {/* قسم: ربط المنتجات */}
             <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground">Product Mapping</h3>
-              <p className="text-xs text-muted-foreground">Choose which product triggers the upsell and which product to suggest</p>
+              <h3 className="text-sm font-semibold text-foreground">ربط المنتجات</h3>
+              <p className="text-xs text-muted-foreground">اختر المنتج الذي يفعّل العرض والمنتج المقترح</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>When viewing product <span className="text-destructive">*</span></Label>
+                <Label>عند عرض المنتج <span className="text-destructive">*</span></Label>
                 <Select value={sourceId} onValueChange={setSourceId}>
-                  <SelectTrigger><SelectValue placeholder="Source product" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="المنتج المصدر" /></SelectTrigger>
                   <SelectContent>
                     {(products ?? []).map((p) => (
                       <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
@@ -78,9 +78,9 @@ export function UpsellManager() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Suggest adding <span className="text-destructive">*</span></Label>
+                <Label>اقتراح إضافة <span className="text-destructive">*</span></Label>
                 <Select value={targetId} onValueChange={setTargetId}>
-                  <SelectTrigger><SelectValue placeholder="Upsell product" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="منتج الترقية" /></SelectTrigger>
                   <SelectContent>
                     {(products ?? []).filter((p) => p.id !== sourceId).map((p) => (
                       <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
@@ -93,38 +93,38 @@ export function UpsellManager() {
             {sourceId && targetId && sourceId !== targetId && (
               <div className="rounded-lg bg-muted/50 border border-border px-3 py-2">
                 <p className="text-xs text-muted-foreground">
-                  When a customer views <span className="font-medium text-foreground">{products?.find(p => p.id === sourceId)?.title}</span>,
-                  they'll see an offer for <span className="font-medium text-foreground">{products?.find(p => p.id === targetId)?.title}</span>
+                  عندما يعرض العميل <span className="font-medium text-foreground">{products?.find(p => p.id === sourceId)?.title}</span>،
+                  سيرى عرضاً لـ <span className="font-medium text-foreground">{products?.find(p => p.id === targetId)?.title}</span>
                 </p>
               </div>
             )}
 
             <div className="border-t border-border" />
 
-            {/* Section: Discount */}
+            {/* قسم: الخصم */}
             <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground">Discount</h3>
-              <p className="text-xs text-muted-foreground">Set the discount percentage for the upsell offer</p>
+              <h3 className="text-sm font-semibold text-foreground">الخصم</h3>
+              <p className="text-xs text-muted-foreground">حدد نسبة الخصم لعرض الترقية</p>
             </div>
             <div className="space-y-1.5 max-w-[200px]">
-              <Label>Discount % <span className="text-destructive">*</span></Label>
+              <Label>نسبة الخصم % <span className="text-destructive">*</span></Label>
               <Input type="number" min={1} max={99} value={discount} onChange={(e) => setDiscount(e.target.value)} />
             </div>
 
             <div className="flex gap-2 pt-2 border-t border-border">
               <Button onClick={() => createMut.mutate()} disabled={!canSubmit || createMut.isPending}>
-                {createMut.isPending ? "Creating…" : "Create Upsell"}
+                {createMut.isPending ? "جاري الإنشاء…" : "إنشاء عرض الترقية"}
               </Button>
-              <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setCreating(false)}>إلغاء</Button>
             </div>
           </CardContent>
         </Card>
       )}
 
       {isLoading ? (
-        <p className="text-muted-foreground text-sm">Loading…</p>
+        <p className="text-muted-foreground text-sm">جاري التحميل…</p>
       ) : !upsells?.length ? (
-        <p className="text-muted-foreground text-sm py-8 text-center">No upsells configured yet</p>
+        <p className="text-muted-foreground text-sm py-8 text-center">لا توجد عروض ترقية مُعدّة بعد</p>
       ) : (
         <div className="space-y-2">
           {upsells.map((u) => {
@@ -134,9 +134,9 @@ export function UpsellManager() {
                 <CardContent className="py-3 flex items-center justify-between">
                   <p className="text-sm">
                     <span className="font-medium">{(u.source as { title: string }).title}</span>
-                    <span className="text-muted-foreground mx-2">→</span>
+                    <span className="text-muted-foreground mx-2">←</span>
                     <span className="font-medium">{(u.target as { title: string }).title}</span>
-                    <span className="text-accent ml-2">-{Number(u.discount_percent)}%</span>
+                    <span className="text-accent mr-2">-{Number(u.discount_percent)}%</span>
                   </p>
                   <div className="flex items-center gap-0.5">
                     <UpsellPreviewButton
