@@ -72,9 +72,9 @@ export function QuantityDiscountManager() {
       {selectedProduct && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label>Discount Tiers</Label>
+            <Label>مستويات الخصم</Label>
             <Button size="sm" variant="outline" onClick={addTier}>
-              <Plus className="w-3 h-3 mr-1" /> Add Tier
+              <Plus className="w-3 h-3 mr-1" /> إضافة مستوى
             </Button>
           </div>
 
