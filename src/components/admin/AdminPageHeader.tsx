@@ -87,7 +87,7 @@ export function AdminPageHeader({
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={search.placeholder ?? "Search…"}
+                placeholder={search.placeholder ?? "بحث…"}
                 value={search.value}
                 onChange={(e) => search.onChange(e.target.value)}
                 className="pl-9 h-9 bg-secondary/50 border-border"
