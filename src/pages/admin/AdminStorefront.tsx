@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchStorefrontConfig,
@@ -76,6 +76,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AdminStorefront() {
   const queryClient = useQueryClient();
@@ -84,6 +85,8 @@ export default function AdminStorefront() {
   const [categoryDialog, setCategoryDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [catForm, setCatForm] = useState({ name: "", slug: "", image: "", description: "", position: 0 });
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: savedConfig, isLoading: configLoading } = useQuery({
     queryKey: ["storefront-config"],
@@ -728,12 +731,55 @@ export default function AdminStorefront() {
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">صورة الفئة (رابط)</Label>
-              <Input
-                value={catForm.image}
-                onChange={(e) => setCatForm((p) => ({ ...p, image: e.target.value }))}
-                placeholder="https://..."
+              <Label className="text-xs">صورة الفئة</Label>
+              {catForm.image && (
+                <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
+                  <img src={catForm.image} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setCatForm((p) => ({ ...p, image: "" }))}
+                    className="absolute top-0.5 end-0.5 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center text-xs"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploading(true);
+                  try {
+                    const ext = file.name.split(".").pop();
+                    const path = `categories/${Date.now()}.${ext}`;
+                    const { error } = await supabase.storage.from("product-images").upload(path, file);
+                    if (error) throw error;
+                    const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+                    setCatForm((p) => ({ ...p, image: urlData.publicUrl }));
+                    toast.success("تم رفع الصورة");
+                  } catch {
+                    toast.error("فشل في رفع الصورة");
+                  } finally {
+                    setUploading(false);
+                    e.target.value = "";
+                  }
+                }}
               />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full text-xs gap-1.5"
+                disabled={uploading}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Image className="w-3.5 h-3.5" />}
+                {uploading ? "جاري الرفع…" : "رفع صورة"}
+              </Button>
             </div>
             <div className="space-y-2">
               <Label className="text-xs">الوصف (اختياري)</Label>
