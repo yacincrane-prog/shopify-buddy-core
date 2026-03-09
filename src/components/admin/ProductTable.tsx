@@ -48,7 +48,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
     },
     {
       key: "stock",
-      header: "Stock",
+      header: "المخزون",
       sortable: true,
       sortValue: (p) => p.inventory_quantity,
       render: (p) => (
