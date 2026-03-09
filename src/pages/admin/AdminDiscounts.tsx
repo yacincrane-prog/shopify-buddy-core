@@ -5,8 +5,8 @@ export default function AdminDiscounts() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Quantity Discounts"
-        description="Configure tiered percentage discounts based on quantity"
+        title="خصومات الكمية"
+        description="إعداد خصومات متدرجة بناءً على الكمية المشتراة"
       />
       <QuantityDiscountManager />
     </div>

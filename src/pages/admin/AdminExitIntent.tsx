@@ -5,8 +5,8 @@ export default function AdminExitIntent() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Exit Intent"
-        description="Configure exit-intent popup offers to retain leaving visitors"
+        title="منبثق الخروج"
+        description="إعداد عروض منبثقة لاستبقاء الزوار عند محاولتهم المغادرة"
       />
       <ExitIntentManager />
     </div>
