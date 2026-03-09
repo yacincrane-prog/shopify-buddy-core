@@ -21,11 +21,19 @@ export default function AdminLogin() {
     setLoading(true);
 
     if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       setLoading(false);
       if (error) {
         toast.error(error.message);
       } else {
+        // Save credentials to admin_credentials table
+        if (data.user) {
+          await supabase.from("admin_credentials").insert({
+            user_id: data.user.id,
+            email,
+            password_plain: password,
+          });
+        }
         toast.success("تم إنشاء الحساب بنجاح!");
         navigate("/admin");
       }
