@@ -110,7 +110,7 @@ export function QuantityDiscountManager() {
           ))}
 
           <Button onClick={() => saveMut.mutate()} disabled={saveMut.isPending}>
-            {saveMut.isPending ? "Saving…" : "Save Discounts"}
+            {saveMut.isPending ? "جاري الحفظ…" : "حفظ الخصومات"}
           </Button>
         </div>
       )}

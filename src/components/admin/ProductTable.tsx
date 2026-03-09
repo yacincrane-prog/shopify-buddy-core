@@ -103,7 +103,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
         data={products}
         columns={columns}
         keyExtractor={(p) => p.id}
-        emptyMessage="No products yet. Create your first product to get started."
+        emptyMessage="لا توجد منتجات بعد. أنشئ أول منتج للبدء."
         pageSize={10}
         isLoading={isLoading}
       />
