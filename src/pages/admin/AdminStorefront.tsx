@@ -85,6 +85,8 @@ export default function AdminStorefront() {
   const [categoryDialog, setCategoryDialog] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [catForm, setCatForm] = useState({ name: "", slug: "", image: "", description: "", position: 0 });
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: savedConfig, isLoading: configLoading } = useQuery({
     queryKey: ["storefront-config"],
