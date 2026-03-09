@@ -76,6 +76,12 @@ import {
   Facebook,
   Instagram,
   LayoutGrid,
+  Monitor,
+  Tablet,
+  Smartphone,
+  PanelRightOpen,
+  PanelRightClose,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -153,6 +159,9 @@ export default function AdminStorefront() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [catForm, setCatForm] = useState({ name: "", slug: "", image: "", description: "", position: 0 });
   const [uploading, setUploading] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
+  const [previewKey, setPreviewKey] = useState(0);
+  const [previewViewport, setPreviewViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
@@ -174,6 +183,7 @@ export default function AdminStorefront() {
     mutationFn: () => saveStorefrontConfig(config),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["storefront-config"] });
+      setPreviewKey((k) => k + 1);
       toast.success("تم حفظ إعدادات المتجر");
     },
     onError: () => toast.error("فشل في حفظ الإعدادات"),
@@ -276,26 +286,39 @@ export default function AdminStorefront() {
     );
   }
 
+  const VIEWPORTS = [
+    { id: "desktop" as const, icon: Monitor, width: "100%", label: "سطح المكتب" },
+    { id: "tablet" as const, icon: Tablet, width: "768px", label: "جهاز لوحي" },
+    { id: "mobile" as const, icon: Smartphone, width: "375px", label: "هاتف" },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <AdminPageHeader
           title="تخصيص المتجر"
           description="تحكم في مظهر متجرك: الصفحة الرئيسية، الفئات، صفحة المنتج، والمزيد"
         />
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" asChild>
-            <a href="/" target="_blank" rel="noopener noreferrer">
-              <Eye className="w-4 h-4 me-1" /> معاينة المتجر
-            </a>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowPreview((p) => !p)}
+            className="hidden lg:flex"
+          >
+            {showPreview ? <PanelRightClose className="w-4 h-4 me-1" /> : <PanelRightOpen className="w-4 h-4 me-1" />}
+            {showPreview ? "إخفاء المعاينة" : "إظهار المعاينة"}
           </Button>
-          <Button onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending}>
+          <Button onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending} size="sm">
             {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : <Save className="w-4 h-4 me-1" />}
             حفظ التغييرات
           </Button>
         </div>
       </div>
 
+      <div className={`flex gap-4 ${showPreview ? "" : ""}`}>
+        {/* Settings Panel */}
+        <div className={`min-w-0 ${showPreview ? "w-1/2 hidden lg:block" : "w-full"} lg:block w-full`}>
       <Tabs defaultValue="homepage" className="w-full">
         <TabsList className="w-full grid grid-cols-2 sm:grid-cols-5 mb-4 h-auto">
           <TabsTrigger value="homepage" className="text-xs gap-1.5 py-2">
@@ -780,8 +803,59 @@ export default function AdminStorefront() {
           </Card>
         </TabsContent>
       </Tabs>
+        </div>
 
-      {/* Category Dialog */}
+        {/* Live Preview Panel */}
+        {showPreview && (
+          <div className="hidden lg:flex flex-col w-1/2 sticky top-0 h-[calc(100vh-8rem)]">
+            <div className="flex items-center justify-between px-3 py-2 border border-border rounded-t-lg bg-card">
+              <span className="text-xs font-semibold text-muted-foreground">معاينة مباشرة</span>
+              <div className="flex items-center gap-1.5">
+                <div className="flex items-center rounded-md border border-border p-0.5 bg-muted/30">
+                  {VIEWPORTS.map((vp) => (
+                    <Button
+                      key={vp.id}
+                      variant={previewViewport === vp.id ? "default" : "ghost"}
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setPreviewViewport(vp.id)}
+                      title={vp.label}
+                    >
+                      <vp.icon className="w-3 h-3" />
+                    </Button>
+                  ))}
+                </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-6 w-6"
+                  onClick={() => setPreviewKey((k) => k + 1)}
+                  title="تحديث المعاينة"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 border border-t-0 border-border rounded-b-lg bg-muted/20 flex items-start justify-center overflow-auto p-2">
+              <div
+                className="bg-background border border-border rounded-lg shadow-sm overflow-hidden transition-all duration-300 h-full"
+                style={{
+                  width: VIEWPORTS.find((v) => v.id === previewViewport)!.width,
+                  maxWidth: "100%",
+                }}
+              >
+                <iframe
+                  key={previewKey}
+                  src="/"
+                  className="w-full h-full border-0"
+                  title="معاينة الصفحة الرئيسية"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       <Dialog open={categoryDialog} onOpenChange={setCategoryDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
