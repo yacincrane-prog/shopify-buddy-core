@@ -61,6 +61,7 @@ const translations: Record<string, Record<Lang, string>> = {
 
   // Sidebar
   "nav.dashboard": { ar: "لوحة التحكم", en: "Dashboard" },
+  "nav.storefront": { ar: "تخصيص المتجر", en: "Storefront" },
   "nav.products": { ar: "المنتجات", en: "Products" },
   "nav.orders": { ar: "الطلبات", en: "Orders" },
   "nav.landingPages": { ar: "صفحات الهبوط", en: "Landing Pages" },
