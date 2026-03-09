@@ -49,7 +49,7 @@ export function QuantityOfferManager() {
         free_delivery: false,
         position: (offers?.length ?? 0),
       }),
-    onSuccess: () => { invalidate(); toast.success("Tier added"); },
+    onSuccess: () => { invalidate(); toast.success("تمت إضافة المستوى"); },
   });
 
   const updateMutation = useMutation({
@@ -60,21 +60,21 @@ export function QuantityOfferManager() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteOffer,
-    onSuccess: () => { invalidate(); toast.success("Tier removed"); },
+    onSuccess: () => { invalidate(); toast.success("تم حذف المستوى"); },
   });
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Zap className="w-5 h-5 text-accent" />
-        <h2 className="text-lg font-semibold">Smart Quantity Offers</h2>
+        <h2 className="text-lg font-semibold">عروض الكمية الذكية</h2>
       </div>
 
       <div className="space-y-2">
-        <Label>Select Product</Label>
+        <Label>اختر المنتج</Label>
         <Select value={selectedProductId} onValueChange={setSelectedProductId}>
           <SelectTrigger>
-            <SelectValue placeholder="Choose a product…" />
+            <SelectValue placeholder="اختر منتجاً…" />
           </SelectTrigger>
           <SelectContent>
             {products?.map((p) => (
@@ -87,12 +87,12 @@ export function QuantityOfferManager() {
       {selectedProductId && (
         <>
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
+            <p className="text-sm text-muted-foreground">جاري التحميل…</p>
           ) : (
             <div className="space-y-3">
               {!offers?.length && (
                 <p className="text-sm text-muted-foreground py-2">
-                  No quantity offers configured. The standard quantity selector will be used.
+                  لا توجد عروض كمية مُعدّة. سيتم استخدام محدد الكمية الافتراضي.
                 </p>
               )}
 
@@ -106,7 +106,7 @@ export function QuantityOfferManager() {
               ))}
 
               <Button variant="outline" size="sm" onClick={() => addMutation.mutate()} disabled={addMutation.isPending}>
-                <Plus className="w-4 h-4 mr-1" /> Add Tier
+                <Plus className="w-4 h-4 ml-1" /> إضافة مستوى
               </Button>
             </div>
           )}
@@ -152,31 +152,31 @@ function OfferRow({
       <CardContent className="py-3 px-4 space-y-3">
         <div className="grid grid-cols-3 gap-3">
           <div className="space-y-1">
-            <Label className="text-xs">Quantity</Label>
+            <Label className="text-xs">الكمية</Label>
             <Input type="number" min={1} value={qty} onChange={(e) => setQty(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs">Price (DA)</Label>
+            <Label className="text-xs">السعر (د.ج)</Label>
             <Input type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label className="text-xs">Label (optional)</Label>
-            <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Most Popular" />
+            <Label className="text-xs">التسمية (اختياري)</Label>
+            <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="مثال: الأكثر طلباً" />
           </div>
         </div>
         <div className="flex items-center gap-6 flex-wrap">
           <div className="flex items-center gap-2">
             <Switch checked={bestOffer} onCheckedChange={setBestOffer} />
-            <Label className="text-xs">Best Offer</Label>
+            <Label className="text-xs">أفضل عرض</Label>
           </div>
           <div className="flex items-center gap-2">
             <Switch checked={freeDelivery} onCheckedChange={setFreeDelivery} />
-            <Label className="text-xs">Free Delivery</Label>
+            <Label className="text-xs">توصيل مجاني</Label>
           </div>
-          <div className="ml-auto flex gap-1">
+          <div className="mr-auto flex gap-1">
             {hasChanges && (
               <Button size="sm" onClick={save}>
-                <Save className="w-3 h-3 mr-1" /> Save
+                <Save className="w-3 h-3 ml-1" /> حفظ
               </Button>
             )}
             <Button size="sm" variant="outline" onClick={onDelete}>

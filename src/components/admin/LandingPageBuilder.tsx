@@ -97,7 +97,7 @@ export function LandingPageBuilder() {
   const createMutation = useMutation({
     mutationFn: async () => {
       const product = products?.find((p) => p.id === newProductId);
-      if (!product) throw new Error("Select a product");
+      if (!product) throw new Error("اختر منتجاً");
       const slug = newSlug.trim() || product.slug + "-" + Date.now().toString(36);
       const page = await createLandingPage({
         product_id: newProductId,
@@ -105,7 +105,7 @@ export function LandingPageBuilder() {
         slug,
         template: newTemplate,
       });
-      if (!page) throw new Error("Failed to create — slug may already exist");
+      if (!page) throw new Error("فشل الإنشاء — قد يكون الرابط مستخدماً بالفعل");
       const template = TEMPLATES.find((t) => t.id === newTemplate);
       if (template) {
         await bulkCreateSections(page.id, template.sections);
@@ -114,21 +114,21 @@ export function LandingPageBuilder() {
     },
     onSuccess: (page) => {
       queryClient.invalidateQueries({ queryKey: ["landing-pages-admin"] });
-      toast.success("Landing page created!");
+      toast.success("تم إنشاء صفحة الهبوط!");
       setEditingPage(page as LandingPage);
       setView("edit");
       setNewTitle("");
       setNewSlug("");
       setNewProductId("");
     },
-    onError: (e: any) => toast.error(e.message || "Failed to create"),
+    onError: (e: any) => toast.error(e.message || "فشل الإنشاء"),
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteLandingPage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["landing-pages-admin"] });
-      toast.success("Deleted");
+      toast.success("تم الحذف");
     },
   });
 
@@ -137,7 +137,7 @@ export function LandingPageBuilder() {
       updateLandingPage(id, { is_published: published }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["landing-pages-admin"] });
-      toast.success("Updated");
+      toast.success("تم التحديث");
     },
   });
 
@@ -145,22 +145,22 @@ export function LandingPageBuilder() {
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" onClick={() => setView("list")}>
-          <ArrowLeft className="w-4 h-4 mr-1" /> Back
+          <ArrowLeft className="w-4 h-4 ml-1" /> رجوع
         </Button>
         <Card>
           <CardHeader>
-            <CardTitle>Create Landing Page</CardTitle>
+            <CardTitle>إنشاء صفحة هبوط</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground">Page Details</h3>
-              <p className="text-xs text-muted-foreground">Select a product and customize the page title</p>
+              <h3 className="text-sm font-semibold text-foreground">تفاصيل الصفحة</h3>
+              <p className="text-xs text-muted-foreground">اختر منتجاً وخصّص عنوان الصفحة</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Product <span className="text-destructive">*</span></Label>
+                <Label>المنتج <span className="text-destructive">*</span></Label>
                 <Select value={newProductId} onValueChange={setNewProductId}>
-                  <SelectTrigger><SelectValue placeholder="Select product…" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="اختر منتجاً…" /></SelectTrigger>
                   <SelectContent>
                     {products?.map((p) => (
                       <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
@@ -169,14 +169,14 @@ export function LandingPageBuilder() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Page Title</Label>
-                <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Leave empty to use product title" />
+                <Label>عنوان الصفحة</Label>
+                <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="اتركه فارغاً لاستخدام عنوان المنتج" />
               </div>
               <div className="space-y-1.5">
-                <Label>Slug (URL)</Label>
+                <Label>الرابط (URL)</Label>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <span>/offer/</span>
-                  <Input value={newSlug} onChange={(e) => setNewSlug(e.target.value.replace(/[^a-z0-9-]/g, ""))} placeholder="auto-generated if empty" className="font-mono text-xs" />
+                  <Input value={newSlug} onChange={(e) => setNewSlug(e.target.value.replace(/[^a-z0-9-]/g, ""))} placeholder="يُنشأ تلقائياً إذا ترك فارغاً" className="font-mono text-xs" />
                 </div>
               </div>
             </div>
@@ -184,8 +184,8 @@ export function LandingPageBuilder() {
             <div className="border-t border-border" />
 
             <div className="space-y-1">
-              <h3 className="text-sm font-semibold text-foreground">Template</h3>
-              <p className="text-xs text-muted-foreground">Choose a pre-built template to start with</p>
+              <h3 className="text-sm font-semibold text-foreground">القالب</h3>
+              <p className="text-xs text-muted-foreground">اختر قالباً جاهزاً للبدء</p>
             </div>
             <div className="grid gap-2">
               {TEMPLATES.map((t) => (
@@ -193,13 +193,13 @@ export function LandingPageBuilder() {
                   key={t.id}
                   type="button"
                   onClick={() => setNewTemplate(t.id)}
-                  className={`text-left p-4 rounded-lg border-2 transition-all ${
+                  className={`text-right p-4 rounded-lg border-2 transition-all ${
                     newTemplate === t.id ? "border-accent bg-accent/5 shadow-sm" : "border-border hover:border-muted-foreground/30"
                   }`}
                 >
                   <p className="font-medium text-sm">{t.name}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {t.sections.length} sections: {t.sections.map((s) => LP_SECTION_TYPES.find((st) => st.value === s)?.label).join(", ")}
+                    {t.sections.length} أقسام: {t.sections.map((s) => LP_SECTION_TYPES.find((st) => st.value === s)?.label).join("، ")}
                   </p>
                 </button>
               ))}
@@ -207,7 +207,7 @@ export function LandingPageBuilder() {
 
             <div className="pt-2 border-t border-border">
               <Button onClick={() => createMutation.mutate()} disabled={!newProductId || createMutation.isPending}>
-                <Rocket className="w-4 h-4 mr-1" /> Create Landing Page
+                <Rocket className="w-4 h-4 ml-1" /> إنشاء صفحة الهبوط
               </Button>
             </div>
           </CardContent>
@@ -231,17 +231,17 @@ export function LandingPageBuilder() {
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold flex items-center gap-2">
           <Globe className="w-4 h-4 text-accent" />
-          Landing Pages
+          صفحات الهبوط
         </h3>
         <Button size="sm" onClick={() => setView("create")}>
-          <Plus className="w-4 h-4 mr-1" /> New Page
+          <Plus className="w-4 h-4 ml-1" /> صفحة جديدة
         </Button>
       </div>
 
       {isLoading ? (
-        <p className="text-muted-foreground text-sm py-4">Loading…</p>
+        <p className="text-muted-foreground text-sm py-4">جاري التحميل…</p>
       ) : !pages?.length ? (
-        <p className="text-sm text-muted-foreground py-4">No landing pages yet.</p>
+        <p className="text-sm text-muted-foreground py-4">لا توجد صفحات هبوط بعد.</p>
       ) : (
         <div className="space-y-2">
           {pages.map((page: any) => (
@@ -252,8 +252,8 @@ export function LandingPageBuilder() {
                   <div className="flex gap-2 items-center">
                     <Badge variant="outline" className="text-xs font-mono">/offer/{page.slug}</Badge>
                     {page.is_published
-                      ? <Badge className="bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))] text-xs">Live</Badge>
-                      : <Badge variant="outline" className="text-xs">Draft</Badge>}
+                      ? <Badge className="bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))] text-xs">مباشر</Badge>
+                      : <Badge variant="outline" className="text-xs">مسودة</Badge>}
                   </div>
                 </div>
                 <div className="flex gap-1">
@@ -265,10 +265,10 @@ export function LandingPageBuilder() {
                     </Button>
                   )}
                   <Button size="sm" variant="outline" onClick={() => togglePublish.mutate({ id: page.id, published: !page.is_published })}>
-                    {page.is_published ? "Unpublish" : "Publish"}
+                    {page.is_published ? "إلغاء النشر" : "نشر"}
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => { setEditingPage(page); setView("edit"); }}>
-                    Edit
+                    تعديل
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => deleteMutation.mutate(page.id)}>
                     <Trash2 className="w-3 h-3" />
@@ -322,7 +322,7 @@ function SortableSectionItem({
       ref={setNodeRef}
       style={style}
       onClick={onSelect}
-      className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-left text-sm transition-colors group ${
+      className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-right text-sm transition-colors group ${
         isSelected
           ? "bg-accent/10 text-accent border border-accent/30"
           : "hover:bg-muted/60 border border-transparent"
@@ -336,7 +336,7 @@ function SortableSectionItem({
         <button
           onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
           className="p-0.5 hover:text-accent"
-          title="Duplicate"
+          title="نسخ"
         >
           <Copy className="w-3 h-3" />
         </button>
@@ -379,29 +379,28 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
 
   const invalidate = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["lp-sections-admin", page.id] });
-    // Refresh preview iframe
     setPreviewKey((k) => k + 1);
   }, [queryClient, page.id]);
 
   const addMutation = useMutation({
     mutationFn: (type: LPSectionType) => createLPSection(page.id, type, sections?.length ?? 0),
-    onSuccess: () => { invalidate(); toast.success("Section added"); setAddingType(""); },
+    onSuccess: () => { invalidate(); toast.success("تمت إضافة القسم"); setAddingType(""); },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Pick<LPSection, "content" | "is_visible">> }) =>
       updateLPSection(id, updates),
-    onSuccess: () => { invalidate(); toast.success("Saved"); },
+    onSuccess: () => { invalidate(); toast.success("تم الحفظ"); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteLPSection,
-    onSuccess: () => { invalidate(); toast.success("Removed"); setSelectedId(null); },
+    onSuccess: () => { invalidate(); toast.success("تم الحذف"); setSelectedId(null); },
   });
 
   const duplicateMutation = useMutation({
     mutationFn: (section: LPSection) => duplicateLPSection(section, sections?.length ?? 0),
-    onSuccess: () => { invalidate(); toast.success("Section duplicated"); },
+    onSuccess: () => { invalidate(); toast.success("تم نسخ القسم"); },
   });
 
   const addPresetMutation = useMutation({
@@ -418,7 +417,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
         .single();
       return data;
     },
-    onSuccess: () => { invalidate(); toast.success("Template section added"); },
+    onSuccess: () => { invalidate(); toast.success("تمت إضافة قسم القالب"); },
   });
 
   const moveMutation = useMutation({
@@ -455,11 +454,11 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
 
   return (
     <div className="flex flex-col h-[calc(100vh-120px)] -m-6">
-      {/* Top toolbar */}
+      {/* شريط الأدوات العلوي */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={onBack}>
-            <ArrowLeft className="w-4 h-4 mr-1" /> Back
+            <ArrowLeft className="w-4 h-4 ml-1" /> رجوع
           </Button>
           <div className="h-5 w-px bg-border" />
           <h2 className="text-sm font-semibold truncate max-w-[200px]">{page.title}</h2>
@@ -485,27 +484,27 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
             </Button>
           </div>
           <Button size="sm" variant="outline" onClick={() => setFullPreview(true)}>
-            <Maximize2 className="w-3.5 h-3.5 mr-1" /> Full Preview
+            <Maximize2 className="w-3.5 h-3.5 ml-1" /> معاينة كاملة
           </Button>
           <Button size="sm" variant="outline" asChild>
             <a href={`/offer/${page.slug}`} target="_blank" rel="noopener">
-              <ExternalLink className="w-3.5 h-3.5 mr-1" /> Open
+              <ExternalLink className="w-3.5 h-3.5 ml-1" /> فتح
             </a>
           </Button>
         </div>
       </div>
 
-      {/* 3-panel body - stacked on small screens, side-by-side on desktop */}
+      {/* 3-panel body */}
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-        {/* Left: Section List */}
-        <div className="w-full lg:w-64 shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-card flex flex-col max-h-[30vh] lg:max-h-none">
+        {/* اليمين: قائمة الأقسام */}
+        <div className="w-full lg:w-64 shrink-0 border-b lg:border-b-0 lg:border-l border-border bg-card flex flex-col max-h-[30vh] lg:max-h-none">
           <div className="px-3 py-2.5 border-b border-border">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Sections</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">الأقسام</p>
           </div>
           <ScrollArea className="flex-1">
             <div className="p-2 space-y-1">
               {isLoading ? (
-                <p className="text-xs text-muted-foreground p-2">Loading…</p>
+                <p className="text-xs text-muted-foreground p-2">جاري التحميل…</p>
               ) : sections?.length ? (
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                   <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
@@ -529,7 +528,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
             </div>
           </ScrollArea>
 
-          {/* Add section */}
+          {/* إضافة قسم */}
           <div className="p-2 border-t border-border space-y-2">
             <div className="flex rounded-md border border-border p-0.5 bg-muted/30">
               <button
@@ -538,7 +537,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
                   addMode === "type" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
-                <Plus className="w-3 h-3 inline mr-0.5" /> Blank
+                <Plus className="w-3 h-3 inline ml-0.5" /> فارغ
               </button>
               <button
                 onClick={() => setAddMode("preset")}
@@ -546,7 +545,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
                   addMode === "preset" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
               >
-                <LayoutTemplate className="w-3 h-3 inline mr-0.5" /> Templates
+                <LayoutTemplate className="w-3 h-3 inline ml-0.5" /> قوالب
               </button>
             </div>
 
@@ -554,7 +553,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
               <>
                 <Select value={addingType} onValueChange={(v) => setAddingType(v as LPSectionType)}>
                   <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="Add section…" />
+                    <SelectValue placeholder="إضافة قسم…" />
                   </SelectTrigger>
                   <SelectContent>
                     {LP_SECTION_TYPES.map((t) => (
@@ -568,7 +567,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
                   onClick={() => addingType && addMutation.mutate(addingType as LPSectionType)}
                   disabled={!addingType}
                 >
-                  <Plus className="w-3 h-3 mr-1" /> Add Section
+                  <Plus className="w-3 h-3 ml-1" /> إضافة قسم
                 </Button>
               </>
             ) : (
@@ -579,7 +578,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
                       key={preset.id}
                       onClick={() => addPresetMutation.mutate(preset)}
                       disabled={addPresetMutation.isPending}
-                      className="w-full text-left px-2.5 py-2 rounded-md text-xs hover:bg-muted/60 border border-transparent hover:border-border transition-colors"
+                      className="w-full text-right px-2.5 py-2 rounded-md text-xs hover:bg-muted/60 border border-transparent hover:border-border transition-colors"
                     >
                       {preset.label}
                     </button>
@@ -590,7 +589,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
           </div>
         </div>
 
-        {/* Center: Live Preview */}
+        {/* الوسط: المعاينة المباشرة */}
         <div className="flex-1 bg-muted/30 flex items-start justify-center overflow-auto p-4 min-h-[40vh] lg:min-h-0">
           <div
             className={`bg-background border border-border rounded-lg shadow-lg overflow-hidden transition-all duration-300 w-full ${
@@ -602,14 +601,14 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
               key={previewKey}
               src={`/offer/${page.slug}`}
               className="w-full h-full border-0"
-              title="Landing page preview"
+              title="معاينة صفحة الهبوط"
             />
           </div>
         </div>
 
-        {/* Right: Section Editor */}
+        {/* اليسار: محرر القسم */}
         {selectedSection ? (
-          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-border bg-card flex flex-col max-h-[40vh] lg:max-h-none">
+          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-r border-border bg-card flex flex-col max-h-[40vh] lg:max-h-none">
             <div className="px-3 py-2.5 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
                 <Badge variant="secondary" className="text-[10px] shrink-0">{sectionLabel(selectedSection.section_type)}</Badge>
@@ -647,10 +646,10 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
             </ScrollArea>
           </div>
         ) : (
-          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-l border-border bg-card flex flex-col items-center justify-center text-center p-6 min-h-[200px] lg:min-h-0">
+          <div className="w-full lg:w-80 shrink-0 border-t lg:border-t-0 lg:border-r border-border bg-card flex flex-col items-center justify-center text-center p-6 min-h-[200px] lg:min-h-0">
             <PanelRightOpen className="w-8 h-8 text-muted-foreground/40 mb-3" />
-            <p className="text-sm font-medium text-muted-foreground">No section selected</p>
-            <p className="text-xs text-muted-foreground/70 mt-1">Click a section in the left panel to edit its content</p>
+            <p className="text-sm font-medium text-muted-foreground">لم يتم تحديد قسم</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">انقر على قسم في اللوحة الجانبية لتعديل محتواه</p>
           </div>
         )}
       </div>
@@ -658,7 +657,7 @@ function VisualBuilder({ page, onBack }: { page: LandingPage; onBack: () => void
         url={`/offer/${page.slug}`}
         open={fullPreview}
         onOpenChange={setFullPreview}
-        title={`${page.title} — Full Preview`}
+        title={`${page.title} — معاينة كاملة`}
         refreshKey={previewKey}
       />
     </div>
@@ -674,7 +673,6 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
   const hasChanges = JSON.stringify(content) !== JSON.stringify(section.content);
   const update = (key: string, value: any) => setContent({ ...content, [key]: value });
 
-  // Reset when section changes
   useEffect(() => {
     setContent(section.content);
   }, [section.id, section.content]);
@@ -716,7 +714,7 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
           <Button size="sm" variant="ghost" className="h-6 text-[10px] text-destructive" onClick={() => {
             update(key, (content[key] ?? []).filter((_: any, j: number) => j !== i));
           }}>
-            <Trash2 className="w-3 h-3 mr-1" /> Remove
+            <Trash2 className="w-3 h-3 ml-1" /> حذف
           </Button>
         </div>
       ))}
@@ -725,7 +723,7 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
         fields.forEach((f) => (empty[f.name] = ""));
         update(key, [...(content[key] ?? []), empty]);
       }}>
-        <Plus className="w-3 h-3 mr-1" /> Add Item
+        <Plus className="w-3 h-3 ml-1" /> إضافة عنصر
       </Button>
     </div>
   );
@@ -735,17 +733,17 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
       case "hero":
         return (
           <div className="space-y-3">
-            <FieldGroup label="Headline">
-              <Input className="h-8 text-xs" placeholder="Headline" value={content.headline ?? ""} onChange={(e) => update("headline", e.target.value)} />
+            <FieldGroup label="العنوان الرئيسي">
+              <Input className="h-8 text-xs" placeholder="العنوان الرئيسي" value={content.headline ?? ""} onChange={(e) => update("headline", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="Subtitle">
-              <Input className="h-8 text-xs" placeholder="Subtitle" value={content.subtitle ?? ""} onChange={(e) => update("subtitle", e.target.value)} />
+            <FieldGroup label="العنوان الفرعي">
+              <Input className="h-8 text-xs" placeholder="العنوان الفرعي" value={content.subtitle ?? ""} onChange={(e) => update("subtitle", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="Image URL">
-              <Input className="h-8 text-xs" placeholder="Image URL" value={content.image_url ?? ""} onChange={(e) => update("image_url", e.target.value)} />
+            <FieldGroup label="رابط الصورة">
+              <Input className="h-8 text-xs" placeholder="رابط الصورة" value={content.image_url ?? ""} onChange={(e) => update("image_url", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="CTA Button Text">
-              <Input className="h-8 text-xs" placeholder="Order Now" value={content.cta_text ?? ""} onChange={(e) => update("cta_text", e.target.value)} />
+            <FieldGroup label="نص زر الإجراء">
+              <Input className="h-8 text-xs" placeholder="اطلب الآن" value={content.cta_text ?? ""} onChange={(e) => update("cta_text", e.target.value)} />
             </FieldGroup>
           </div>
         );
@@ -753,32 +751,32 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
       case "order_form":
         return (
           <div className="rounded-lg bg-muted/30 p-3">
-            <p className="text-xs text-muted-foreground">This section uses product data automatically. No configuration needed.</p>
+            <p className="text-xs text-muted-foreground">هذا القسم يستخدم بيانات المنتج تلقائياً. لا حاجة لإعداد إضافي.</p>
           </div>
         );
       case "video":
         return (
           <div className="space-y-3">
-            <FieldGroup label="Video Title">
-              <Input className="h-8 text-xs" placeholder="Video Title" value={content.title ?? ""} onChange={(e) => update("title", e.target.value)} />
+            <FieldGroup label="عنوان الفيديو">
+              <Input className="h-8 text-xs" placeholder="عنوان الفيديو" value={content.title ?? ""} onChange={(e) => update("title", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="Video URL">
-              <Input className="h-8 text-xs" placeholder="YouTube/Vimeo embed URL" value={content.video_url ?? ""} onChange={(e) => update("video_url", e.target.value)} />
+            <FieldGroup label="رابط الفيديو">
+              <Input className="h-8 text-xs" placeholder="رابط YouTube/Vimeo" value={content.video_url ?? ""} onChange={(e) => update("video_url", e.target.value)} />
             </FieldGroup>
           </div>
         );
       case "benefits":
         return (
           <div className="space-y-3">
-            <FieldGroup label="Section Heading">
-              <Input className="h-8 text-xs" placeholder="Why Choose Us" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            <FieldGroup label="عنوان القسم">
+              <Input className="h-8 text-xs" placeholder="لماذا تختارنا" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </FieldGroup>
             <div className="space-y-1">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Benefits</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">المزايا</Label>
               {renderArrayEditor("items", [
-                { name: "icon", placeholder: "Icon (emoji)" },
-                { name: "title", placeholder: "Benefit title" },
-                { name: "description", placeholder: "Description", type: "textarea" },
+                { name: "icon", placeholder: "أيقونة (إيموجي)" },
+                { name: "title", placeholder: "عنوان الميزة" },
+                { name: "description", placeholder: "الوصف", type: "textarea" },
               ])}
             </div>
           </div>
@@ -786,15 +784,15 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
       case "reviews":
         return (
           <div className="space-y-3">
-            <FieldGroup label="Section Heading">
-              <Input className="h-8 text-xs" placeholder="Customer Reviews" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            <FieldGroup label="عنوان القسم">
+              <Input className="h-8 text-xs" placeholder="آراء العملاء" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </FieldGroup>
             <div className="space-y-1">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Reviews</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">التقييمات</Label>
               {renderArrayEditor("items", [
-                { name: "name", placeholder: "Customer name" },
-                { name: "text", placeholder: "Review text", type: "textarea" },
-                { name: "image_url", placeholder: "Customer image URL (optional)" },
+                { name: "name", placeholder: "اسم العميل" },
+                { name: "text", placeholder: "نص التقييم", type: "textarea" },
+                { name: "image_url", placeholder: "رابط صورة العميل (اختياري)" },
               ])}
             </div>
           </div>
@@ -802,21 +800,21 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
       case "before_after":
         return (
           <div className="space-y-3">
-            <FieldGroup label="Heading">
-              <Input className="h-8 text-xs" placeholder="See the Difference" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            <FieldGroup label="العنوان">
+              <Input className="h-8 text-xs" placeholder="شاهد الفرق" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="Before Image URL">
-              <Input className="h-8 text-xs" placeholder="Before Image URL" value={content.before_image ?? ""} onChange={(e) => update("before_image", e.target.value)} />
+            <FieldGroup label="رابط صورة قبل">
+              <Input className="h-8 text-xs" placeholder="رابط صورة قبل" value={content.before_image ?? ""} onChange={(e) => update("before_image", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="After Image URL">
-              <Input className="h-8 text-xs" placeholder="After Image URL" value={content.after_image ?? ""} onChange={(e) => update("after_image", e.target.value)} />
+            <FieldGroup label="رابط صورة بعد">
+              <Input className="h-8 text-xs" placeholder="رابط صورة بعد" value={content.after_image ?? ""} onChange={(e) => update("after_image", e.target.value)} />
             </FieldGroup>
             <div className="grid grid-cols-2 gap-2">
-              <FieldGroup label="Before Label">
-                <Input className="h-8 text-xs" placeholder="Before" value={content.before_label ?? ""} onChange={(e) => update("before_label", e.target.value)} />
+              <FieldGroup label="تسمية قبل">
+                <Input className="h-8 text-xs" placeholder="قبل" value={content.before_label ?? ""} onChange={(e) => update("before_label", e.target.value)} />
               </FieldGroup>
-              <FieldGroup label="After Label">
-                <Input className="h-8 text-xs" placeholder="After" value={content.after_label ?? ""} onChange={(e) => update("after_label", e.target.value)} />
+              <FieldGroup label="تسمية بعد">
+                <Input className="h-8 text-xs" placeholder="بعد" value={content.after_label ?? ""} onChange={(e) => update("after_label", e.target.value)} />
               </FieldGroup>
             </div>
           </div>
@@ -824,14 +822,14 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
       case "faq":
         return (
           <div className="space-y-3">
-            <FieldGroup label="Section Heading">
-              <Input className="h-8 text-xs" placeholder="FAQ" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            <FieldGroup label="عنوان القسم">
+              <Input className="h-8 text-xs" placeholder="الأسئلة الشائعة" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </FieldGroup>
             <div className="space-y-1">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Questions</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">الأسئلة</Label>
               {renderArrayEditor("items", [
-                { name: "question", placeholder: "Question" },
-                { name: "answer", placeholder: "Answer", type: "textarea" },
+                { name: "question", placeholder: "السؤال" },
+                { name: "answer", placeholder: "الإجابة", type: "textarea" },
               ])}
             </div>
           </div>
@@ -839,13 +837,13 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
       case "countdown":
         return (
           <div className="space-y-3">
-            <FieldGroup label="Heading">
-              <Input className="h-8 text-xs" placeholder="Limited Time Offer" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            <FieldGroup label="العنوان">
+              <Input className="h-8 text-xs" placeholder="عرض لفترة محدودة" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="Subtitle">
-              <Input className="h-8 text-xs" placeholder="Subtitle" value={content.subtitle ?? ""} onChange={(e) => update("subtitle", e.target.value)} />
+            <FieldGroup label="العنوان الفرعي">
+              <Input className="h-8 text-xs" placeholder="العنوان الفرعي" value={content.subtitle ?? ""} onChange={(e) => update("subtitle", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="End Date & Time">
+            <FieldGroup label="تاريخ ووقت الانتهاء">
               <Input className="h-8 text-xs" type="datetime-local" value={content.end_date ?? ""} onChange={(e) => update("end_date", e.target.value)} />
             </FieldGroup>
           </div>
@@ -853,14 +851,14 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
       case "guarantee":
         return (
           <div className="space-y-3">
-            <FieldGroup label="Icon (emoji)">
+            <FieldGroup label="أيقونة (إيموجي)">
               <Input className="h-8 text-xs" placeholder="🛡️" value={content.icon ?? ""} onChange={(e) => update("icon", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="Heading">
-              <Input className="h-8 text-xs" placeholder="Our Guarantee" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
+            <FieldGroup label="العنوان">
+              <Input className="h-8 text-xs" placeholder="ضماننا" value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </FieldGroup>
-            <FieldGroup label="Text">
-              <Textarea className="text-xs" placeholder="Guarantee details…" value={content.text ?? ""} rows={3} onChange={(e) => update("text", e.target.value)} />
+            <FieldGroup label="النص">
+              <Textarea className="text-xs" placeholder="تفاصيل الضمان…" value={content.text ?? ""} rows={3} onChange={(e) => update("text", e.target.value)} />
             </FieldGroup>
           </div>
         );
@@ -874,7 +872,7 @@ function SectionContentEditor({ section, onSave }: { section: LPSection; onSave:
       {renderFields()}
       {hasChanges && (
         <Button size="sm" className="w-full" onClick={() => onSave(content)}>
-          <Save className="w-3 h-3 mr-1" /> Save Changes
+          <Save className="w-3 h-3 ml-1" /> حفظ التغييرات
         </Button>
       )}
     </div>

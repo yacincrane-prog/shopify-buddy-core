@@ -62,18 +62,18 @@ export function SectionBuilder() {
   const addMutation = useMutation({
     mutationFn: (type: SectionType) =>
       createSection(selectedProductId, type, (sections?.length ?? 0)),
-    onSuccess: () => { invalidate(); toast.success("Section added"); setAddingType(""); },
+    onSuccess: () => { invalidate(); toast.success("تمت إضافة القسم"); setAddingType(""); },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Pick<ProductSection, "content" | "is_visible">> }) =>
       updateSection(id, updates),
-    onSuccess: () => { invalidate(); toast.success("Section updated"); },
+    onSuccess: () => { invalidate(); toast.success("تم تحديث القسم"); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteSection,
-    onSuccess: () => { invalidate(); toast.success("Section removed"); },
+    onSuccess: () => { invalidate(); toast.success("تم حذف القسم"); },
   });
 
   const moveMutation = useMutation({
@@ -98,14 +98,14 @@ export function SectionBuilder() {
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Layers className="w-5 h-5 text-accent" />
-        <h2 className="text-lg font-semibold">Page Builder</h2>
+        <h2 className="text-lg font-semibold">منشئ الصفحات</h2>
       </div>
 
       <div className="space-y-2">
-        <Label>Select Product</Label>
+        <Label>اختر المنتج</Label>
         <Select value={selectedProductId} onValueChange={setSelectedProductId}>
           <SelectTrigger>
-            <SelectValue placeholder="Choose a product…" />
+            <SelectValue placeholder="اختر منتجاً…" />
           </SelectTrigger>
           <SelectContent>
             {products?.map((p) => (
@@ -118,12 +118,12 @@ export function SectionBuilder() {
       {selectedProductId && (
         <>
           {isLoading ? (
-            <p className="text-muted-foreground text-sm py-4">Loading sections…</p>
+            <p className="text-muted-foreground text-sm py-4">جاري تحميل الأقسام…</p>
           ) : (
             <div className="space-y-2">
               {!sections?.length && (
                 <p className="text-sm text-muted-foreground py-4">
-                  No custom sections yet. The default product layout will be used. Add sections below to customize.
+                  لا توجد أقسام مخصصة بعد. سيتم استخدام التصميم الافتراضي للمنتج. أضف أقساماً أدناه للتخصيص.
                 </p>
               )}
 
@@ -134,7 +134,7 @@ export function SectionBuilder() {
                       <GripVertical className="w-4 h-4 text-muted-foreground" />
                       <Badge variant="secondary" className="text-xs">{sectionLabel(section.section_type)}</Badge>
                       <span className="text-xs text-muted-foreground">#{index + 1}</span>
-                      <div className="ml-auto flex items-center gap-1">
+                      <div className="mr-auto flex items-center gap-1">
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => moveSection(index, "up")} disabled={index === 0}>
                           <ChevronUp className="w-3 h-3" />
                         </Button>
@@ -164,10 +164,10 @@ export function SectionBuilder() {
             <CardContent className="py-4 px-4">
               <div className="flex items-end gap-2">
                 <div className="flex-1 space-y-2">
-                  <Label className="text-xs">Add Section</Label>
+                  <Label className="text-xs">إضافة قسم</Label>
                   <Select value={addingType} onValueChange={(v) => setAddingType(v as SectionType)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose section type…" />
+                      <SelectValue placeholder="اختر نوع القسم…" />
                     </SelectTrigger>
                     <SelectContent>
                       {SECTION_TYPES.map((t) => (
@@ -180,7 +180,7 @@ export function SectionBuilder() {
                   onClick={() => addingType && addMutation.mutate(addingType as SectionType)}
                   disabled={!addingType || addMutation.isPending}
                 >
-                  <Plus className="w-4 h-4 mr-1" /> Add
+                  <Plus className="w-4 h-4 ml-1" /> إضافة
                 </Button>
               </div>
             </CardContent>
@@ -210,17 +210,17 @@ function SectionContentEditor({
       case "upsell":
       case "quantity_pricing":
       case "order_button":
-        return <p className="text-xs text-muted-foreground">This section uses product data automatically. No extra configuration needed.</p>;
+        return <p className="text-xs text-muted-foreground">هذا القسم يستخدم بيانات المنتج تلقائياً. لا حاجة لإعداد إضافي.</p>;
 
       case "description":
         return (
           <div className="space-y-2">
-            <Label className="text-xs">Custom Text (leave empty to use product description)</Label>
+            <Label className="text-xs">نص مخصص (اتركه فارغاً لاستخدام وصف المنتج)</Label>
             <Textarea
               value={content.custom_text ?? ""}
               onChange={(e) => update("custom_text", e.target.value)}
               rows={3}
-              placeholder="Enter custom description or leave empty…"
+              placeholder="أدخل وصفاً مخصصاً أو اتركه فارغاً…"
             />
           </div>
         );
@@ -229,15 +229,15 @@ function SectionContentEditor({
         return (
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label className="text-xs">Section Heading</Label>
+              <Label className="text-xs">عنوان القسم</Label>
               <Input value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Reviews</Label>
+              <Label className="text-xs">التقييمات</Label>
               {(content.items ?? []).map((item: any, i: number) => (
                 <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2">
                   <Input
-                    placeholder="Name"
+                    placeholder="الاسم"
                     value={item.name ?? ""}
                     onChange={(e) => {
                       const items = [...(content.items ?? [])];
@@ -246,7 +246,7 @@ function SectionContentEditor({
                     }}
                   />
                   <Input
-                    placeholder="Review text"
+                    placeholder="نص التقييم"
                     value={item.text ?? ""}
                     onChange={(e) => {
                       const items = [...(content.items ?? [])];
@@ -263,7 +263,7 @@ function SectionContentEditor({
                 </div>
               ))}
               <Button size="sm" variant="outline" onClick={() => update("items", [...(content.items ?? []), { name: "", text: "", rating: 5 }])}>
-                <Plus className="w-3 h-3 mr-1" /> Add Review
+                <Plus className="w-3 h-3 ml-1" /> إضافة تقييم
               </Button>
             </div>
           </div>
@@ -273,16 +273,16 @@ function SectionContentEditor({
         return (
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label className="text-xs">Section Heading</Label>
+              <Label className="text-xs">عنوان القسم</Label>
               <Input value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">FAQ Items</Label>
+              <Label className="text-xs">الأسئلة الشائعة</Label>
               {(content.items ?? []).map((item: any, i: number) => (
                 <div key={i} className="space-y-1 border border-border rounded-md p-2">
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Question"
+                      placeholder="السؤال"
                       value={item.question ?? ""}
                       onChange={(e) => {
                         const items = [...(content.items ?? [])];
@@ -298,7 +298,7 @@ function SectionContentEditor({
                     </Button>
                   </div>
                   <Textarea
-                    placeholder="Answer"
+                    placeholder="الإجابة"
                     value={item.answer ?? ""}
                     rows={2}
                     onChange={(e) => {
@@ -310,7 +310,7 @@ function SectionContentEditor({
                 </div>
               ))}
               <Button size="sm" variant="outline" onClick={() => update("items", [...(content.items ?? []), { question: "", answer: "" }])}>
-                <Plus className="w-3 h-3 mr-1" /> Add FAQ
+                <Plus className="w-3 h-3 ml-1" /> إضافة سؤال
               </Button>
             </div>
           </div>
@@ -320,24 +320,24 @@ function SectionContentEditor({
         return (
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label className="text-xs">Heading</Label>
+              <Label className="text-xs">العنوان</Label>
               <Input value={content.heading ?? ""} onChange={(e) => update("heading", e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Image URL</Label>
+              <Label className="text-xs">رابط الصورة</Label>
               <Input value={content.image_url ?? ""} onChange={(e) => update("image_url", e.target.value)} placeholder="https://…" />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Text Content</Label>
+              <Label className="text-xs">المحتوى النصي</Label>
               <Textarea value={content.text ?? ""} onChange={(e) => update("text", e.target.value)} rows={3} />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Layout</Label>
+              <Label className="text-xs">التخطيط</Label>
               <Select value={content.layout ?? "left"} onValueChange={(v) => update("layout", v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="left">Image Left</SelectItem>
-                  <SelectItem value="right">Image Right</SelectItem>
+                  <SelectItem value="left">الصورة يساراً</SelectItem>
+                  <SelectItem value="right">الصورة يميناً</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -348,11 +348,11 @@ function SectionContentEditor({
         return (
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label className="text-xs">Video Title</Label>
+              <Label className="text-xs">عنوان الفيديو</Label>
               <Input value={content.title ?? ""} onChange={(e) => update("title", e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs">Video URL (YouTube/Vimeo embed URL)</Label>
+              <Label className="text-xs">رابط الفيديو (YouTube/Vimeo)</Label>
               <Input value={content.video_url ?? ""} onChange={(e) => update("video_url", e.target.value)} placeholder="https://www.youtube.com/embed/…" />
             </div>
           </div>
@@ -367,13 +367,13 @@ function SectionContentEditor({
     <Accordion type="single" collapsible>
       <AccordionItem value="content" className="border-0">
         <AccordionTrigger className="py-1 text-xs text-muted-foreground hover:no-underline">
-          Edit Content
+          تعديل المحتوى
         </AccordionTrigger>
         <AccordionContent className="pt-2 space-y-3">
           {renderFields()}
           {hasChanges && (
             <Button size="sm" onClick={() => onSave(content)}>
-              <Save className="w-3 h-3 mr-1" /> Save Changes
+              <Save className="w-3 h-3 ml-1" /> حفظ التغييرات
             </Button>
           )}
         </AccordionContent>
