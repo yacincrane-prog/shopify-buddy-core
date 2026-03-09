@@ -73,7 +73,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
     },
     {
       key: "actions",
-      header: "Actions",
+      header: "إجراءات",
       headerClassName: "text-right",
       className: "text-right",
       render: (p) => (
