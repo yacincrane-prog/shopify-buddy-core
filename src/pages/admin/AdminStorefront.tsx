@@ -183,6 +183,7 @@ export default function AdminStorefront() {
     mutationFn: () => saveStorefrontConfig(config),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["storefront-config"] });
+      setPreviewKey((k) => k + 1);
       toast.success("تم حفظ إعدادات المتجر");
     },
     onError: () => toast.error("فشل في حفظ الإعدادات"),
