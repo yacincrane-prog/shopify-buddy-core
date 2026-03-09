@@ -148,9 +148,9 @@ export default function AdminThemeEditor() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["theme-settings"] });
       applyThemeToDocument(theme);
-      toast.success("Theme saved and applied!");
+      toast.success("تم حفظ وتطبيق المظهر!");
     },
-    onError: () => toast.error("Failed to save theme"),
+    onError: () => toast.error("فشل في حفظ المظهر"),
   });
 
   const resetTheme = () => {
