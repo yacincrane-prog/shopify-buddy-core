@@ -80,6 +80,7 @@ import {
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 function SortableCategoryCard({ cat, onToggle, onEdit, onDelete }: {
   cat: Category;
@@ -343,11 +344,13 @@ export default function AdminStorefront() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs">رابط الشعار (اختياري)</Label>
-                <Input
+                <Label className="text-xs">الشعار</Label>
+                <ImageUploadField
                   value={config.logo}
-                  onChange={(e) => setConfig((p) => ({ ...p, logo: e.target.value }))}
+                  onChange={(url) => setConfig((p) => ({ ...p, logo: url }))}
+                  folder="storefront/logo"
                   placeholder="https://example.com/logo.png"
+                  previewClassName="w-16 h-16 rounded-lg"
                 />
               </div>
             </CardContent>
@@ -441,10 +444,12 @@ export default function AdminStorefront() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs">صورة الخلفية (اختياري)</Label>
-                    <Input
+                    <ImageUploadField
                       value={config.hero.backgroundImage}
-                      onChange={(e) => setConfig((p) => ({ ...p, hero: { ...p.hero, backgroundImage: e.target.value } }))}
+                      onChange={(url) => setConfig((p) => ({ ...p, hero: { ...p.hero, backgroundImage: url } }))}
+                      folder="storefront/hero"
                       placeholder="https://example.com/hero.jpg"
+                      previewClassName="w-full h-24 rounded-lg"
                     />
                   </div>
                   {/* Hero Preview */}
