@@ -61,7 +61,7 @@ export default function AdminDashboard() {
           setView("list");
           setEditingProduct(null);
         },
-        onError: () => toast.error("Failed to update product"),
+        onError: () => toast.error("فشل في تحديث المنتج"),
       }
     );
   };
