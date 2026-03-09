@@ -85,7 +85,7 @@ export function QuantityDiscountManager() {
           {tiers.map((tier, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className="flex-1 space-y-1">
-                <Label className="text-xs">Min Qty</Label>
+                <Label className="text-xs">الحد الأدنى للكمية</Label>
                 <Input
                   type="number"
                   min={2}
