@@ -42,7 +42,7 @@ export function AdminSidebar() {
   const { state, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, isRtl } = useLanguage();
 
   const mainNav = [
     { title: t("nav.dashboard"), url: "/admin", icon: LayoutDashboard },
