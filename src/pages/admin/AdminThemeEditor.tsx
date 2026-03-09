@@ -297,11 +297,11 @@ export default function AdminThemeEditor() {
             <div className="space-y-3">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">معاينة العناصر</Label>
               <div className="space-y-2 p-3 rounded-lg bg-muted/30 border border-border">
-                <Button size="sm" className="w-full" style={{ borderRadius: theme.borderRadius }}>Primary Button</Button>
-                <Button size="sm" variant="outline" className="w-full" style={{ borderRadius: theme.borderRadius }}>Outline Button</Button>
-                <Input placeholder="Input field" style={{ borderRadius: theme.borderRadius }} className="h-9" />
+                <Button size="sm" className="w-full" style={{ borderRadius: theme.borderRadius }}>زر أساسي</Button>
+                <Button size="sm" variant="outline" className="w-full" style={{ borderRadius: theme.borderRadius }}>زر ثانوي</Button>
+                <Input placeholder="حقل إدخال" style={{ borderRadius: theme.borderRadius }} className="h-9" />
                 <Card style={{ borderRadius: theme.borderRadius }}>
-                  <CardContent className="p-3"><p className="text-xs text-muted-foreground">Card element preview</p></CardContent>
+                  <CardContent className="p-3"><p className="text-xs text-muted-foreground">معاينة عنصر بطاقة</p></CardContent>
                 </Card>
               </div>
             </div>
