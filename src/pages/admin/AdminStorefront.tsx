@@ -163,6 +163,15 @@ export default function AdminStorefront() {
   const [previewKey, setPreviewKey] = useState(0);
   const [previewViewport, setPreviewViewport] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Send config to iframe for instant preview
+  useEffect(() => {
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "storefront-config-preview", config },
+      "*"
+    );
+  }, [config]);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const { data: savedConfig, isLoading: configLoading } = useQuery({
