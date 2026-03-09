@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ThemeMarketplace } from "@/components/admin/ThemeMarketplace";
 
 const VIEWPORTS = [
   { id: "desktop" as const, icon: Monitor, width: "100%", label: "Desktop" },
