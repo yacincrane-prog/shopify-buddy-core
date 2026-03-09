@@ -73,7 +73,7 @@ export default function AdminDashboard() {
         toast.success("تم حذف المنتج");
         setDeleteId(null);
       },
-      onError: () => toast.error("Failed to delete product"),
+      onError: () => toast.error("فشل في حذف المنتج"),
     });
   };
 
