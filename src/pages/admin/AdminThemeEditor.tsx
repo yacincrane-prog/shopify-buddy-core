@@ -163,7 +163,7 @@ export default function AdminThemeEditor() {
       ...prev,
       colors: { ...prev.colors, ...preset.colors },
     }));
-    toast.info(`Applied "${preset.name}" preset`);
+    toast.info(`تم تطبيق "${preset.name}"`);
   };
 
   const hasChanges = JSON.stringify(theme) !== JSON.stringify(savedTheme ?? DEFAULT_THEME);
