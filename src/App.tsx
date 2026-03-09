@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { useApplyTheme } from "@/hooks/useApplyTheme";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { LanguageProvider } from "@/hooks/useLanguage";
 import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
 import NotFound from "./pages/NotFound";
