@@ -44,7 +44,7 @@ export default function AdminDashboard() {
   const handleCreate = (data: ProductFormData) => {
     createMutation.mutate(data, {
       onSuccess: () => {
-        toast.success("Product created");
+        toast.success("تم إنشاء المنتج");
         setView("list");
       },
       onError: () => toast.error("Failed to create product"),
