@@ -607,6 +607,35 @@ export default function AdminStorefront() {
                   }
                 />
               </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-xs">إظهار نموذج الطلب دائمًا</Label>
+                  <p className="text-[10px] text-muted-foreground">عرض نموذج الطلب مباشرة بدون الضغط على زر</p>
+                </div>
+                <Switch
+                  checked={config.productPage.alwaysShowCheckoutForm ?? true}
+                  onCheckedChange={(v) =>
+                    setConfig((p) => ({ ...p, productPage: { ...p.productPage, alwaysShowCheckoutForm: v } }))
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">موضع نموذج الطلب</Label>
+                <Select
+                  value={config.productPage.checkoutFormPosition ?? "below_title"}
+                  onValueChange={(v: any) =>
+                    setConfig((p) => ({ ...p, productPage: { ...p.productPage, checkoutFormPosition: v } }))
+                  }
+                >
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="below_title">تحت العنوان والسعر</SelectItem>
+                    <SelectItem value="below_description">تحت الوصف</SelectItem>
+                    <SelectItem value="below_gallery">تحت معرض الصور</SelectItem>
+                    <SelectItem value="bottom">أسفل الصفحة</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label className="text-xs">موضع الصور</Label>
                 <Select

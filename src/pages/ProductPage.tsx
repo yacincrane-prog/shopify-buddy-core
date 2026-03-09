@@ -5,6 +5,7 @@ import { fetchProductBySlug } from "@/lib/products";
 import { fetchDiscountsForProduct, getDiscountedPrice } from "@/lib/quantity-discounts";
 import { fetchSectionsForProduct } from "@/lib/product-sections";
 import { fetchOffersForProduct, type QuantityOffer } from "@/lib/quantity-offers";
+import { fetchStorefrontConfig } from "@/lib/storefront-config";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { QuantitySelector } from "@/components/product/QuantitySelector";
 import { QuantityPricing } from "@/components/product/QuantityPricing";
@@ -23,7 +24,6 @@ import { useTrackingPixels } from "@/hooks/useTrackingPixels";
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const [quantity, setQuantity] = useState(1);
-  const [showCheckout, setShowCheckout] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [upsellItem, setUpsellItem] = useState<{ title: string; price: number; discountedPrice: number; quantity: number } | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<QuantityOffer | null>(null);
@@ -33,6 +33,11 @@ export default function ProductPage() {
     queryKey: ["product", slug],
     queryFn: () => fetchProductBySlug(slug!),
     enabled: !!slug,
+  });
+
+  const { data: storefrontConfig } = useQuery({
+    queryKey: ["storefront-config"],
+    queryFn: fetchStorefrontConfig,
   });
 
   useEffect(() => {
@@ -89,6 +94,8 @@ export default function ProductPage() {
 
   const basePrice = Number(product.price);
   const hasOffers = (quantityOffers?.length ?? 0) > 0;
+  const alwaysShowForm = storefrontConfig?.productPage?.alwaysShowCheckoutForm ?? true;
+  const formPosition = storefrontConfig?.productPage?.checkoutFormPosition ?? "below_title";
 
   const activeQuantity = selectedOffer ? selectedOffer.quantity : quantity;
   const activeUnitPrice = selectedOffer
@@ -124,12 +131,10 @@ export default function ProductPage() {
       quantity: 1,
     });
     setShowUpsell(false);
-    setShowCheckout(true);
   };
 
   const handleSkipUpsell = () => {
     setShowUpsell(false);
-    setShowCheckout(true);
   };
 
   const handleOfferSelect = (offer: QuantityOffer) => {
@@ -137,38 +142,48 @@ export default function ProductPage() {
     setQuantity(offer.quantity);
   };
 
+  const renderQuantityBlock = () => (
+    <>
+      {hasOffers ? (
+        <SmartQuantityOffers
+          productId={product.id}
+          basePrice={basePrice}
+          selectedOfferId={selectedOffer?.id ?? null}
+          onSelect={handleOfferSelect}
+        />
+      ) : (
+        <div className="space-y-2">
+          <label className="text-sm font-medium">الكمية</label>
+          <QuantitySelector value={quantity} onChange={setQuantity} max={product.inventory_quantity} />
+          <p className="text-xs text-muted-foreground">{product.inventory_quantity} متوفر في المخزون</p>
+        </div>
+      )}
+    </>
+  );
+
+  const renderCheckoutForm = () => (
+    <CODCheckoutForm
+      product={product}
+      quantity={activeQuantity}
+      unitPrice={Math.round(activeUnitPrice)}
+      upsellItem={upsellItem}
+      freeDelivery={freeDelivery}
+    />
+  );
+
   const renderOrderBlock = () => (
     <div className="space-y-4">
       {inStock ? (
         <>
-          {hasOffers ? (
-            <SmartQuantityOffers
-              productId={product.id}
-              basePrice={basePrice}
-              selectedOfferId={selectedOffer?.id ?? null}
-              onSelect={handleOfferSelect}
-            />
-          ) : (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">الكمية</label>
-              <QuantitySelector value={quantity} onChange={setQuantity} max={product.inventory_quantity} />
-              <p className="text-xs text-muted-foreground">{product.inventory_quantity} متوفر في المخزون</p>
-            </div>
-          )}
+          {renderQuantityBlock()}
 
-          {!showCheckout ? (
+          {alwaysShowForm ? (
+            renderCheckoutForm()
+          ) : (
             <Button size="lg" className="w-full text-sm sm:text-base" onClick={handleOrderClick}>
               <ShoppingBag className="w-4 h-4 ml-2" />
               اطلب الآن — {activeTotalProductPrice.toLocaleString()} د.ج
             </Button>
-          ) : (
-            <CODCheckoutForm
-              product={product}
-              quantity={activeQuantity}
-              unitPrice={Math.round(activeUnitPrice)}
-              upsellItem={upsellItem}
-              freeDelivery={freeDelivery}
-            />
           )}
         </>
       ) : (
@@ -188,6 +203,91 @@ export default function ProductPage() {
         ? basePrice
         : null;
 
+  const renderPriceBlock = () => (
+    <div>
+      <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
+      <div className="flex items-baseline gap-2 sm:gap-3 mt-2 sm:mt-3 flex-wrap">
+        <span className="text-xl sm:text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
+        {displayComparePrice && displayComparePrice > displayPrice && (
+          <span className="text-base sm:text-lg text-muted-foreground line-through">
+            {displayComparePrice.toLocaleString()} د.ج
+          </span>
+        )}
+        {hasDiscount && !selectedOffer && (
+          <Badge variant="secondary" className="text-xs">
+            خصم {Math.round((1 - product.price / product.compare_at_price!) * 100)}%
+          </Badge>
+        )}
+      </div>
+    </div>
+  );
+
+  // For default layout (no custom sections), position the form based on config
+  const renderDefaultLayout = () => {
+    const galleryBlock = <ProductGallery images={product.images ?? []} title={product.title} />;
+    const descBlock = product.description ? (
+      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{product.description}</p>
+    ) : null;
+    const extraBlock = (
+      <>
+        {!hasOffers && <QuantityPricing productId={product.id} basePrice={basePrice} quantity={quantity} />}
+        <BundleOffers productId={product.id} />
+      </>
+    );
+
+    // Build content sections in order based on formPosition
+    const contentSections: React.ReactNode[] = [];
+
+    if (formPosition === "below_title") {
+      contentSections.push(renderPriceBlock());
+      contentSections.push(renderOrderBlock());
+      if (descBlock) contentSections.push(descBlock);
+      contentSections.push(extraBlock);
+    } else if (formPosition === "below_gallery") {
+      // Form goes after gallery in left column context - we put it after price
+      contentSections.push(renderPriceBlock());
+      if (descBlock) contentSections.push(descBlock);
+      contentSections.push(renderOrderBlock());
+      contentSections.push(extraBlock);
+    } else if (formPosition === "below_description") {
+      contentSections.push(renderPriceBlock());
+      if (descBlock) contentSections.push(descBlock);
+      contentSections.push(renderOrderBlock());
+      contentSections.push(extraBlock);
+    } else {
+      // bottom
+      contentSections.push(renderPriceBlock());
+      if (descBlock) contentSections.push(descBlock);
+      contentSections.push(extraBlock);
+      contentSections.push(renderOrderBlock());
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
+        {formPosition === "below_gallery" ? (
+          <div className="space-y-4">
+            {galleryBlock}
+            {renderOrderBlock()}
+          </div>
+        ) : (
+          galleryBlock
+        )}
+
+        <div className="space-y-4 sm:space-y-6">
+          {formPosition === "below_gallery" ? (
+            <>
+              {renderPriceBlock()}
+              {descBlock}
+              {extraBlock}
+            </>
+          ) : (
+            contentSections.map((node, i) => <div key={i}>{node}</div>)
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <header className="border-b border-border bg-card">
@@ -202,22 +302,7 @@ export default function ProductPage() {
       <main className="container px-4 py-6 sm:py-8 md:py-12 max-w-5xl">
         {hasCustomSections ? (
           <div className="space-y-6">
-            <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
-              <div className="flex items-baseline gap-2 sm:gap-3 mt-2 sm:mt-3 flex-wrap">
-                <span className="text-xl sm:text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
-                {displayComparePrice && displayComparePrice > displayPrice && (
-                  <span className="text-base sm:text-lg text-muted-foreground line-through">
-                    {displayComparePrice.toLocaleString()} د.ج
-                  </span>
-                )}
-                {hasDiscount && !selectedOffer && (
-                  <Badge variant="secondary" className="text-xs">
-                    خصم {Math.round((1 - product.price / product.compare_at_price!) * 100)}%
-                  </Badge>
-                )}
-              </div>
-            </div>
+            {renderPriceBlock()}
             <SectionRenderer
               product={product}
               basePrice={basePrice}
@@ -226,42 +311,7 @@ export default function ProductPage() {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
-            <ProductGallery images={product.images ?? []} title={product.title} />
-
-            <div className="space-y-4 sm:space-y-6">
-              <div>
-                <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight">{product.title}</h1>
-                <div className="flex items-baseline gap-2 sm:gap-3 mt-2 sm:mt-3 flex-wrap">
-                  <span className="text-xl sm:text-2xl font-bold">{displayPrice.toLocaleString()} د.ج</span>
-                  {displayComparePrice && displayComparePrice > displayPrice && (
-                    <span className="text-base sm:text-lg text-muted-foreground line-through">
-                      {displayComparePrice.toLocaleString()} د.ج
-                    </span>
-                  )}
-                  {hasDiscount && !selectedOffer && (
-                    <Badge variant="secondary" className="text-xs">
-                      خصم {Math.round((1 - product.price / product.compare_at_price!) * 100)}%
-                    </Badge>
-                  )}
-                </div>
-              </div>
-
-              {product.description && (
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{product.description}</p>
-              )}
-
-              <div className="space-y-4 pt-2">
-                {renderOrderBlock()}
-
-                {!hasOffers && (
-                  <QuantityPricing productId={product.id} basePrice={basePrice} quantity={quantity} />
-                )}
-
-                <BundleOffers productId={product.id} />
-              </div>
-            </div>
-          </div>
+          renderDefaultLayout()
         )}
       </main>
 
