@@ -319,7 +319,7 @@ export default function AdminThemeEditor() {
         <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-card">
           <div className="flex items-center gap-2">
             <Palette className="w-4 h-4 text-accent" />
-            <h2 className="text-sm font-semibold">Theme</h2>
+            <h2 className="text-sm font-semibold">المظهر</h2>
             {hasChanges && <Badge variant="secondary" className="text-[10px]">●</Badge>}
           </div>
           <div className="flex items-center gap-1.5">
