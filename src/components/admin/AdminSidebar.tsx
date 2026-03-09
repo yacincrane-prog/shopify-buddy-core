@@ -42,7 +42,7 @@ export function AdminSidebar() {
   const { state, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, isRtl } = useLanguage();
 
   const mainNav = [
     { title: t("nav.dashboard"), url: "/admin", icon: LayoutDashboard },
@@ -112,7 +112,7 @@ export function AdminSidebar() {
   );
 
   return (
-    <Sidebar collapsible="offcanvas" className="border-r border-border">
+    <Sidebar collapsible="offcanvas" side={isRtl ? "right" : "left"} className={isRtl ? "border-l border-border" : "border-r border-border"}>
       <SidebarHeader className="p-4 flex flex-row items-center justify-between lg:justify-start">
         <NavLink to="/" className="flex items-center gap-2.5 text-foreground hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
