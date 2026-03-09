@@ -129,7 +129,7 @@ export function AdminSidebar() {
 
       <SidebarFooter className="p-3">
         {!collapsed && (
-          <p className="text-[10px] text-muted-foreground/50 text-center">v1.0 · Admin Panel</p>
+          <p className="text-[10px] text-muted-foreground/50 text-center">الإصدار 1.0 · لوحة الإدارة</p>
         )}
       </SidebarFooter>
     </Sidebar>

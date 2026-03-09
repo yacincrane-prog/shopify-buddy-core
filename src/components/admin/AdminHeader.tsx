@@ -57,7 +57,7 @@ export function AdminHeader({ title }: AdminHeaderProps) {
           <DropdownMenuItem disabled className="text-xs text-muted-foreground">{email}</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut} className="text-destructive">
-            <LogOut className="w-3.5 h-3.5 mr-2" /> Sign Out
+            <LogOut className="w-3.5 h-3.5 mr-2" /> تسجيل الخروج
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

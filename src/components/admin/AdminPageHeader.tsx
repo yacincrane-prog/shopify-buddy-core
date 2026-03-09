@@ -110,7 +110,7 @@ export function AdminPageHeader({
             {sort && (
               <Select value={sort.value} onValueChange={sort.onChange}>
                 <SelectTrigger className="h-9 w-full sm:w-40 min-w-[120px]">
-                  <SelectValue placeholder="Sort by" />
+                  <SelectValue placeholder="ترتيب حسب" />
                 </SelectTrigger>
                 <SelectContent>
                   {sort.options.map((opt) => (
