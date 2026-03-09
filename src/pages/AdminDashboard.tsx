@@ -57,7 +57,7 @@ export default function AdminDashboard() {
       { id: editingProduct.id, data },
       {
         onSuccess: () => {
-          toast.success("Product updated");
+          toast.success("تم تحديث المنتج");
           setView("list");
           setEditingProduct(null);
         },
