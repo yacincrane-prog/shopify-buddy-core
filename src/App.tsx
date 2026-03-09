@@ -33,6 +33,7 @@ const AdminTrackingPixels = lazy(() => import("./pages/admin/AdminTrackingPixels
 const AdminDiscountCodes = lazy(() => import("./pages/admin/AdminDiscountCodes"));
 const AdminShipping = lazy(() => import("./pages/admin/AdminShipping"));
 const AdminGoogleSheets = lazy(() => import("./pages/admin/AdminGoogleSheets"));
+const AdminCredentials = lazy(() => import("./pages/admin/AdminCredentials"));
 
 const queryClient = new QueryClient();
 
