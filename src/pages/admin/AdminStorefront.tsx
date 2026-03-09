@@ -202,7 +202,8 @@ export default function AdminStorefront() {
           <Button onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending}>
             {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : <Save className="w-4 h-4 me-1" />}
             حفظ التغييرات
-        </Button>
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="homepage" className="w-full">
