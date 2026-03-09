@@ -854,10 +854,18 @@ export default function AdminStorefront() {
                 }}
               >
                 <iframe
+                  ref={iframeRef}
                   key={previewKey}
                   src="/"
                   className="w-full h-full border-0"
                   title="معاينة الصفحة الرئيسية"
+                  onLoad={() => {
+                    // Send current config once iframe loads
+                    iframeRef.current?.contentWindow?.postMessage(
+                      { type: "storefront-config-preview", config },
+                      "*"
+                    );
+                  }}
                 />
               </div>
             </div>
