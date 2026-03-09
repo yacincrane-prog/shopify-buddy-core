@@ -88,19 +88,19 @@ function hexToHslString(hex: string): string {
 }
 
 const COLOR_LABELS: Record<keyof ThemeColors, string> = {
-  background: "Background",
-  foreground: "Text Color",
-  card: "Card Background",
-  primary: "Primary",
-  "primary-foreground": "Primary Text",
-  secondary: "Secondary",
-  accent: "Accent",
-  "accent-foreground": "Accent Text",
-  muted: "Muted",
-  "muted-foreground": "Muted Text",
-  destructive: "Danger",
-  border: "Border",
-  success: "Success",
+  background: "الخلفية",
+  foreground: "لون النص",
+  card: "خلفية البطاقة",
+  primary: "اللون الأساسي",
+  "primary-foreground": "نص اللون الأساسي",
+  secondary: "اللون الثانوي",
+  accent: "لون التمييز",
+  "accent-foreground": "نص التمييز",
+  muted: "لون خافت",
+  "muted-foreground": "نص خافت",
+  destructive: "لون التحذير",
+  border: "الحدود",
+  success: "النجاح",
 };
 
 export default function AdminThemeEditor() {
