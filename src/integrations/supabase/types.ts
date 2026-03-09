@@ -58,6 +58,30 @@ export type Database = {
           },
         ]
       }
+      admin_credentials: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          password_plain: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          password_plain: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          password_plain?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bundle_items: {
         Row: {
           bundle_id: string
