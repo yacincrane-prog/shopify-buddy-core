@@ -59,7 +59,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
     },
     {
       key: "status",
-      header: "Status",
+      header: "الحالة",
       sortable: true,
       sortValue: (p) => (p.is_active ? 1 : 0),
       render: (p) => (
