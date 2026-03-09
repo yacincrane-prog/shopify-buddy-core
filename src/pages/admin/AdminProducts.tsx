@@ -46,8 +46,8 @@ export default function AdminProducts() {
 
   const handleCreate = (data: ProductFormData) => {
     createMutation.mutate(data, {
-      onSuccess: () => { toast.success("Product created"); setView("list"); },
-      onError: () => toast.error("Failed to create product"),
+      onSuccess: () => { toast.success("تم إنشاء المنتج"); setView("list"); },
+      onError: () => toast.error("فشل في إنشاء المنتج"),
     });
   };
 
@@ -56,8 +56,8 @@ export default function AdminProducts() {
     updateMutation.mutate(
       { id: editingProduct.id, data },
       {
-        onSuccess: () => { toast.success("Product updated"); setView("list"); setEditingProduct(null); },
-        onError: () => toast.error("Failed to update product"),
+        onSuccess: () => { toast.success("تم تحديث المنتج"); setView("list"); setEditingProduct(null); },
+        onError: () => toast.error("فشل في تحديث المنتج"),
       }
     );
   };
@@ -65,8 +65,8 @@ export default function AdminProducts() {
   const handleDelete = () => {
     if (!deleteId) return;
     deleteMutation.mutate(deleteId, {
-      onSuccess: () => { toast.success("Product deleted"); setDeleteId(null); },
-      onError: () => toast.error("Failed to delete product"),
+      onSuccess: () => { toast.success("تم حذف المنتج"); setDeleteId(null); },
+      onError: () => toast.error("فشل في حذف المنتج"),
     });
   };
 
@@ -76,10 +76,10 @@ export default function AdminProducts() {
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" onClick={() => { setView("list"); setEditingProduct(null); }}>
-          <ArrowLeft className="w-4 h-4 mr-1" /> Back to products
+          <ArrowLeft className="w-4 h-4 mr-1" /> العودة للمنتجات
         </Button>
         <Card>
-          <CardHeader><CardTitle>{view === "create" ? "New product" : "Edit product"}</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{view === "create" ? "منتج جديد" : "تعديل المنتج"}</CardTitle></CardHeader>
           <CardContent>
             <ProductForm
               product={view === "edit" ? editingProduct! : undefined}
@@ -96,28 +96,28 @@ export default function AdminProducts() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Products"
-        description="Manage your store product catalog"
+        title="المنتجات"
+        description="إدارة كتالوج منتجات متجرك"
         count={products?.length}
         action={{
-          label: "Add product",
+          label: "إضافة منتج",
           icon: <Plus className="w-4 h-4 mr-1" />,
           onClick: () => setView("create"),
         }}
         search={{
           value: search,
           onChange: setSearch,
-          placeholder: "Search products…",
+          placeholder: "بحث في المنتجات…",
         }}
         filters={[
           {
-            label: "Status",
+            label: "الحالة",
             value: statusFilter,
             onChange: setStatusFilter,
             options: [
-              { label: "All Status", value: "all" },
-              { label: "Active", value: "active" },
-              { label: "Inactive", value: "inactive" },
+              { label: "جميع الحالات", value: "all" },
+              { label: "نشط", value: "active" },
+              { label: "غير نشط", value: "inactive" },
             ],
           },
         ]}
@@ -125,11 +125,11 @@ export default function AdminProducts() {
           value: sortBy,
           onChange: setSortBy,
           options: [
-            { label: "Newest First", value: "newest" },
-            { label: "Oldest First", value: "oldest" },
-            { label: "Price: High → Low", value: "price-high" },
-            { label: "Price: Low → High", value: "price-low" },
-            { label: "Name A-Z", value: "name" },
+            { label: "الأحدث أولاً", value: "newest" },
+            { label: "الأقدم أولاً", value: "oldest" },
+            { label: "السعر: الأعلى → الأقل", value: "price-high" },
+            { label: "السعر: الأقل → الأعلى", value: "price-low" },
+            { label: "الاسم أ-ي", value: "name" },
           ],
         }}
       />
@@ -144,12 +144,12 @@ export default function AdminProducts() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete product?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>حذف المنتج؟</AlertDialogTitle>
+            <AlertDialogDescription>لا يمكن التراجع عن هذا الإجراء.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>حذف</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

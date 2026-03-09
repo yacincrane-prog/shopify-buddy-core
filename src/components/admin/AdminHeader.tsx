@@ -31,7 +31,7 @@ export function AdminHeader({ title }: AdminHeaderProps) {
       <div className="relative hidden md:block w-64">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search…"
+          placeholder="بحث…"
           className="pl-9 h-9 bg-secondary/50 border-0 focus-visible:ring-1"
         />
       </div>
@@ -43,7 +43,7 @@ export function AdminHeader({ title }: AdminHeaderProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
-          <DropdownMenuItem>No new notifications</DropdownMenuItem>
+          <DropdownMenuItem>لا توجد إشعارات جديدة</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -57,7 +57,7 @@ export function AdminHeader({ title }: AdminHeaderProps) {
           <DropdownMenuItem disabled className="text-xs text-muted-foreground">{email}</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut} className="text-destructive">
-            <LogOut className="w-3.5 h-3.5 mr-2" /> Sign Out
+            <LogOut className="w-3.5 h-3.5 mr-2" /> تسجيل الخروج
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -16,36 +16,17 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Plus, Pencil, Trash2, Ticket, Copy } from "lucide-react";
 import { toast } from "sonner";
@@ -61,7 +42,6 @@ export default function AdminDiscountCodes() {
   const [editing, setEditing] = useState<DiscountCode | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  // Form state
   const [code, setCode] = useState("");
   const [discountType, setDiscountType] = useState<DiscountType>("percentage");
   const [discountValue, setDiscountValue] = useState("");
@@ -76,21 +56,21 @@ export default function AdminDiscountCodes() {
 
   const createMut = useMutation({
     mutationFn: createDiscountCode,
-    onSuccess: () => { invalidate(); toast.success("Discount code created"); closeDialog(); },
-    onError: (e: any) => toast.error(e?.message?.includes("duplicate") ? "Code already exists" : "Failed to create"),
+    onSuccess: () => { invalidate(); toast.success("تم إنشاء كود الخصم"); closeDialog(); },
+    onError: (e: any) => toast.error(e?.message?.includes("duplicate") ? "الكود موجود بالفعل" : "فشل في الإنشاء"),
   });
 
   const updateMut = useMutation({
     mutationFn: ({ id, ...rest }: { id: string } & Parameters<typeof updateDiscountCode>[1]) =>
       updateDiscountCode(id, rest),
-    onSuccess: () => { invalidate(); toast.success("Discount code updated"); closeDialog(); },
-    onError: () => toast.error("Failed to update"),
+    onSuccess: () => { invalidate(); toast.success("تم تحديث كود الخصم"); closeDialog(); },
+    onError: () => toast.error("فشل في التحديث"),
   });
 
   const deleteMut = useMutation({
     mutationFn: deleteDiscountCode,
-    onSuccess: () => { invalidate(); toast.success("Deleted"); setDeleteId(null); },
-    onError: () => toast.error("Failed to delete"),
+    onSuccess: () => { invalidate(); toast.success("تم الحذف"); setDeleteId(null); },
+    onError: () => toast.error("فشل في الحذف"),
   });
 
   const toggleMut = useMutation({
@@ -127,13 +107,13 @@ export default function AdminDiscountCodes() {
 
   const handleSave = () => {
     const trimmedCode = code.toUpperCase().trim();
-    if (!trimmedCode) { toast.error("Code is required"); return; }
-    if (trimmedCode.length < 3 || trimmedCode.length > 30) { toast.error("Code must be 3-30 characters"); return; }
-    if (!/^[A-Z0-9_-]+$/.test(trimmedCode)) { toast.error("Code can only contain letters, numbers, hyphens, underscores"); return; }
+    if (!trimmedCode) { toast.error("الكود مطلوب"); return; }
+    if (trimmedCode.length < 3 || trimmedCode.length > 30) { toast.error("الكود يجب أن يكون 3-30 حرف"); return; }
+    if (!/^[A-Z0-9_-]+$/.test(trimmedCode)) { toast.error("الكود يقبل فقط أحرف، أرقام، شرطات وشرطات سفلية"); return; }
 
     const val = parseFloat(discountValue);
-    if (isNaN(val) || val <= 0) { toast.error("Discount value must be positive"); return; }
-    if (discountType === "percentage" && val > 100) { toast.error("Percentage can't exceed 100%"); return; }
+    if (isNaN(val) || val <= 0) { toast.error("قيمة الخصم يجب أن تكون موجبة"); return; }
+    if (discountType === "percentage" && val > 100) { toast.error("النسبة لا يمكن أن تتجاوز 100%"); return; }
 
     const payload = {
       code: trimmedCode,
@@ -154,7 +134,7 @@ export default function AdminDiscountCodes() {
 
   const copyCode = (c: string) => {
     navigator.clipboard.writeText(c);
-    toast.success("Copied!");
+    toast.success("تم النسخ!");
   };
 
   const isSaving = createMut.isPending || updateMut.isPending;
@@ -165,37 +145,37 @@ export default function AdminDiscountCodes() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Discount Codes"
-        description="Create and manage discount codes for your store"
+        title="أكواد الخصم"
+        description="إنشاء وإدارة أكواد الخصم لمتجرك"
       >
         <Button onClick={openCreate} size="sm">
-          <Plus className="w-4 h-4 mr-1" /> Add Code
+          <Plus className="w-4 h-4 mr-1" /> إضافة كود
         </Button>
       </AdminPageHeader>
 
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="text-center py-16 text-muted-foreground">Loading…</div>
+            <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
           ) : !codes?.length ? (
             <div className="text-center py-16 space-y-3">
               <Ticket className="w-10 h-10 mx-auto text-muted-foreground/50" />
-              <p className="text-muted-foreground">No discount codes yet</p>
+              <p className="text-muted-foreground">لا توجد أكواد خصم بعد</p>
               <Button variant="outline" size="sm" onClick={openCreate}>
-                <Plus className="w-4 h-4 mr-1" /> Create your first code
+                <Plus className="w-4 h-4 mr-1" /> أنشئ أول كود
               </Button>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Discount</TableHead>
-                  <TableHead>Min Order</TableHead>
-                  <TableHead>Usage</TableHead>
-                  <TableHead>Expires</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>الكود</TableHead>
+                  <TableHead>الخصم</TableHead>
+                  <TableHead>الحد الأدنى</TableHead>
+                  <TableHead>الاستخدام</TableHead>
+                  <TableHead>انتهاء الصلاحية</TableHead>
+                  <TableHead>الحالة</TableHead>
+                  <TableHead className="text-right">إجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -214,10 +194,10 @@ export default function AdminDiscountCodes() {
                     <TableCell className="font-medium">
                       {dc.discount_type === "percentage"
                         ? `${dc.discount_value}%`
-                        : `${dc.discount_value.toLocaleString()} DA`}
+                        : `${dc.discount_value.toLocaleString()} د.ج`}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
-                      {dc.min_order_amount > 0 ? `${dc.min_order_amount.toLocaleString()} DA` : "—"}
+                      {dc.min_order_amount > 0 ? `${dc.min_order_amount.toLocaleString()} د.ج` : "—"}
                     </TableCell>
                     <TableCell className="text-sm">
                       {dc.current_uses}{dc.max_uses !== null ? ` / ${dc.max_uses}` : ""}
@@ -225,15 +205,15 @@ export default function AdminDiscountCodes() {
                     <TableCell className="text-sm text-muted-foreground">
                       {dc.expires_at ? (
                         <span className={isExpired(dc) ? "text-destructive" : ""}>
-                          {new Date(dc.expires_at).toLocaleDateString()}
-                          {isExpired(dc) && " (expired)"}
+                          {new Date(dc.expires_at).toLocaleDateString("ar-DZ")}
+                          {isExpired(dc) && " (منتهي)"}
                         </span>
                       ) : "—"}
                     </TableCell>
                     <TableCell>
                       {isExpired(dc) || isMaxed(dc) ? (
                         <Badge variant="secondary" className="text-xs">
-                          {isExpired(dc) ? "Expired" : "Maxed"}
+                          {isExpired(dc) ? "منتهي" : "مستنفد"}
                         </Badge>
                       ) : (
                         <Switch
@@ -260,15 +240,14 @@ export default function AdminDiscountCodes() {
         </CardContent>
       </Card>
 
-      {/* Add / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit Discount Code" : "Create Discount Code"}</DialogTitle>
+            <DialogTitle>{editing ? "تعديل كود الخصم" : "إنشاء كود خصم"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label>Code *</Label>
+              <Label>الكود *</Label>
               <Input
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
@@ -276,21 +255,21 @@ export default function AdminDiscountCodes() {
                 maxLength={30}
                 className="font-mono uppercase"
               />
-              <p className="text-xs text-muted-foreground">Letters, numbers, hyphens, underscores only</p>
+              <p className="text-xs text-muted-foreground">أحرف، أرقام، شرطات وشرطات سفلية فقط</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Type</Label>
+                <Label>النوع</Label>
                 <Select value={discountType} onValueChange={(v) => setDiscountType(v as DiscountType)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="percentage">Percentage (%)</SelectItem>
-                    <SelectItem value="fixed">Fixed Amount (DA)</SelectItem>
+                    <SelectItem value="percentage">نسبة مئوية (%)</SelectItem>
+                    <SelectItem value="fixed">مبلغ ثابت (د.ج)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Value *</Label>
+                <Label>القيمة *</Label>
                 <Input
                   type="number"
                   value={discountValue}
@@ -303,7 +282,7 @@ export default function AdminDiscountCodes() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label>Min Order (DA)</Label>
+                <Label>الحد الأدنى للطلب (د.ج)</Label>
                 <Input
                   type="number"
                   value={minOrder}
@@ -313,18 +292,18 @@ export default function AdminDiscountCodes() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Max Uses</Label>
+                <Label>أقصى عدد استخدام</Label>
                 <Input
                   type="number"
                   value={maxUses}
                   onChange={(e) => setMaxUses(e.target.value)}
-                  placeholder="Unlimited"
+                  placeholder="غير محدود"
                   min="1"
                 />
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label>Expires At</Label>
+              <Label>تاريخ الانتهاء</Label>
               <Input
                 type="datetime-local"
                 value={expiresAt}
@@ -333,28 +312,27 @@ export default function AdminDiscountCodes() {
             </div>
             <div className="flex items-center gap-3">
               <Switch checked={isActive} onCheckedChange={setIsActive} />
-              <Label>Active</Label>
+              <Label>نشط</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={closeDialog}>Cancel</Button>
+            <Button variant="outline" onClick={closeDialog}>إلغاء</Button>
             <Button onClick={handleSave} disabled={isSaving}>
-              {editing ? "Save Changes" : "Create Code"}
+              {editing ? "حفظ التغييرات" : "إنشاء الكود"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirm */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete discount code?</AlertDialogTitle>
-            <AlertDialogDescription>This will permanently remove this discount code.</AlertDialogDescription>
+            <AlertDialogTitle>حذف كود الخصم؟</AlertDialogTitle>
+            <AlertDialogDescription>سيتم حذف كود الخصم هذا نهائياً.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteId && deleteMut.mutate(deleteId)}>Delete</AlertDialogAction>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && deleteMut.mutate(deleteId)}>حذف</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

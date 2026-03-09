@@ -5,8 +5,8 @@ export default function AdminPageBuilder() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Page Builder"
-        description="Manage and customize product page sections"
+        title="منشئ الصفحات"
+        description="إدارة وتخصيص أقسام صفحات المنتجات"
       />
       <SectionBuilder />
     </div>

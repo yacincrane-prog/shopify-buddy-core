@@ -117,7 +117,7 @@ export function AdminSidebar() {
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <Package className="h-4 w-4 text-primary-foreground" />
           </div>
-          {!collapsed && <span className="text-base font-bold tracking-tight">Store Admin</span>}
+          {!collapsed && <span className="text-base font-bold tracking-tight">لوحة التحكم</span>}
         </NavLink>
       </SidebarHeader>
 
@@ -129,7 +129,7 @@ export function AdminSidebar() {
 
       <SidebarFooter className="p-3">
         {!collapsed && (
-          <p className="text-[10px] text-muted-foreground/50 text-center">v1.0 · Admin Panel</p>
+          <p className="text-[10px] text-muted-foreground/50 text-center">الإصدار 1.0 · لوحة الإدارة</p>
         )}
       </SidebarFooter>
     </Sidebar>

@@ -88,19 +88,19 @@ function hexToHslString(hex: string): string {
 }
 
 const COLOR_LABELS: Record<keyof ThemeColors, string> = {
-  background: "Background",
-  foreground: "Text Color",
-  card: "Card Background",
-  primary: "Primary",
-  "primary-foreground": "Primary Text",
-  secondary: "Secondary",
-  accent: "Accent",
-  "accent-foreground": "Accent Text",
-  muted: "Muted",
-  "muted-foreground": "Muted Text",
-  destructive: "Danger",
-  border: "Border",
-  success: "Success",
+  background: "الخلفية",
+  foreground: "لون النص",
+  card: "خلفية البطاقة",
+  primary: "اللون الأساسي",
+  "primary-foreground": "نص اللون الأساسي",
+  secondary: "اللون الثانوي",
+  accent: "لون التمييز",
+  "accent-foreground": "نص التمييز",
+  muted: "لون خافت",
+  "muted-foreground": "نص خافت",
+  destructive: "لون التحذير",
+  border: "الحدود",
+  success: "النجاح",
 };
 
 export default function AdminThemeEditor() {
@@ -148,14 +148,14 @@ export default function AdminThemeEditor() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["theme-settings"] });
       applyThemeToDocument(theme);
-      toast.success("Theme saved and applied!");
+      toast.success("تم حفظ وتطبيق المظهر!");
     },
-    onError: () => toast.error("Failed to save theme"),
+    onError: () => toast.error("فشل في حفظ المظهر"),
   });
 
   const resetTheme = () => {
     setTheme(DEFAULT_THEME);
-    toast.info("Theme reset to defaults (not saved yet)");
+    toast.info("تم إعادة المظهر للافتراضي (لم يتم الحفظ بعد)");
   };
 
   const applyPreset = (preset: typeof COLOR_PRESETS[number]) => {
@@ -163,7 +163,7 @@ export default function AdminThemeEditor() {
       ...prev,
       colors: { ...prev.colors, ...preset.colors },
     }));
-    toast.info(`Applied "${preset.name}" preset`);
+    toast.info(`تم تطبيق "${preset.name}"`);
   };
 
   const hasChanges = JSON.stringify(theme) !== JSON.stringify(savedTheme ?? DEFAULT_THEME);
@@ -172,7 +172,7 @@ export default function AdminThemeEditor() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20 text-muted-foreground">
-        <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading theme…
+        <Loader2 className="w-5 h-5 animate-spin mr-2" /> جاري تحميل المظهر…
       </div>
     );
   }
@@ -183,19 +183,19 @@ export default function AdminThemeEditor() {
         <Tabs defaultValue="colors" className="w-full">
           <TabsList className="w-full grid grid-cols-3 mb-4">
             <TabsTrigger value="colors" className="text-xs gap-1">
-              <Palette className="w-3.5 h-3.5" /> Colors
+              <Palette className="w-3.5 h-3.5" /> الألوان
             </TabsTrigger>
             <TabsTrigger value="fonts" className="text-xs gap-1">
-              <Type className="w-3.5 h-3.5" /> Fonts
+              <Type className="w-3.5 h-3.5" /> الخطوط
             </TabsTrigger>
             <TabsTrigger value="style" className="text-xs gap-1">
-              <Paintbrush className="w-3.5 h-3.5" /> Style
+              <Paintbrush className="w-3.5 h-3.5" /> الأنماط
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="colors" className="mt-0 space-y-5">
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Quick Presets</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">أنماط سريعة</Label>
               <div className="grid grid-cols-3 gap-1.5">
                 {COLOR_PRESETS.map((preset) => (
                   <button
@@ -219,7 +219,7 @@ export default function AdminThemeEditor() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Customize Colors</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">تخصيص الألوان</Label>
               <div className="space-y-2">
                 {(Object.keys(COLOR_LABELS) as (keyof ThemeColors)[]).map((key) => (
                   <div key={key} className="flex items-center gap-2">
@@ -244,7 +244,7 @@ export default function AdminThemeEditor() {
           <TabsContent value="fonts" className="mt-0 space-y-5">
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label className="text-xs">Heading Font</Label>
+                <Label className="text-xs">خط العناوين</Label>
                 <Select value={theme.fonts.heading} onValueChange={(v) => updateFont("heading", v)}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -258,7 +258,7 @@ export default function AdminThemeEditor() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs">Body Font</Label>
+                <Label className="text-xs">خط النص</Label>
                 <Select value={theme.fonts.body} onValueChange={(v) => updateFont("body", v)}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -276,7 +276,7 @@ export default function AdminThemeEditor() {
 
           <TabsContent value="style" className="mt-0 space-y-5">
             <div className="space-y-3">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Border Radius</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">حواف الزوايا</Label>
               <div className="grid grid-cols-3 gap-1.5">
                 {RADIUS_OPTIONS.map((opt) => (
                   <button
@@ -295,13 +295,13 @@ export default function AdminThemeEditor() {
             </div>
 
             <div className="space-y-3">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Preview Elements</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">معاينة العناصر</Label>
               <div className="space-y-2 p-3 rounded-lg bg-muted/30 border border-border">
-                <Button size="sm" className="w-full" style={{ borderRadius: theme.borderRadius }}>Primary Button</Button>
-                <Button size="sm" variant="outline" className="w-full" style={{ borderRadius: theme.borderRadius }}>Outline Button</Button>
-                <Input placeholder="Input field" style={{ borderRadius: theme.borderRadius }} className="h-9" />
+                <Button size="sm" className="w-full" style={{ borderRadius: theme.borderRadius }}>زر أساسي</Button>
+                <Button size="sm" variant="outline" className="w-full" style={{ borderRadius: theme.borderRadius }}>زر ثانوي</Button>
+                <Input placeholder="حقل إدخال" style={{ borderRadius: theme.borderRadius }} className="h-9" />
                 <Card style={{ borderRadius: theme.borderRadius }}>
-                  <CardContent className="p-3"><p className="text-xs text-muted-foreground">Card element preview</p></CardContent>
+                  <CardContent className="p-3"><p className="text-xs text-muted-foreground">معاينة عنصر بطاقة</p></CardContent>
                 </Card>
               </div>
             </div>
@@ -319,7 +319,7 @@ export default function AdminThemeEditor() {
         <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-card">
           <div className="flex items-center gap-2">
             <Palette className="w-4 h-4 text-accent" />
-            <h2 className="text-sm font-semibold">Theme</h2>
+            <h2 className="text-sm font-semibold">المظهر</h2>
             {hasChanges && <Badge variant="secondary" className="text-[10px]">●</Badge>}
           </div>
           <div className="flex items-center gap-1.5">
@@ -363,8 +363,8 @@ export default function AdminThemeEditor() {
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-3">
           <Palette className="w-5 h-5 text-accent" />
-          <h2 className="text-sm font-semibold">Theme Editor</h2>
-          {hasChanges && <Badge variant="secondary" className="text-[10px]">Unsaved changes</Badge>}
+          <h2 className="text-sm font-semibold">محرر المظهر</h2>
+          {hasChanges && <Badge variant="secondary" className="text-[10px]">تغييرات غير محفوظة</Badge>}
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center rounded-md border border-border p-0.5 bg-muted/30">
@@ -382,11 +382,11 @@ export default function AdminThemeEditor() {
             ))}
           </div>
           <Button size="sm" variant="outline" onClick={resetTheme}>
-            <RotateCcw className="w-3.5 h-3.5 mr-1" /> Reset
+            <RotateCcw className="w-3.5 h-3.5 mr-1" /> إعادة تعيين
           </Button>
           <Button size="sm" onClick={() => saveMutation.mutate()} disabled={!hasChanges || saveMutation.isPending}>
             {saveMutation.isPending ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Save className="w-3.5 h-3.5 mr-1" />}
-            Save & Apply
+            حفظ وتطبيق
           </Button>
         </div>
       </div>

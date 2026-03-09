@@ -44,10 +44,10 @@ export default function AdminDashboard() {
   const handleCreate = (data: ProductFormData) => {
     createMutation.mutate(data, {
       onSuccess: () => {
-        toast.success("Product created");
+        toast.success("تم إنشاء المنتج");
         setView("list");
       },
-      onError: () => toast.error("Failed to create product"),
+      onError: () => toast.error("فشل في إنشاء المنتج"),
     });
   };
 
@@ -57,11 +57,11 @@ export default function AdminDashboard() {
       { id: editingProduct.id, data },
       {
         onSuccess: () => {
-          toast.success("Product updated");
+          toast.success("تم تحديث المنتج");
           setView("list");
           setEditingProduct(null);
         },
-        onError: () => toast.error("Failed to update product"),
+        onError: () => toast.error("فشل في تحديث المنتج"),
       }
     );
   };
@@ -70,10 +70,10 @@ export default function AdminDashboard() {
     if (!deleteId) return;
     deleteMutation.mutate(deleteId, {
       onSuccess: () => {
-        toast.success("Product deleted");
+        toast.success("تم حذف المنتج");
         setDeleteId(null);
       },
-      onError: () => toast.error("Failed to delete product"),
+      onError: () => toast.error("فشل في حذف المنتج"),
     });
   };
 
@@ -91,12 +91,12 @@ export default function AdminDashboard() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <Package className="w-5 h-5 text-accent" />
-            <h1 className="text-lg font-semibold">Admin</h1>
+            <h1 className="text-lg font-semibold">الإدارة</h1>
           </div>
           {view === "list" && (
             <Button onClick={() => setView("create")} size="sm">
               <Plus className="w-4 h-4 mr-1" />
-              Add product
+              إضافة منتج
             </Button>
           )}
         </div>
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
         {(view === "create" || view === "edit") ? (
           <Card>
             <CardHeader>
-              <CardTitle>{view === "create" ? "New product" : "Edit product"}</CardTitle>
+              <CardTitle>{view === "create" ? "منتج جديد" : "تعديل المنتج"}</CardTitle>
             </CardHeader>
             <CardContent>
               <ProductForm
@@ -120,23 +120,23 @@ export default function AdminDashboard() {
         ) : (
           <Tabs defaultValue="products">
             <TabsList className="mb-6">
-              <TabsTrigger value="products">Products</TabsTrigger>
-              <TabsTrigger value="bundles">Bundles</TabsTrigger>
-              <TabsTrigger value="discounts">Qty Discounts</TabsTrigger>
-              <TabsTrigger value="upsells">Upsells</TabsTrigger>
-              <TabsTrigger value="exit-intent">Exit Intent</TabsTrigger>
-              <TabsTrigger value="page-builder">Page Builder</TabsTrigger>
-              <TabsTrigger value="qty-offers">Qty Offers</TabsTrigger>
-              <TabsTrigger value="post-upsell">Post-Order</TabsTrigger>
-              <TabsTrigger value="abandoned">Abandoned</TabsTrigger>
-              <TabsTrigger value="landing-pages">Landing Pages</TabsTrigger>
+              <TabsTrigger value="products">المنتجات</TabsTrigger>
+              <TabsTrigger value="bundles">الحزم</TabsTrigger>
+              <TabsTrigger value="discounts">خصومات الكمية</TabsTrigger>
+              <TabsTrigger value="upsells">العروض الإضافية</TabsTrigger>
+              <TabsTrigger value="exit-intent">منبثق الخروج</TabsTrigger>
+              <TabsTrigger value="page-builder">منشئ الصفحات</TabsTrigger>
+              <TabsTrigger value="qty-offers">عروض الكمية</TabsTrigger>
+              <TabsTrigger value="post-upsell">عروض ما بعد الطلب</TabsTrigger>
+              <TabsTrigger value="abandoned">العملاء المهجورون</TabsTrigger>
+              <TabsTrigger value="landing-pages">صفحات الهبوط</TabsTrigger>
             </TabsList>
 
             <TabsContent value="products">
               <Card>
                 <CardContent className="p-0">
                   {isLoading ? (
-                    <div className="text-center py-16 text-muted-foreground">Loading…</div>
+                    <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
                   ) : (
                     <ProductTable products={products ?? []} onEdit={startEdit} onDelete={setDeleteId} />
                   )}
@@ -186,12 +186,12 @@ export default function AdminDashboard() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete product?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>حذف المنتج؟</AlertDialogTitle>
+            <AlertDialogDescription>لا يمكن التراجع عن هذا الإجراء.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>حذف</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

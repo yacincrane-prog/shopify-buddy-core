@@ -32,14 +32,14 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
     },
     {
       key: "title",
-      header: "Product",
+      header: "المنتج",
       sortable: true,
       sortValue: (p) => p.title,
       render: (p) => <span className="font-medium text-foreground">{p.title}</span>,
     },
     {
       key: "price",
-      header: "Price",
+      header: "السعر",
       sortable: true,
       sortValue: (p) => Number(p.price),
       render: (p) => (
@@ -48,7 +48,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
     },
     {
       key: "stock",
-      header: "Stock",
+      header: "المخزون",
       sortable: true,
       sortValue: (p) => p.inventory_quantity,
       render: (p) => (
@@ -59,7 +59,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
     },
     {
       key: "status",
-      header: "Status",
+      header: "الحالة",
       sortable: true,
       sortValue: (p) => (p.is_active ? 1 : 0),
       render: (p) => (
@@ -67,13 +67,13 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
           variant={p.is_active ? "default" : "secondary"}
           className={p.is_active ? "bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))]" : ""}
         >
-          {p.is_active ? "Active" : "Draft"}
+          {p.is_active ? "نشط" : "مسودة"}
         </Badge>
       ),
     },
     {
       key: "actions",
-      header: "Actions",
+      header: "إجراءات",
       headerClassName: "text-right",
       className: "text-right",
       render: (p) => (
@@ -103,7 +103,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
         data={products}
         columns={columns}
         keyExtractor={(p) => p.id}
-        emptyMessage="No products yet. Create your first product to get started."
+        emptyMessage="لا توجد منتجات بعد. أنشئ أول منتج للبدء."
         pageSize={10}
         isLoading={isLoading}
       />

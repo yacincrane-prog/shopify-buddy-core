@@ -27,19 +27,19 @@ export default function AdminPostUpsell() {
 
   const saveMutation = useMutation({
     mutationFn: upsertPostOrderUpsell,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["post-order-upsells-admin"] }); toast.success("Post-order upsell saved"); setEditing(null); },
-    onError: () => toast.error("Failed to save — each product can only have one post-order upsell"),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["post-order-upsells-admin"] }); toast.success("تم حفظ عرض ما بعد الطلب"); setEditing(null); },
+    onError: () => toast.error("فشل في الحفظ — كل منتج يمكن أن يحتوي على عرض واحد فقط"),
   });
 
   const deleteMutation = useMutation({
     mutationFn: deletePostOrderUpsell,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["post-order-upsells-admin"] }); toast.success("Deleted"); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["post-order-upsells-admin"] }); toast.success("تم الحذف"); },
   });
 
   const getProductTitle = (id: string) => products?.find((p) => p.id === id)?.title ?? id;
 
   const startNew = () =>
-    setEditing({ source_product_id: "", upsell_product_id: "", discount_percent: 40, headline: "Special Offer Before Finalizing Your Order", accept_text: "Add to My Order", decline_text: "No Thanks", is_active: true });
+    setEditing({ source_product_id: "", upsell_product_id: "", discount_percent: 40, headline: "عرض خاص قبل إتمام طلبك", accept_text: "أضف لطلبي", decline_text: "لا شكراً", is_active: true });
 
   const filtered = useMemo(() => {
     if (!search) return configs ?? [];
@@ -51,37 +51,37 @@ export default function AdminPostUpsell() {
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" onClick={() => setEditing(null)}>
-          <ArrowLeft className="w-4 h-4 mr-1" /> Back
+          <ArrowLeft className="w-4 h-4 mr-1" /> العودة
         </Button>
         <Card>
-          <CardHeader><CardTitle className="text-base">{editing.id ? "Edit" : "New"} Post-Order Upsell</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">{editing.id ? "تعديل" : "جديد"} عرض ما بعد الطلب</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs">Source Product (triggers on order)</Label>
+                <Label className="text-xs">المنتج الأساسي (يظهر عند طلبه)</Label>
                 <Select value={editing.source_product_id ?? ""} onValueChange={(v) => setEditing({ ...editing, source_product_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="اختر…" /></SelectTrigger>
                   <SelectContent>{products?.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs">Upsell Product (offered after order)</Label>
+                <Label className="text-xs">المنتج المقترح (يُعرض بعد الطلب)</Label>
                 <Select value={editing.upsell_product_id ?? ""} onValueChange={(v) => setEditing({ ...editing, upsell_product_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Select…" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="اختر…" /></SelectTrigger>
                   <SelectContent>{products?.filter((p) => p.id !== editing.source_product_id).map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
             </div>
-            <div className="space-y-2"><Label className="text-xs">Discount %</Label><Input type="number" min={0} max={100} value={editing.discount_percent ?? 40} onChange={(e) => setEditing({ ...editing, discount_percent: Number(e.target.value) })} /></div>
-            <div className="space-y-2"><Label className="text-xs">Headline</Label><Input value={editing.headline ?? ""} onChange={(e) => setEditing({ ...editing, headline: e.target.value })} /></div>
+            <div className="space-y-2"><Label className="text-xs">نسبة الخصم %</Label><Input type="number" min={0} max={100} value={editing.discount_percent ?? 40} onChange={(e) => setEditing({ ...editing, discount_percent: Number(e.target.value) })} /></div>
+            <div className="space-y-2"><Label className="text-xs">العنوان الرئيسي</Label><Input value={editing.headline ?? ""} onChange={(e) => setEditing({ ...editing, headline: e.target.value })} /></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2"><Label className="text-xs">Accept Button Text</Label><Input value={editing.accept_text ?? ""} onChange={(e) => setEditing({ ...editing, accept_text: e.target.value })} /></div>
-              <div className="space-y-2"><Label className="text-xs">Decline Button Text</Label><Input value={editing.decline_text ?? ""} onChange={(e) => setEditing({ ...editing, decline_text: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-xs">نص زر القبول</Label><Input value={editing.accept_text ?? ""} onChange={(e) => setEditing({ ...editing, accept_text: e.target.value })} /></div>
+              <div className="space-y-2"><Label className="text-xs">نص زر الرفض</Label><Input value={editing.decline_text ?? ""} onChange={(e) => setEditing({ ...editing, decline_text: e.target.value })} /></div>
             </div>
-            <div className="flex items-center gap-2"><Switch checked={editing.is_active ?? true} onCheckedChange={(v) => setEditing({ ...editing, is_active: v })} /><Label className="text-xs">Active</Label></div>
+            <div className="flex items-center gap-2"><Switch checked={editing.is_active ?? true} onCheckedChange={(v) => setEditing({ ...editing, is_active: v })} /><Label className="text-xs">نشط</Label></div>
             <div className="flex gap-2">
-              <Button onClick={() => saveMutation.mutate(editing as any)} disabled={!editing.source_product_id || !editing.upsell_product_id || saveMutation.isPending}><Save className="w-4 h-4 mr-1" /> Save</Button>
-              <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
+              <Button onClick={() => saveMutation.mutate(editing as any)} disabled={!editing.source_product_id || !editing.upsell_product_id || saveMutation.isPending}><Save className="w-4 h-4 mr-1" /> حفظ</Button>
+              <Button variant="outline" onClick={() => setEditing(null)}>إلغاء</Button>
             </div>
           </CardContent>
         </Card>
@@ -92,18 +92,18 @@ export default function AdminPostUpsell() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Post-Order Upsell"
-        description="Offer products after order submission to increase revenue"
+        title="عروض ما بعد الطلب"
+        description="اعرض منتجات إضافية بعد تأكيد الطلب لزيادة الإيرادات"
         count={configs?.length}
-        action={{ label: "New", icon: <Plus className="w-4 h-4 mr-1" />, onClick: startNew }}
-        search={{ value: search, onChange: setSearch, placeholder: "Search…" }}
+        action={{ label: "جديد", icon: <Plus className="w-4 h-4 mr-1" />, onClick: startNew }}
+        search={{ value: search, onChange: setSearch, placeholder: "بحث…" }}
       />
 
       {isLoading ? (
-        <div className="text-center py-16 text-muted-foreground">Loading…</div>
+        <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
       ) : !filtered.length ? (
         <div className="text-center py-16 text-muted-foreground">
-          {search ? "No results match your search" : "No post-order upsells configured"}
+          {search ? "لا توجد نتائج مطابقة" : "لم يتم إعداد عروض ما بعد الطلب بعد"}
         </div>
       ) : (
         <div className="space-y-2">
@@ -113,16 +113,16 @@ export default function AdminPostUpsell() {
                 <div className="space-y-1">
                   <p className="text-sm">
                     <span className="font-medium">{getProductTitle(c.source_product_id)}</span>
-                    <span className="text-muted-foreground mx-2">→</span>
+                    <span className="text-muted-foreground mx-2">←</span>
                     <span className="font-medium">{getProductTitle(c.upsell_product_id)}</span>
                   </p>
                   <div className="flex gap-2">
-                    <Badge variant="secondary" className="text-xs">{c.discount_percent}% off</Badge>
-                    {c.is_active ? <Badge className="bg-success text-success-foreground text-xs">Active</Badge> : <Badge variant="outline" className="text-xs">Inactive</Badge>}
+                    <Badge variant="secondary" className="text-xs">خصم {c.discount_percent}%</Badge>
+                    {c.is_active ? <Badge className="bg-success text-success-foreground text-xs">نشط</Badge> : <Badge variant="outline" className="text-xs">غير نشط</Badge>}
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <Button size="sm" variant="outline" onClick={() => setEditing(c)}>Edit</Button>
+                  <Button size="sm" variant="outline" onClick={() => setEditing(c)}>تعديل</Button>
                   <Button size="sm" variant="outline" onClick={() => deleteMutation.mutate(c.id)}><Trash2 className="w-3 h-3" /></Button>
                 </div>
               </CardContent>

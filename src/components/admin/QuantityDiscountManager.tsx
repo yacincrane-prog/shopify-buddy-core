@@ -38,9 +38,9 @@ export function QuantityDiscountManager() {
     mutationFn: () => setDiscountsForProduct(selectedProduct, tiers.filter((t) => t.min_quantity > 0 && t.discount_percent > 0)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["quantity-discounts"] });
-      toast.success("Discounts saved");
+      toast.success("تم حفظ الخصومات");
     },
-    onError: () => toast.error("Failed to save discounts"),
+    onError: () => toast.error("فشل في حفظ الخصومات"),
   });
 
   const addTier = () => setTiers((prev) => [...prev, { min_quantity: prev.length ? Math.max(...prev.map((t) => t.min_quantity)) + 1 : 2, discount_percent: 5 }]);
@@ -52,14 +52,14 @@ export function QuantityDiscountManager() {
     <div className="space-y-4">
       <h2 className="text-lg font-semibold flex items-center gap-2">
         <Percent className="w-5 h-5 text-accent" />
-        Quantity Discounts
+        خصومات الكمية
       </h2>
 
       <div className="space-y-1.5">
-        <Label>Select Product</Label>
+        <Label>اختر المنتج</Label>
         <Select value={selectedProduct} onValueChange={(v) => { setSelectedProduct(v); setTiers([]); }}>
           <SelectTrigger>
-            <SelectValue placeholder="Choose a product" />
+            <SelectValue placeholder="اختر منتج" />
           </SelectTrigger>
           <SelectContent>
             {(products ?? []).map((p) => (
@@ -72,20 +72,20 @@ export function QuantityDiscountManager() {
       {selectedProduct && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label>Discount Tiers</Label>
+            <Label>مستويات الخصم</Label>
             <Button size="sm" variant="outline" onClick={addTier}>
-              <Plus className="w-3 h-3 mr-1" /> Add Tier
+              <Plus className="w-3 h-3 mr-1" /> إضافة مستوى
             </Button>
           </div>
 
           {tiers.length === 0 && (
-            <p className="text-sm text-muted-foreground py-4 text-center">No tiers set. Add one above.</p>
+            <p className="text-sm text-muted-foreground py-4 text-center">لا توجد مستويات. أضف واحداً أعلاه.</p>
           )}
 
           {tiers.map((tier, i) => (
             <div key={i} className="flex items-center gap-2">
               <div className="flex-1 space-y-1">
-                <Label className="text-xs">Min Qty</Label>
+                <Label className="text-xs">الحد الأدنى للكمية</Label>
                 <Input
                   type="number"
                   min={2}
@@ -94,7 +94,7 @@ export function QuantityDiscountManager() {
                 />
               </div>
               <div className="flex-1 space-y-1">
-                <Label className="text-xs">Discount %</Label>
+                <Label className="text-xs">نسبة الخصم %</Label>
                 <Input
                   type="number"
                   min={1}
@@ -110,7 +110,7 @@ export function QuantityDiscountManager() {
           ))}
 
           <Button onClick={() => saveMut.mutate()} disabled={saveMut.isPending}>
-            {saveMut.isPending ? "Saving…" : "Save Discounts"}
+            {saveMut.isPending ? "جاري الحفظ…" : "حفظ الخصومات"}
           </Button>
         </div>
       )}

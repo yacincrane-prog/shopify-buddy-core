@@ -4,12 +4,12 @@ export default function AdminAnalytics() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Analytics"
-        description="Track store performance and conversions"
+        title="التحليلات"
+        description="تتبع أداء المتجر والتحويلات"
       />
       <div className="rounded-lg border border-dashed border-border p-12 text-center text-muted-foreground">
-        <p className="text-lg font-medium">Coming soon</p>
-        <p className="text-sm mt-1">Analytics dashboard will be available here.</p>
+        <p className="text-lg font-medium">قريباً</p>
+        <p className="text-sm mt-1">لوحة التحليلات ستكون متاحة هنا.</p>
       </div>
     </div>
   );

@@ -23,13 +23,13 @@ export default function AdminUpsells() {
 
   const createMut = useMutation({
     mutationFn: () => createUpsell(sourceId, targetId, Number(discount)),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["upsells"] }); toast.success("Upsell created"); setCreating(false); setSourceId(""); setTargetId(""); setDiscount("30"); },
-    onError: () => toast.error("Failed to create upsell"),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["upsells"] }); toast.success("تم إنشاء العرض الإضافي"); setCreating(false); setSourceId(""); setTargetId(""); setDiscount("30"); },
+    onError: () => toast.error("فشل في إنشاء العرض الإضافي"),
   });
 
   const deleteMut = useMutation({
     mutationFn: deleteUpsell,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["upsells"] }); toast.success("Upsell removed"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["upsells"] }); toast.success("تم حذف العرض الإضافي"); },
   });
 
   const canSubmit = sourceId && targetId && sourceId !== targetId && Number(discount) > 0;
@@ -47,31 +47,31 @@ export default function AdminUpsells() {
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" onClick={() => setCreating(false)}>
-          <ArrowLeft className="w-4 h-4 mr-1" /> Back to upsells
+          <ArrowLeft className="w-4 h-4 mr-1" /> العودة للعروض الإضافية
         </Button>
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <h2 className="text-lg font-semibold">New Upsell</h2>
+            <h2 className="text-lg font-semibold">عرض إضافي جديد</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label>When viewing product</Label>
+                <Label>عند عرض المنتج</Label>
                 <Select value={sourceId} onValueChange={setSourceId}>
-                  <SelectTrigger><SelectValue placeholder="Source product" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="المنتج الأساسي" /></SelectTrigger>
                   <SelectContent>{(products ?? []).map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label>Suggest adding</Label>
+                <Label>اقتراح إضافة</Label>
                 <Select value={targetId} onValueChange={setTargetId}>
-                  <SelectTrigger><SelectValue placeholder="Upsell product" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="المنتج المقترح" /></SelectTrigger>
                   <SelectContent>{(products ?? []).filter((p) => p.id !== sourceId).map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
             </div>
-            <div className="space-y-1.5 max-w-[200px]"><Label>Discount %</Label><Input type="number" min={1} max={99} value={discount} onChange={(e) => setDiscount(e.target.value)} /></div>
+            <div className="space-y-1.5 max-w-[200px]"><Label>نسبة الخصم %</Label><Input type="number" min={1} max={99} value={discount} onChange={(e) => setDiscount(e.target.value)} /></div>
             <div className="flex gap-2">
-              <Button onClick={() => createMut.mutate()} disabled={!canSubmit || createMut.isPending}>{createMut.isPending ? "Creating…" : "Create Upsell"}</Button>
-              <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
+              <Button onClick={() => createMut.mutate()} disabled={!canSubmit || createMut.isPending}>{createMut.isPending ? "جاري الإنشاء…" : "إنشاء العرض"}</Button>
+              <Button variant="outline" onClick={() => setCreating(false)}>إلغاء</Button>
             </div>
           </CardContent>
         </Card>
@@ -82,18 +82,18 @@ export default function AdminUpsells() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Upsells"
-        description="Configure pre-order upsell offers"
+        title="العروض الإضافية"
+        description="إعداد عروض إضافية قبل الطلب"
         count={upsells?.length}
-        action={{ label: "New Upsell", icon: <Plus className="w-4 h-4 mr-1" />, onClick: () => setCreating(true) }}
-        search={{ value: search, onChange: setSearch, placeholder: "Search upsells…" }}
+        action={{ label: "عرض جديد", icon: <Plus className="w-4 h-4 mr-1" />, onClick: () => setCreating(true) }}
+        search={{ value: search, onChange: setSearch, placeholder: "بحث في العروض…" }}
       />
 
       {isLoading ? (
-        <div className="text-center py-16 text-muted-foreground">Loading…</div>
+        <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
       ) : !filtered.length ? (
         <div className="text-center py-16 text-muted-foreground">
-          {search ? "No upsells match your search" : "No upsells configured yet"}
+          {search ? "لا توجد عروض مطابقة للبحث" : "لم يتم إعداد عروض إضافية بعد"}
         </div>
       ) : (
         <div className="space-y-2">
@@ -102,7 +102,7 @@ export default function AdminUpsells() {
               <CardContent className="py-3 flex items-center justify-between">
                 <p className="text-sm">
                   <span className="font-medium">{(u.source as { title: string }).title}</span>
-                  <span className="text-muted-foreground mx-2">→</span>
+                  <span className="text-muted-foreground mx-2">←</span>
                   <span className="font-medium">{(u.target as { title: string }).title}</span>
                   <span className="text-accent ml-2">-{Number(u.discount_percent)}%</span>
                 </p>

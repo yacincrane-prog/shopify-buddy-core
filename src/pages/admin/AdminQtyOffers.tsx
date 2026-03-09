@@ -5,8 +5,8 @@ export default function AdminQtyOffers() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Quantity Offers"
-        description="Set up smart quantity-based pricing tiers for your products"
+        title="عروض الكمية"
+        description="إعداد مستويات تسعير ذكية بناءً على الكمية لمنتجاتك"
       />
       <QuantityOfferManager />
     </div>
