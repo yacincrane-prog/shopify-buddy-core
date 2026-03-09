@@ -88,11 +88,13 @@ function AppInner() {
 const App = () => {
   return (
   <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AppInner />
-      </TooltipProvider>
-    </QueryClientProvider>
+    <LanguageProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AppInner />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </LanguageProvider>
   </ErrorBoundary>
   );
 };
