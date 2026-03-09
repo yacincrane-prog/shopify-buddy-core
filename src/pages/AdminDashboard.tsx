@@ -91,12 +91,12 @@ export default function AdminDashboard() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <Package className="w-5 h-5 text-accent" />
-            <h1 className="text-lg font-semibold">Admin</h1>
+            <h1 className="text-lg font-semibold">الإدارة</h1>
           </div>
           {view === "list" && (
             <Button onClick={() => setView("create")} size="sm">
               <Plus className="w-4 h-4 mr-1" />
-              Add product
+              إضافة منتج
             </Button>
           )}
         </div>
