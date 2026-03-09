@@ -276,7 +276,7 @@ export default function AdminThemeEditor() {
 
           <TabsContent value="style" className="mt-0 space-y-5">
             <div className="space-y-3">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Border Radius</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">حواف الزوايا</Label>
               <div className="grid grid-cols-3 gap-1.5">
                 {RADIUS_OPTIONS.map((opt) => (
                   <button
