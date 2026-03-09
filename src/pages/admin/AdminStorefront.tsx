@@ -444,10 +444,12 @@ export default function AdminStorefront() {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs">صورة الخلفية (اختياري)</Label>
-                    <Input
+                    <ImageUploadField
                       value={config.hero.backgroundImage}
-                      onChange={(e) => setConfig((p) => ({ ...p, hero: { ...p.hero, backgroundImage: e.target.value } }))}
+                      onChange={(url) => setConfig((p) => ({ ...p, hero: { ...p.hero, backgroundImage: url } }))}
+                      folder="storefront/hero"
                       placeholder="https://example.com/hero.jpg"
+                      previewClassName="w-full h-24 rounded-lg"
                     />
                   </div>
                   {/* Hero Preview */}
