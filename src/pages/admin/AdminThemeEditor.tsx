@@ -178,11 +178,19 @@ export default function AdminThemeEditor() {
     );
   }
 
+  const handleInstallTheme = (config: typeof theme) => {
+    setTheme(config);
+    toast.success("تم تطبيق الثيم! اضغط 'حفظ وتطبيق' لحفظه نهائياً");
+  };
+
   const controlsPanel = (
     <ScrollArea className="flex-1">
       <div className="p-4">
-        <Tabs defaultValue="colors" className="w-full">
-          <TabsList className="w-full grid grid-cols-3 mb-4">
+        <Tabs defaultValue="marketplace" className="w-full">
+          <TabsList className="w-full grid grid-cols-4 mb-4">
+            <TabsTrigger value="marketplace" className="text-xs gap-1">
+              <Store className="w-3.5 h-3.5" /> ثيمات
+            </TabsTrigger>
             <TabsTrigger value="colors" className="text-xs gap-1">
               <Palette className="w-3.5 h-3.5" /> الألوان
             </TabsTrigger>
@@ -193,6 +201,10 @@ export default function AdminThemeEditor() {
               <Paintbrush className="w-3.5 h-3.5" /> الأنماط
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="marketplace" className="mt-0">
+            <ThemeMarketplace currentTheme={theme} onInstallTheme={handleInstallTheme} />
+          </TabsContent>
 
           <TabsContent value="colors" className="mt-0 space-y-5">
             <div className="space-y-2">
