@@ -295,7 +295,7 @@ export default function AdminThemeEditor() {
             </div>
 
             <div className="space-y-3">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Preview Elements</Label>
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">معاينة العناصر</Label>
               <div className="space-y-2 p-3 rounded-lg bg-muted/30 border border-border">
                 <Button size="sm" className="w-full" style={{ borderRadius: theme.borderRadius }}>Primary Button</Button>
                 <Button size="sm" variant="outline" className="w-full" style={{ borderRadius: theme.borderRadius }}>Outline Button</Button>
