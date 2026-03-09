@@ -32,7 +32,7 @@ export function ProductTable({ products, onEdit, onDelete, onView, isLoading }: 
     },
     {
       key: "title",
-      header: "Product",
+      header: "المنتج",
       sortable: true,
       sortValue: (p) => p.title,
       render: (p) => <span className="font-medium text-foreground">{p.title}</span>,
