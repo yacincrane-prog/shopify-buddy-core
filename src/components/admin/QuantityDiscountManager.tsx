@@ -38,9 +38,9 @@ export function QuantityDiscountManager() {
     mutationFn: () => setDiscountsForProduct(selectedProduct, tiers.filter((t) => t.min_quantity > 0 && t.discount_percent > 0)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["quantity-discounts"] });
-      toast.success("Discounts saved");
+      toast.success("تم حفظ الخصومات");
     },
-    onError: () => toast.error("Failed to save discounts"),
+    onError: () => toast.error("فشل في حفظ الخصومات"),
   });
 
   const addTier = () => setTiers((prev) => [...prev, { min_quantity: prev.length ? Math.max(...prev.map((t) => t.min_quantity)) + 1 : 2, discount_percent: 5 }]);
