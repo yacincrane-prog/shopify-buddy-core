@@ -43,7 +43,7 @@ export function AdminHeader({ title }: AdminHeaderProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64">
-          <DropdownMenuItem>No new notifications</DropdownMenuItem>
+          <DropdownMenuItem>لا توجد إشعارات جديدة</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
