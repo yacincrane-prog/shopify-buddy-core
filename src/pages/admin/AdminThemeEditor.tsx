@@ -363,8 +363,8 @@ export default function AdminThemeEditor() {
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-3">
           <Palette className="w-5 h-5 text-accent" />
-          <h2 className="text-sm font-semibold">Theme Editor</h2>
-          {hasChanges && <Badge variant="secondary" className="text-[10px]">Unsaved changes</Badge>}
+          <h2 className="text-sm font-semibold">محرر المظهر</h2>
+          {hasChanges && <Badge variant="secondary" className="text-[10px]">تغييرات غير محفوظة</Badge>}
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center rounded-md border border-border p-0.5 bg-muted/30">
