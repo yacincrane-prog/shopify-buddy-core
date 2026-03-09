@@ -16,36 +16,17 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Plus, Pencil, Trash2, Activity } from "lucide-react";
 import { toast } from "sonner";
@@ -71,7 +52,6 @@ export default function AdminTrackingPixels() {
   const [editing, setEditing] = useState<TrackingPixel | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  // Form state
   const [platform, setPlatform] = useState<PixelPlatform>("facebook");
   const [pixelId, setPixelId] = useState("");
   const [name, setName] = useState("");
@@ -81,10 +61,10 @@ export default function AdminTrackingPixels() {
     mutationFn: createTrackingPixel,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tracking-pixels"] });
-      toast.success("Pixel added");
+      toast.success("تم إضافة البكسل");
       closeDialog();
     },
-    onError: () => toast.error("Failed to add pixel"),
+    onError: () => toast.error("فشل في إضافة البكسل"),
   });
 
   const updateMut = useMutation({
@@ -93,10 +73,10 @@ export default function AdminTrackingPixels() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tracking-pixels"] });
       queryClient.invalidateQueries({ queryKey: ["active-tracking-pixels"] });
-      toast.success("Pixel updated");
+      toast.success("تم تحديث البكسل");
       closeDialog();
     },
-    onError: () => toast.error("Failed to update pixel"),
+    onError: () => toast.error("فشل في تحديث البكسل"),
   });
 
   const deleteMut = useMutation({
@@ -104,10 +84,10 @@ export default function AdminTrackingPixels() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tracking-pixels"] });
       queryClient.invalidateQueries({ queryKey: ["active-tracking-pixels"] });
-      toast.success("Pixel deleted");
+      toast.success("تم حذف البكسل");
       setDeleteId(null);
     },
-    onError: () => toast.error("Failed to delete pixel"),
+    onError: () => toast.error("فشل في حذف البكسل"),
   });
 
   const toggleMut = useMutation({
@@ -144,7 +124,7 @@ export default function AdminTrackingPixels() {
 
   const handleSave = () => {
     if (!pixelId.trim()) {
-      toast.error("Pixel ID is required");
+      toast.error("معرف البكسل مطلوب");
       return;
     }
     if (editing) {
@@ -159,35 +139,35 @@ export default function AdminTrackingPixels() {
   return (
     <div className="space-y-6">
       <AdminPageHeader
-        title="Tracking Pixels"
-        description="Manage Facebook and TikTok tracking pixels for your store"
+        title="بكسلات التتبع"
+        description="إدارة بكسلات Facebook و TikTok لمتجرك"
       >
         <Button onClick={openCreate} size="sm">
-          <Plus className="w-4 h-4 mr-1" /> Add Pixel
+          <Plus className="w-4 h-4 mr-1" /> إضافة بكسل
         </Button>
       </AdminPageHeader>
 
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="text-center py-16 text-muted-foreground">Loading…</div>
+            <div className="text-center py-16 text-muted-foreground">جاري التحميل…</div>
           ) : !pixels?.length ? (
             <div className="text-center py-16 space-y-3">
               <Activity className="w-10 h-10 mx-auto text-muted-foreground/50" />
-              <p className="text-muted-foreground">No tracking pixels configured</p>
+              <p className="text-muted-foreground">لم يتم إعداد بكسلات تتبع</p>
               <Button variant="outline" size="sm" onClick={openCreate}>
-                <Plus className="w-4 h-4 mr-1" /> Add your first pixel
+                <Plus className="w-4 h-4 mr-1" /> أضف أول بكسل
               </Button>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Platform</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Pixel ID</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>المنصة</TableHead>
+                  <TableHead>الاسم</TableHead>
+                  <TableHead>معرف البكسل</TableHead>
+                  <TableHead>الحالة</TableHead>
+                  <TableHead className="text-right">إجراءات</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -224,15 +204,14 @@ export default function AdminTrackingPixels() {
         </CardContent>
       </Card>
 
-      {/* Add / Edit dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit Pixel" : "Add Tracking Pixel"}</DialogTitle>
+            <DialogTitle>{editing ? "تعديل البكسل" : "إضافة بكسل تتبع"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label>Platform</Label>
+              <Label>المنصة</Label>
               <Select value={platform} onValueChange={(v) => setPlatform(v as PixelPlatform)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -242,7 +221,7 @@ export default function AdminTrackingPixels() {
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Pixel ID *</Label>
+              <Label>معرف البكسل *</Label>
               <Input
                 value={pixelId}
                 onChange={(e) => setPixelId(e.target.value)}
@@ -250,37 +229,36 @@ export default function AdminTrackingPixels() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Name (optional)</Label>
+              <Label>الاسم (اختياري)</Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Main Store Pixel"
+                placeholder="مثال: بكسل المتجر الرئيسي"
               />
             </div>
             <div className="flex items-center gap-3">
               <Switch checked={isActive} onCheckedChange={setIsActive} />
-              <Label>Active</Label>
+              <Label>نشط</Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={closeDialog}>Cancel</Button>
+            <Button variant="outline" onClick={closeDialog}>إلغاء</Button>
             <Button onClick={handleSave} disabled={isSaving}>
-              {editing ? "Save Changes" : "Add Pixel"}
+              {editing ? "حفظ التغييرات" : "إضافة البكسل"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete confirm */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete pixel?</AlertDialogTitle>
-            <AlertDialogDescription>This will permanently remove this tracking pixel.</AlertDialogDescription>
+            <AlertDialogTitle>حذف البكسل؟</AlertDialogTitle>
+            <AlertDialogDescription>سيتم حذف بكسل التتبع هذا نهائياً.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteId && deleteMut.mutate(deleteId)}>Delete</AlertDialogAction>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={() => deleteId && deleteMut.mutate(deleteId)}>حذف</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
