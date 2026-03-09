@@ -155,7 +155,7 @@ export default function AdminThemeEditor() {
 
   const resetTheme = () => {
     setTheme(DEFAULT_THEME);
-    toast.info("Theme reset to defaults (not saved yet)");
+    toast.info("تم إعادة المظهر للافتراضي (لم يتم الحفظ بعد)");
   };
 
   const applyPreset = (preset: typeof COLOR_PRESETS[number]) => {
