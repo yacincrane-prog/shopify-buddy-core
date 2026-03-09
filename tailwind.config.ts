@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Cairo", "Tajawal", "Inter", "system-ui", "sans-serif"],
       },
       colors: {
         success: {
