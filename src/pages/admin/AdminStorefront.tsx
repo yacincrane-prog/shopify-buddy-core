@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   fetchStorefrontConfig,
@@ -78,6 +81,69 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
+function SortableCategoryCard({ cat, onToggle, onEdit, onDelete }: {
+  cat: Category;
+  onToggle: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: cat.id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
+
+  return (
+    <Card ref={setNodeRef} style={style}>
+      <CardContent className="p-3 flex items-center gap-3">
+        <button {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing touch-none shrink-0">
+          <GripVertical className="w-4 h-4 text-muted-foreground/40" />
+        </button>
+        {cat.image ? (
+          <img src={cat.image} alt={cat.name} className="w-10 h-10 rounded-lg object-cover border border-border" />
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+            <FolderTree className="w-4 h-4 text-muted-foreground" />
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate">{cat.name}</p>
+          <p className="text-[10px] text-muted-foreground">/{cat.slug}</p>
+        </div>
+        <Badge variant={cat.is_active ? "default" : "secondary"} className="text-[10px]">
+          {cat.is_active ? "نشطة" : "معطلة"}
+        </Badge>
+        <div className="flex gap-1">
+          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onToggle}>
+            {cat.is_active ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+          </Button>
+          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={onEdit}>
+            <Pencil className="w-3.5 h-3.5" />
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive">
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>حذف الفئة؟</AlertDialogTitle>
+                <AlertDialogDescription>
+                  سيتم حذف الفئة "{cat.name}" نهائياً. المنتجات المرتبطة لن تُحذف.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete} className="bg-destructive text-destructive-foreground">
+                  حذف
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminStorefront() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -87,6 +153,7 @@ export default function AdminStorefront() {
   const [catForm, setCatForm] = useState({ name: "", slug: "", image: "", description: "", position: 0 });
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const { data: savedConfig, isLoading: configLoading } = useQuery({
     queryKey: ["storefront-config"],
@@ -147,6 +214,25 @@ export default function AdminStorefront() {
       updateCategory(id, { is_active }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] }),
   });
+
+  const handleCategoryDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = categories.findIndex((c) => c.id === active.id);
+    const newIndex = categories.findIndex((c) => c.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = [...categories];
+    const [moved] = reordered.splice(oldIndex, 1);
+    reordered.splice(newIndex, 0, moved);
+    queryClient.setQueryData(["categories"], reordered);
+    try {
+      await Promise.all(reordered.map((cat, i) => updateCategory(cat.id, { position: i })));
+      toast.success("تم تحديث ترتيب الفئات");
+    } catch {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.error("فشل في تحديث الترتيب");
+    }
+  }, [categories, queryClient]);
 
   const resetCatForm = () => setCatForm({ name: "", slug: "", image: "", description: "", position: 0 });
 
@@ -457,63 +543,21 @@ export default function AdminStorefront() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-2">
-              {categories.map((cat) => (
-                <Card key={cat.id}>
-                  <CardContent className="p-3 flex items-center gap-3">
-                    <GripVertical className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                    {cat.image ? (
-                      <img src={cat.image} alt={cat.name} className="w-10 h-10 rounded-lg object-cover border border-border" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                        <FolderTree className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{cat.name}</p>
-                      <p className="text-[10px] text-muted-foreground">/{cat.slug}</p>
-                    </div>
-                    <Badge variant={cat.is_active ? "default" : "secondary"} className="text-[10px]">
-                      {cat.is_active ? "نشطة" : "معطلة"}
-                    </Badge>
-                    <div className="flex gap-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7"
-                        onClick={() => toggleCatMutation.mutate({ id: cat.id, is_active: !cat.is_active })}
-                      >
-                        {cat.is_active ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                      </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEditCategory(cat)}>
-                        <Pencil className="w-3.5 h-3.5" />
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>حذف الفئة؟</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              سيتم حذف الفئة "{cat.name}" نهائياً. المنتجات المرتبطة لن تُحذف.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>إلغاء</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteCatMutation.mutate(cat.id)} className="bg-destructive text-destructive-foreground">
-                              حذف
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+              <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-2">
+                  {categories.map((cat) => (
+                    <SortableCategoryCard
+                      key={cat.id}
+                      cat={cat}
+                      onToggle={() => toggleCatMutation.mutate({ id: cat.id, is_active: !cat.is_active })}
+                      onEdit={() => openEditCategory(cat)}
+                      onDelete={() => deleteCatMutation.mutate(cat.id)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </TabsContent>
 
