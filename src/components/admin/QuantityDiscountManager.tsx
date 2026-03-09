@@ -52,7 +52,7 @@ export function QuantityDiscountManager() {
     <div className="space-y-4">
       <h2 className="text-lg font-semibold flex items-center gap-2">
         <Percent className="w-5 h-5 text-accent" />
-        Quantity Discounts
+        خصومات الكمية
       </h2>
 
       <div className="space-y-1.5">
