@@ -56,10 +56,10 @@ export function QuantityDiscountManager() {
       </h2>
 
       <div className="space-y-1.5">
-        <Label>Select Product</Label>
+        <Label>اختر المنتج</Label>
         <Select value={selectedProduct} onValueChange={(v) => { setSelectedProduct(v); setTiers([]); }}>
           <SelectTrigger>
-            <SelectValue placeholder="Choose a product" />
+            <SelectValue placeholder="اختر منتج" />
           </SelectTrigger>
           <SelectContent>
             {(products ?? []).map((p) => (
