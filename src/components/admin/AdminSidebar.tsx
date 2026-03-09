@@ -19,6 +19,7 @@ import {
   Truck,
   FileSpreadsheet,
   KeyRound,
+  Store,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -45,6 +46,7 @@ export function AdminSidebar() {
 
   const mainNav = [
     { title: t("nav.dashboard"), url: "/admin", icon: LayoutDashboard },
+    { title: t("nav.storefront"), url: "/admin/storefront", icon: Store },
     { title: t("nav.products"), url: "/admin/products", icon: Package },
     { title: t("nav.orders"), url: "/admin/orders", icon: ShoppingCart },
     { title: t("nav.landingPages"), url: "/admin/landing-pages", icon: FileText },

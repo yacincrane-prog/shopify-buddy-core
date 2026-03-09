@@ -145,6 +145,42 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image: string | null
+          is_active: boolean
+          name: string
+          position: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          is_active?: boolean
+          name: string
+          position?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          is_active?: boolean
+          name?: string
+          position?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discount_codes: {
         Row: {
           code: string
@@ -557,6 +593,7 @@ export type Database = {
       }
       products: {
         Row: {
+          category_id: string | null
           compare_at_price: number | null
           created_at: string
           description: string | null
@@ -570,6 +607,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category_id?: string | null
           compare_at_price?: number | null
           created_at?: string
           description?: string | null
@@ -583,6 +621,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category_id?: string | null
           compare_at_price?: number | null
           created_at?: string
           description?: string | null
@@ -595,7 +634,15 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       quantity_discounts: {
         Row: {

@@ -35,6 +35,7 @@ const AdminDiscountCodes = lazy(() => import("./pages/admin/AdminDiscountCodes")
 const AdminShipping = lazy(() => import("./pages/admin/AdminShipping"));
 const AdminGoogleSheets = lazy(() => import("./pages/admin/AdminGoogleSheets"));
 const AdminCredentials = lazy(() => import("./pages/admin/AdminCredentials"));
+const AdminStorefront = lazy(() => import("./pages/admin/AdminStorefront"));
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ function AppInner() {
 
           <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
             <Route index element={<Suspense fallback={<AdminFallback />}><AdminOverview /></Suspense>} />
+            <Route path="storefront" element={<Suspense fallback={<AdminFallback />}><AdminStorefront /></Suspense>} />
             <Route path="products" element={<Suspense fallback={<AdminFallback />}><AdminProducts /></Suspense>} />
             <Route path="orders" element={<Suspense fallback={<AdminFallback />}><AdminOrders /></Suspense>} />
             <Route path="landing-pages" element={<Suspense fallback={<AdminFallback />}><AdminLandingPages /></Suspense>} />
