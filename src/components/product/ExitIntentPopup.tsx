@@ -123,13 +123,65 @@ export function ExitIntentPopup() {
     return () => window.removeEventListener("scroll", handler);
   }, [popup, show]);
 
-  // Mobile check
+  // Mobile: detect back button (popstate), rapid scroll-up, or tab switch
   useEffect(() => {
     if (!popup) return;
-    if (!popup.config.showOnMobile && window.innerWidth < 768) {
-      // Don't show on mobile
-    }
-  }, [popup]);
+    if (!popup.config.showOnMobile) return;
+    if (window.innerWidth >= 768) return;
+
+    // Push a dummy history state so pressing back triggers popstate
+    window.history.pushState({ exitIntent: true }, "");
+
+    const onBack = (e: PopStateEvent) => {
+      if (!readyRef.current) return;
+      // Re-push so the user doesn't actually leave
+      window.history.pushState({ exitIntent: true }, "");
+      show();
+    };
+
+    // Rapid scroll-up detection
+    let lastScrollY = window.scrollY;
+    let scrollUpDistance = 0;
+    const onScroll = () => {
+      if (!readyRef.current) return;
+      const delta = lastScrollY - window.scrollY;
+      if (delta > 0) {
+        scrollUpDistance += delta;
+        if (scrollUpDistance > 300) {
+          show();
+          scrollUpDistance = 0;
+        }
+      } else {
+        scrollUpDistance = 0;
+      }
+      lastScrollY = window.scrollY;
+    };
+
+    // Tab visibility change (switching apps / tabs)
+    const onVisibility = () => {
+      if (!readyRef.current) return;
+      if (document.visibilityState === "hidden") {
+        // Show when they come back
+        const onReturn = () => {
+          if (document.visibilityState === "visible") {
+            show();
+            document.removeEventListener("visibilitychange", onReturn);
+          }
+        };
+        document.addEventListener("visibilitychange", onReturn);
+      }
+    };
+
+    window.addEventListener("popstate", onBack);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      window.removeEventListener("popstate", onBack);
+      window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [popup, show]);
 
   if (!popup) return null;
   if (!popup.config.showOnMobile && typeof window !== "undefined" && window.innerWidth < 768) return null;
