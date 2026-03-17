@@ -61,6 +61,11 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [validatingCode, setValidatingCode] = useState(false);
 
   // Auto-apply discount from exit intent popup
+  const effectiveUnitPrice = unitPrice ?? Number(product.price);
+  const productTotal = effectiveUnitPrice * quantity;
+  const upsellTotal = upsellItem ? upsellItem.discountedPrice * upsellItem.quantity : 0;
+  const subtotalBeforeDiscount = productTotal + upsellTotal;
+
   useEffect(() => {
     const handler = async (e: Event) => {
       const code = (e as CustomEvent).detail as string;
@@ -80,7 +85,7 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
     };
     window.addEventListener("auto-apply-discount", handler);
     return () => window.removeEventListener("auto-apply-discount", handler);
-  }, [appliedDiscount]);
+  }, [appliedDiscount, subtotalBeforeDiscount]);
 
   const visibleFields = config.fields.filter((f) => f.visible).sort((a, b) => a.position - b.position);
   const getField = (id: string) => config.fields.find((f) => f.id === id);
