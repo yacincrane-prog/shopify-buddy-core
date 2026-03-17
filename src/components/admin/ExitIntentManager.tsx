@@ -164,9 +164,38 @@ export function ExitIntentManager() {
                   </div>
                 )}
 
-                <div className="flex items-center gap-2">
-                  <Switch checked={cfg.showOnMobile} onCheckedChange={(v) => updateConfig({ showOnMobile: v })} />
-                  <Label>إظهار على الهاتف المحمول</Label>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Switch checked={cfg.showOnMobile} onCheckedChange={(v) => updateConfig({ showOnMobile: v })} />
+                    <Label>إظهار على الهاتف المحمول</Label>
+                  </div>
+
+                  {cfg.showOnMobile && (
+                    <div className="mr-6 space-y-2.5 border-r-2 border-accent/20 pr-4">
+                      <p className="text-xs font-medium text-muted-foreground">محفزات الجوال</p>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={cfg.mobileTriggerBack ?? true}
+                          onCheckedChange={(v) => updateConfig({ mobileTriggerBack: v })}
+                        />
+                        <Label className="text-sm">زر الرجوع</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={cfg.mobileTriggerScroll ?? true}
+                          onCheckedChange={(v) => updateConfig({ mobileTriggerScroll: v })}
+                        />
+                        <Label className="text-sm">التمرير السريع للأعلى</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={cfg.mobileTriggerTabSwitch ?? true}
+                          onCheckedChange={(v) => updateConfig({ mobileTriggerTabSwitch: v })}
+                        />
+                        <Label className="text-sm">تبديل التطبيقات / التبويبات</Label>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">

@@ -123,64 +123,63 @@ export function ExitIntentPopup() {
     return () => window.removeEventListener("scroll", handler);
   }, [popup, show]);
 
-  // Mobile: detect back button (popstate), rapid scroll-up, or tab switch
+  // Mobile: detect back button, rapid scroll-up, or tab switch based on config
   useEffect(() => {
     if (!popup) return;
     if (!popup.config.showOnMobile) return;
     if (window.innerWidth >= 768) return;
 
-    // Push a dummy history state so pressing back triggers popstate
-    window.history.pushState({ exitIntent: true }, "");
+    const cfg = popup.config;
+    const cleanups: (() => void)[] = [];
 
-    const onBack = (e: PopStateEvent) => {
-      if (!readyRef.current) return;
-      // Re-push so the user doesn't actually leave
+    // Back button
+    if (cfg.mobileTriggerBack !== false) {
       window.history.pushState({ exitIntent: true }, "");
-      show();
-    };
+      const onBack = () => {
+        if (!readyRef.current) return;
+        window.history.pushState({ exitIntent: true }, "");
+        show();
+      };
+      window.addEventListener("popstate", onBack);
+      cleanups.push(() => window.removeEventListener("popstate", onBack));
+    }
 
-    // Rapid scroll-up detection
-    let lastScrollY = window.scrollY;
-    let scrollUpDistance = 0;
-    const onScroll = () => {
-      if (!readyRef.current) return;
-      const delta = lastScrollY - window.scrollY;
-      if (delta > 0) {
-        scrollUpDistance += delta;
-        if (scrollUpDistance > 300) {
-          show();
-          scrollUpDistance = 0;
+    // Rapid scroll-up
+    if (cfg.mobileTriggerScroll !== false) {
+      let lastScrollY = window.scrollY;
+      let scrollUpDistance = 0;
+      const onScroll = () => {
+        if (!readyRef.current) return;
+        const delta = lastScrollY - window.scrollY;
+        if (delta > 0) {
+          scrollUpDistance += delta;
+          if (scrollUpDistance > 300) { show(); scrollUpDistance = 0; }
+        } else { scrollUpDistance = 0; }
+        lastScrollY = window.scrollY;
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      cleanups.push(() => window.removeEventListener("scroll", onScroll));
+    }
+
+    // Tab/app switch
+    if (cfg.mobileTriggerTabSwitch !== false) {
+      const onVisibility = () => {
+        if (!readyRef.current) return;
+        if (document.visibilityState === "hidden") {
+          const onReturn = () => {
+            if (document.visibilityState === "visible") {
+              show();
+              document.removeEventListener("visibilitychange", onReturn);
+            }
+          };
+          document.addEventListener("visibilitychange", onReturn);
         }
-      } else {
-        scrollUpDistance = 0;
-      }
-      lastScrollY = window.scrollY;
-    };
+      };
+      document.addEventListener("visibilitychange", onVisibility);
+      cleanups.push(() => document.removeEventListener("visibilitychange", onVisibility));
+    }
 
-    // Tab visibility change (switching apps / tabs)
-    const onVisibility = () => {
-      if (!readyRef.current) return;
-      if (document.visibilityState === "hidden") {
-        // Show when they come back
-        const onReturn = () => {
-          if (document.visibilityState === "visible") {
-            show();
-            document.removeEventListener("visibilitychange", onReturn);
-          }
-        };
-        document.addEventListener("visibilitychange", onReturn);
-      }
-    };
-
-    window.addEventListener("popstate", onBack);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    document.addEventListener("visibilitychange", onVisibility);
-
-    return () => {
-      window.removeEventListener("popstate", onBack);
-      window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
+    return () => cleanups.forEach((fn) => fn());
   }, [popup, show]);
 
   if (!popup) return null;

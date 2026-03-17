@@ -1,13 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export interface ExitIntentConfig {
-  // Trigger
   triggerType: "mouse_leave" | "scroll" | "time" | "mouse_leave_or_time";
   delaySeconds: number;
   scrollPercent: number;
-  // Display
   showOnMobile: boolean;
-  // Design
+  mobileTriggerBack: boolean;
+  mobileTriggerScroll: boolean;
+  mobileTriggerTabSwitch: boolean;
   bgColor: string;
   textColor: string;
   buttonColor: string;
@@ -16,7 +16,6 @@ export interface ExitIntentConfig {
   animation: "fade" | "slide_up" | "scale" | "bounce";
   iconType: "gift" | "percent" | "tag" | "heart" | "star" | "none";
   borderRadius: "sm" | "md" | "lg" | "xl";
-  // Timer
   showTimer: boolean;
   timerMinutes: number;
 }
@@ -26,6 +25,9 @@ export const DEFAULT_EXIT_CONFIG: ExitIntentConfig = {
   delaySeconds: 0,
   scrollPercent: 50,
   showOnMobile: false,
+  mobileTriggerBack: true,
+  mobileTriggerScroll: true,
+  mobileTriggerTabSwitch: true,
   bgColor: "",
   textColor: "",
   buttonColor: "",
