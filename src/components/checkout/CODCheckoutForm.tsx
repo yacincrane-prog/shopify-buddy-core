@@ -61,10 +61,6 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   const [validatingCode, setValidatingCode] = useState(false);
 
   // Auto-apply discount from exit intent popup
-  const effectiveUnitPrice = unitPrice ?? Number(product.price);
-  const productTotal = effectiveUnitPrice * quantity;
-  const upsellTotal = upsellItem ? upsellItem.discountedPrice * upsellItem.quantity : 0;
-  const subtotalBeforeDiscount = productTotal + upsellTotal;
 
   useEffect(() => {
     const handler = async (e: Event) => {
