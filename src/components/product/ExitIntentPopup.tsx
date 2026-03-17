@@ -249,7 +249,12 @@ export function ExitIntentPopup() {
               ...(cfg.buttonColor ? { backgroundColor: cfg.buttonColor } : {}),
               ...(cfg.buttonTextColor ? { color: cfg.buttonTextColor } : {}),
             }}
-            onClick={() => setOpen(false)}
+            onClick={() => {
+              if (popup.discount_code) {
+                window.dispatchEvent(new CustomEvent("auto-apply-discount", { detail: popup.discount_code }));
+              }
+              setOpen(false);
+            }}
           >
             {popup.cta_text}
           </Button>
