@@ -117,6 +117,29 @@ export function CODCheckoutForm({ product, quantity, unitPrice, upsellItem, free
   }, [shippingRates]);
 
   const subtotalBeforeDiscount = productTotal + upsellTotal;
+
+  // Auto-apply discount from exit intent popup
+  useEffect(() => {
+    const handler = async (e: Event) => {
+      const code = (e as CustomEvent).detail as string;
+      if (!code || appliedDiscount) return;
+      setDiscountInput(code.toUpperCase());
+      setValidatingCode(true);
+      try {
+        const result = await validateDiscountCode(code, subtotalBeforeDiscount || 1);
+        if (result.valid && result.discount) {
+          setAppliedDiscount(result.discount);
+          setDiscountError("");
+          toast.success("تم تطبيق الخصم تلقائياً!");
+        }
+      } catch {} finally {
+        setValidatingCode(false);
+      }
+    };
+    window.addEventListener("auto-apply-discount", handler);
+    return () => window.removeEventListener("auto-apply-discount", handler);
+  }, [appliedDiscount, subtotalBeforeDiscount]);
+
   const discountAmount = appliedDiscount ? calculateDiscount(appliedDiscount, subtotalBeforeDiscount) : 0;
   const totalPrice = subtotalBeforeDiscount - discountAmount + shippingPrice;
 
