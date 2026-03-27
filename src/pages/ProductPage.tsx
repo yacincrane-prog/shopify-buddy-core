@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import type { UpsellWithProduct } from "@/lib/upsells";
 import { useTrackingPixels } from "@/hooks/useTrackingPixels";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "sonner";
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -28,6 +30,7 @@ export default function ProductPage() {
   const [upsellItem, setUpsellItem] = useState<{ title: string; price: number; discountedPrice: number; quantity: number } | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<QuantityOffer | null>(null);
   const { trackEvent } = useTrackingPixels();
+  const { addItem } = useCart();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", slug],
@@ -171,8 +174,22 @@ export default function ProductPage() {
     />
   );
 
+  const handleAddToCart = () => {
+    addItem({
+      productId: product.id,
+      slug: product.slug,
+      title: product.title,
+      price: Math.round(activeUnitPrice),
+      compareAtPrice: product.compare_at_price,
+      image: product.images?.[0] ?? null,
+      maxQuantity: product.inventory_quantity,
+      quantity: activeQuantity,
+    });
+    toast.success("تمت الإضافة إلى السلة");
+  };
+
   const renderOrderBlock = () => (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {inStock ? (
         <>
           {renderQuantityBlock()}
@@ -185,6 +202,16 @@ export default function ProductPage() {
               اطلب الآن — {activeTotalProductPrice.toLocaleString()} د.ج
             </Button>
           )}
+
+          <Button
+            size="lg"
+            variant="outline"
+            className="w-full text-sm sm:text-base"
+            onClick={handleAddToCart}
+          >
+            <ShoppingBag className="w-4 h-4 ml-2" />
+            أضف إلى السلة
+          </Button>
         </>
       ) : (
         <Button size="lg" className="w-full" disabled>

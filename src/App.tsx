@@ -7,8 +7,12 @@ import { lazy, Suspense } from "react";
 import { useApplyTheme } from "@/hooks/useApplyTheme";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LanguageProvider } from "@/hooks/useLanguage";
+import { CartProvider } from "@/hooks/useCart";
+import { CartDrawer } from "@/components/cart/CartDrawer";
+import { FloatingCartButton } from "@/components/cart/FloatingCartButton";
 import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
+import CartPage from "./pages/CartPage";
 import NotFound from "./pages/NotFound";
 import LandingPageView from "./pages/LandingPageView";
 import AdminLogin from "./pages/AdminLogin";
@@ -49,10 +53,13 @@ function AppInner() {
     <>
       <Toaster />
       <Sonner />
+      <CartDrawer />
+      <FloatingCartButton />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/product/:slug" element={<ProductPage />} />
+          <Route path="/cart" element={<CartPage />} />
           <Route path="/offer/:slug" element={<LandingPageView />} />
           <Route path="/admin/login" element={<AdminLogin />} />
 
@@ -93,7 +100,9 @@ const App = () => {
     <LanguageProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <AppInner />
+          <CartProvider>
+            <AppInner />
+          </CartProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </LanguageProvider>
